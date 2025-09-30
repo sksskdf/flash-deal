@@ -1,0 +1,60 @@
+{
+  "name": "Flash Deal Dev",
+  "dockerComposeFile": [
+    "docker-compose.yml"
+  ],
+  "service": "app",
+  "workspaceFolder": "/workspaces/flashdeal",
+  "runServices": [
+    "mongo",
+    "redis",
+    "kafka",
+    "otel-collector",
+    "prometheus",
+    "grafana",
+    "k6",
+    "loki",
+    "promtail"
+  ],
+  "shutdownAction": "stopCompose",
+  "remoteUser": "vscode",
+  "overrideCommand": true,
+  "features": {},
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspaces/flashdeal,type=bind,consistency=cached",
+    "source=flashdeal-maven-cache,target=/home/vscode/.m2,type=volume",
+    "source=flashdeal-gradle-cache,target=/home/vscode/.gradle,type=volume"
+  ],
+  "forwardPorts": [
+    8080,
+    27017,
+    6379,
+    9092,
+    4317,
+    4318,
+    8889,
+    9090,
+    3000
+  ],
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "java.configuration.runtimes": [
+          {
+            "name": "JavaSE-17",
+            "path": "/usr/lib/jvm/msopenjdk-current"
+          }
+        ]
+      },
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "Pivotal.vscode-boot-dev-pack",
+        "vscjava.vscode-spring-initializr",
+        "vmware.vscode-spring-boot",
+        "GraphQL.vscode-graphql"
+      ]
+    }
+  }
+}
+
+
