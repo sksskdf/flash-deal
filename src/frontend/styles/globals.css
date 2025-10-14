@@ -1,0 +1,240 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-size: 16px;
+  
+  /* Flash Deal Color Tokens */
+  --fd-primary-50: #EEF2FF;
+  --fd-primary-100: #E0E7FF;
+  --fd-primary-200: #C7D2FE;
+  --fd-primary-300: #A5B4FC;
+  --fd-primary-400: #818CF8;
+  --fd-primary-500: #6366F1;
+  --fd-primary-600: #4F46E5;
+  --fd-primary-700: #4338CA;
+  --fd-primary-800: #3730A3;
+  --fd-primary-900: #312E81;
+  
+  --fd-success-50: #ECFDF5;
+  --fd-success-500: #10B981;
+  --fd-success-600: #059669;
+  
+  --fd-warning-50: #FFFBEB;
+  --fd-warning-500: #F59E0B;
+  --fd-warning-600: #D97706;
+  
+  --fd-danger-50: #FEF2F2;
+  --fd-danger-500: #EF4444;
+  --fd-danger-600: #DC2626;
+  
+  --fd-info-50: #F0F9FF;
+  --fd-info-500: #0EA5E9;
+  --fd-info-600: #0284C7;
+  
+  --fd-gray-50: #F9FAFB;
+  --fd-gray-100: #F3F4F6;
+  --fd-gray-200: #E5E7EB;
+  --fd-gray-300: #D1D5DB;
+  --fd-gray-400: #9CA3AF;
+  --fd-gray-500: #6B7280;
+  --fd-gray-600: #4B5563;
+  --fd-gray-700: #374151;
+  --fd-gray-800: #1F2937;
+  --fd-gray-900: #111827;
+  
+  /* Semantic Colors */
+  --fd-fg-default: var(--fd-gray-900);
+  --fd-fg-muted: var(--fd-gray-600);
+  --fd-fg-inverse: #ffffff;
+  --fd-bg-app: var(--fd-gray-50);
+  --fd-bg-surface: #ffffff;
+  --fd-bg-subtle: var(--fd-gray-50);
+  --fd-border-default: var(--fd-gray-200);
+  --fd-primary-default: var(--fd-primary-600);
+  --fd-primary-hover: var(--fd-primary-700);
+  --fd-success-default: var(--fd-success-600);
+  --fd-warning-default: var(--fd-warning-600);
+  --fd-danger-default: var(--fd-danger-600);
+  
+  /* Spacing */
+  --fd-spacing-0: 0px;
+  --fd-spacing-2: 2px;
+  --fd-spacing-4: 4px;
+  --fd-spacing-6: 6px;
+  --fd-spacing-8: 8px;
+  --fd-spacing-12: 12px;
+  --fd-spacing-16: 16px;
+  --fd-spacing-20: 20px;
+  --fd-spacing-24: 24px;
+  --fd-spacing-32: 32px;
+  --fd-spacing-40: 40px;
+  --fd-spacing-48: 48px;
+  --fd-spacing-56: 56px;
+  --fd-spacing-64: 64px;
+  
+  /* Radius */
+  --fd-radius-sm: 4px;
+  --fd-radius-md: 8px;
+  --fd-radius-lg: 12px;
+  --fd-radius-full: 9999px;
+  
+  /* Shadows */
+  --fd-shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+  --fd-shadow-sm: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  --fd-shadow-md: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+  --fd-shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+  
+  /* Motion */
+  --fd-duration-fast: 100ms;
+  --fd-duration-normal: 200ms;
+  --fd-duration-slow: 300ms;
+  --fd-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  
+  /* Legacy tokens for shadcn compatibility */
+  --background: #ffffff;
+  --foreground: oklch(0.145 0 0);
+  --card: #ffffff;
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: var(--fd-primary-600);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0.0058 264.53);
+  --secondary-foreground: #030213;
+  --muted: #ececf0;
+  --muted-foreground: #717182;
+  --accent: #e9ebef;
+  --accent-foreground: #030213;
+  --destructive: var(--fd-danger-600);
+  --destructive-foreground: #ffffff;
+  --border: var(--fd-border-default);
+  --input: transparent;
+  --input-background: #f3f3f5;
+  --switch-background: #cbced4;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: var(--fd-radius-md);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: #030213;
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--background);
+      color: var(--foreground);
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h2 {
+      font-size: var(--text-xl);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h3 {
+      font-size: var(--text-lg);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    h4 {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    p {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    button {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-medium);
+      line-height: 1.5;
+    }
+
+    input {
+      font-size: var(--text-base);
+      font-weight: var(--font-weight-normal);
+      line-height: 1.5;
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}
