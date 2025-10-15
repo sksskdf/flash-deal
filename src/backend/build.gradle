@@ -17,6 +17,25 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs = ['main/java']
+        }
+        resources {
+            srcDirs = ['main/resources']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['test/java']
+        }
+        resources {
+            srcDirs = ['test/resources']
+        }
+    }
+}
+
 dependencies {
     // Web Application
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
@@ -32,6 +51,7 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
