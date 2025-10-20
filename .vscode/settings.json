@@ -1,0 +1,5 @@
+{
+    "terminal.integrated.env.linux": {
+        "GRADLE_USER_HOME": "/workspaces/flashdeal/src/backend/.gradle"
+    }
+}
