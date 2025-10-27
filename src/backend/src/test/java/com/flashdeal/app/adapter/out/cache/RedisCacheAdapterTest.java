@@ -7,11 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-// import org.testcontainers.containers.GenericContainer;
-// import org.testcontainers.junit.jupiter.Container;
-// import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -24,14 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest
 @ActiveProfiles("test")
-// @Testcontainers
 class RedisCacheAdapterTest {
-
-    // @Container
-    // static GenericContainer<?> redis = new GenericContainer<>("redis:7.0")
-    //         .withExposedPorts(6379);
-
-    // @DynamicPropertySource는 application-test.yml에서 처리
 
     @Autowired
     private ReactiveRedisTemplate<String, Object> redisTemplate;

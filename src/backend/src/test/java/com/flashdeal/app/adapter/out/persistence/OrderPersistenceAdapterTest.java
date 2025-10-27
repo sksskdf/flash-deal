@@ -5,36 +5,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-// import org.testcontainers.containers.MongoDBContainer;
-// import org.testcontainers.junit.jupiter.Container;
-// import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.test.context.ActiveProfiles;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.flashdeal.app.test.TestDataFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Order Persistence Adapter 테스트
  */
 @DataMongoTest
-// @Testcontainers
+@ActiveProfiles("test")
 class OrderPersistenceAdapterTest {
-
-    // @Container
-    // static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        // Mock MongoDB 설정 (실제 MongoDB 없이 테스트)
-        registry.add("spring.data.mongodb.uri", () -> "mongodb://localhost:27017/test");
-    }
 
     @Autowired
     private OrderMongoRepository mongoRepository;
@@ -51,7 +35,7 @@ class OrderPersistenceAdapterTest {
     @Test
     void shouldSaveAndFindOrder() {
         // Given
-        Order order = createTestOrder();
+        Order order = TestDataFactory.createOrder();
 
         // When
         Mono<Order> saveResult = adapter.save(order);
@@ -72,8 +56,8 @@ class OrderPersistenceAdapterTest {
     @Test
     void shouldFindOrdersByUserId() {
         // Given
-        Order order1 = createTestOrder();
-        Order order2 = createTestOrder();
+        Order order1 = TestDataFactory.createOrder();
+        Order order2 = TestDataFactory.createOrder();
         UserId userId = order1.getUserId();
 
         // When
@@ -93,7 +77,7 @@ class OrderPersistenceAdapterTest {
     @Test
     void shouldFindOrdersByStatus() {
         // Given
-        Order order = createTestOrder();
+        Order order = TestDataFactory.createOrder();
         order.transitionTo(OrderStatus.PROCESSING);
 
         // When
@@ -110,7 +94,7 @@ class OrderPersistenceAdapterTest {
     @Test
     void shouldFindOrderByIdempotencyKey() {
         // Given
-        Order order = createTestOrder();
+        Order order = TestDataFactory.createOrder();
         String idempotencyKey = order.getIdempotencyKey();
 
         // When
@@ -127,7 +111,7 @@ class OrderPersistenceAdapterTest {
     @Test
     void shouldDeleteOrder() {
         // Given
-        Order order = createTestOrder();
+        Order order = TestDataFactory.createOrder();
         OrderId orderId = order.getOrderId();
 
         // When
@@ -147,7 +131,7 @@ class OrderPersistenceAdapterTest {
     @Test
     void shouldCheckOrderExists() {
         // Given
-        Order order = createTestOrder();
+        Order order = TestDataFactory.createOrder();
         OrderId orderId = order.getOrderId();
 
         // When
@@ -159,21 +143,5 @@ class OrderPersistenceAdapterTest {
         StepVerifier.create(existsResult)
                 .assertNext(exists -> assertThat(exists).isTrue())
                 .verifyComplete();
-    }
-
-    private Order createTestOrder() {
-        OrderId orderId = OrderId.generate();
-        UserId userId = UserId.generate();
-        String orderNumber = "ORD-" + System.currentTimeMillis();
-        String idempotencyKey = "idempotency-" + System.currentTimeMillis();
-
-        // 임시로 빈 리스트와 기본 Shipping으로 생성
-        List<OrderItem> items = new ArrayList<>();
-        Shipping shipping = new Shipping("STANDARD", 
-            new Recipient("Test User", "010-0000-0000"),
-            new Address("Test Street", "Test City", "00000", "KR"),
-            "Test instructions");
-
-        return new Order(orderId, userId, items, shipping);
     }
 }

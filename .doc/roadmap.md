@@ -42,7 +42,65 @@
   - 에러 핸들링 설계
 
 - **7. 구현**
-  - 구현
+  - **7.1 Infrastructure 레이어 구현**
+    - Repository Port 인터페이스 정의 (Product, Inventory, Order)
+    - MongoDB Persistence Adapter 구현 (Document, Mapper, Repository)
+    - Redis Cache Adapter 구현 (재고 캐싱, 원자적 연산)
+    - Kafka Messaging Adapter 구현 (Event Publisher/Consumer)
+    - Infrastructure 설정 (MongoDB, Redis, Kafka Configuration)
+    - Testcontainers 기반 통합 테스트 작성
+  
+  - **7.2 Application 레이어 구현**
+    - Use Case 인터페이스 정의 (Port In)
+    - Application Service 구현 (주문 생성, 재고 관리, 상품 조회)
+    - Domain Service 구현 (비즈니스 로직)
+    - Event Handler 구현 (도메인 이벤트 처리)
+    - Application Service 테스트 작성
+  
+  - **7.3 GraphQL API 레이어 구현**
+    - GraphQL Schema 정의 (Query, Mutation, Subscription)
+    - Resolver 구현 (Product, Inventory, Order)
+    - DataLoader 구현 (N+1 문제 해결)
+    - Cursor-based Pagination 구현
+    - Error Handling 구현 (Union Types)
+    - GraphQL API 테스트 작성
+  
+  - **7.4 핵심 비즈니스 플로우 구현**
+    - 주문 생성 플로우 (재고 확인 → 예약 → 주문 생성)
+    - 결제 처리 플로우 (결제 요청 → 완료 → 재고 확정)
+    - 재고 관리 플로우 (감소, 증가, 예약 해제)
+    - 주문 취소 플로우 (취소 요청 → 재고 복구 → 환불)
+    - 플래시딜 상태 관리 (시작, 종료, 품절 처리)
+  
+  - **7.5 이벤트 기반 아키텍처 구현**
+    - 도메인 이벤트 발행 (OrderCreated, PaymentCompleted, InventoryReserved)
+    - 이벤트 핸들러 구현 (비동기 처리)
+    - 이벤트 스토어 구현 (이벤트 저장)
+    - 이벤트 리플레이 기능 구현
+    - 이벤트 기반 테스트 작성
+  
+  - **7.6 성능 최적화 구현**
+    - Redis 파이프라이닝 구현 (배치 연산)
+    - MongoDB 인덱스 최적화
+    - Reactor 백프레셔 설정
+    - Connection Pool 튜닝
+    - 캐시 전략 구현 (Redis, Application Cache)
+  
+  - **7.7 보안 및 검증 구현**
+    - 입력 검증 (Bean Validation)
+    - 멱등성 처리 (Idempotency Key)
+    - Rate Limiting 구현
+    - 인증/인가 기본 구조
+    - 보안 테스트 작성
+  
+  - **7.8 프론트엔드 연결 작업**
+  
+  - **7.9 모니터링 및 로깅 구현**
+    - OpenTelemetry 트레이싱 설정
+    - Prometheus 메트릭 수집
+    - 구조화된 로깅 구현
+    - Health Check 엔드포인트
+    - 모니터링 테스트 작성
 
 - **8. 관측 강화와 병목 진단**
   - OpenTelemetry 트레이싱: 주요 경로(주문/재고) 스팬 태그 표준화

@@ -6,31 +6,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-// import org.testcontainers.containers.MongoDBContainer;
-// import org.testcontainers.junit.jupiter.Container;
-// import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.test.context.ActiveProfiles;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import com.flashdeal.app.test.TestDataFactory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Inventory Persistence Adapter 테스트
  */
 @DataMongoTest
-// @Testcontainers
+@ActiveProfiles("test")
 class InventoryPersistenceAdapterTest {
-
-    // @Container
-    // static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0");
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        // Mock MongoDB 설정 (실제 MongoDB 없이 테스트)
-        registry.add("spring.data.mongodb.uri", () -> "mongodb://localhost:27017/test");
-    }
 
     @Autowired
     private InventoryMongoRepository mongoRepository;
@@ -47,7 +35,7 @@ class InventoryPersistenceAdapterTest {
     @Test
     void shouldSaveAndFindInventory() {
         // Given
-        Inventory inventory = createTestInventory();
+        Inventory inventory = TestDataFactory.createInventory();
 
         // When
         Mono<Inventory> saveResult = adapter.save(inventory);
@@ -69,7 +57,7 @@ class InventoryPersistenceAdapterTest {
     @Test
     void shouldFindInventoryByProductId() {
         // Given
-        Inventory inventory = createTestInventory();
+        Inventory inventory = TestDataFactory.createInventory();
         ProductId productId = inventory.getProductId();
 
         // When
@@ -89,7 +77,7 @@ class InventoryPersistenceAdapterTest {
     @Test
     void shouldDeleteInventory() {
         // Given
-        Inventory inventory = createTestInventory();
+        Inventory inventory = TestDataFactory.createInventory();
         InventoryId inventoryId = inventory.getInventoryId();
 
         // When
@@ -109,7 +97,7 @@ class InventoryPersistenceAdapterTest {
     @Test
     void shouldCheckInventoryExistsByProductId() {
         // Given
-        Inventory inventory = createTestInventory();
+        Inventory inventory = TestDataFactory.createInventory();
         ProductId productId = inventory.getProductId();
 
         // When
@@ -126,7 +114,7 @@ class InventoryPersistenceAdapterTest {
     @Test
     void shouldReserveInventory() {
         // Given
-        Inventory inventory = createTestInventory();
+        Inventory inventory = TestDataFactory.createInventory();
         int reserveQuantity = 5;
 
         // When
@@ -146,15 +134,6 @@ class InventoryPersistenceAdapterTest {
                     assertThat(reservedInventory.getStock().getTotal()).isEqualTo(1000);
                 })
                 .verifyComplete();
-    }
-
-    private Inventory createTestInventory() {
-        InventoryId inventoryId = InventoryId.generate();
-        ProductId productId = ProductId.generate();
-        Stock stock = Stock.initial(1000);
-        Policy policy = Policy.defaultPolicy();
-
-        return new Inventory(inventoryId, productId, stock, policy);
     }
 }
 

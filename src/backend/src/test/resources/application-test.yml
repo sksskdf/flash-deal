@@ -1,22 +1,10 @@
 spring:
-  profiles:
-    active: test
-  
-  # H2 인메모리 데이터베이스 (MongoDB 대신)
-  datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: 
-  
-  h2:
-    console:
-      enabled: true
-  
-  # Embedded Redis 설정
   data:
+    mongodb:
+      uri: mongodb://flashdeal-mongo:27017/test
+      auto-index-creation: true
     redis:
-      host: localhost
+      host: flashdeal-redis
       port: 6379
       timeout: 2000ms
       lettuce:
@@ -25,31 +13,21 @@ spring:
           max-idle: 8
           min-idle: 0
   
-  # Embedded Kafka 설정
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: flashdeal-kafka:9092
     consumer:
-      group-id: test-group
+      group-id: integration-test-group
       auto-offset-reset: earliest
+      enable-auto-commit: true
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-
-# 테스트 전용 설정
-test:
-  embedded:
-    redis:
-      enabled: true
-    kafka:
-      enabled: true
-    mongodb:
-      enabled: false  # H2 사용으로 MongoDB 비활성화
+      acks: all
+      retries: 3
 
 # 로깅 설정
 logging:
   level:
     com.flashdeal: DEBUG
     org.springframework.data: DEBUG
-    org.testcontainers: WARN
-
-
+    org.springframework.kafka: DEBUG

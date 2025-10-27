@@ -17,9 +17,9 @@ spring:
     name: flashdeal-app
   data:
     mongodb:
-      uri: mongodb://mongo:27017/flashdeal
+      uri: mongodb://flashdeal-mongo:27017/flashdeal
     redis:
-      host: redis
+      host: flashdeal-redis
       port: 6379
 
 logging:
