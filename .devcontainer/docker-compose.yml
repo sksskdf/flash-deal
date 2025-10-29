@@ -6,17 +6,14 @@ services:
     container_name: flashdeal-dev
     volumes:
       - ..:/workspaces/flashdeal:cached
+      - /var/run/docker.sock:/var/run/docker.sock
       - logs-data:/var/log/flashdeal
       - flashdeal-gradle-cache:/home/vscode/.gradle
       - flashdeal-node-modules:/workspaces/flashdeal/src/frontend/node_modules
     command: sleep infinity
     networks:
       - flashnet
-    depends_on:
-      - mongo
-      - redis
-      - kafka
-
+      
   mongo:
     image: mongo:6
     container_name: flashdeal-mongo
@@ -152,5 +149,3 @@ volumes:
   flashdeal-gradle-cache:
   flashdeal-node-modules:
   logs-data:
-
-

@@ -1,8 +1,10 @@
 package com.flashdeal.app.domain.order;
 
+import org.junit.jupiter.api.Test;
+
 import com.flashdeal.app.domain.product.Price;
 import com.flashdeal.app.domain.product.ProductId;
-import org.junit.jupiter.api.Test;
+
 import org.junit.jupiter.api.DisplayName;
 
 import java.math.BigDecimal;

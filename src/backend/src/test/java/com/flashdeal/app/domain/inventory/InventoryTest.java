@@ -1,7 +1,9 @@
 package com.flashdeal.app.domain.inventory;
 
-import com.flashdeal.app.domain.product.ProductId;
 import org.junit.jupiter.api.Test;
+
+import com.flashdeal.app.domain.product.ProductId;
+
 import org.junit.jupiter.api.DisplayName;
 
 import static org.junit.jupiter.api.Assertions.*;

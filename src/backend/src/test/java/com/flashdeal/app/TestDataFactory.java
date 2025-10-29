@@ -1,8 +1,4 @@
-package com.flashdeal.app.test;
-
-import com.flashdeal.app.domain.inventory.*;
-import com.flashdeal.app.domain.order.*;
-import com.flashdeal.app.domain.product.*;
+package com.flashdeal.app;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -11,6 +7,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.flashdeal.app.domain.inventory.*;
+import com.flashdeal.app.domain.order.*;
+import com.flashdeal.app.domain.product.*;
 
 /**
  * 테스트 데이터 팩토리 클래스

@@ -17,25 +17,6 @@ repositories {
     mavenCentral()
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['src/main/app']
-        }
-        resources {
-            srcDirs = ['src/main/resources']
-        }
-    }
-    test {
-        java {
-            srcDirs = ['src/test/java']
-        }
-        resources {
-            srcDirs = ['src/test/resources']
-        }
-    }
-}
-
 dependencies {
     // Web Application
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
@@ -53,15 +34,10 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
     testImplementation 'org.assertj:assertj-core'
     
-    // Embedded 데이터베이스
-    testImplementation 'com.h2database:h2'
-    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    testImplementation 'org.springframework.kafka:spring-kafka-test'
-    
-    // Testcontainers (선택적)
     testImplementation 'org.testcontainers:junit-jupiter:1.19.3'
     testImplementation 'org.testcontainers:mongodb:1.19.3'
     testImplementation 'org.testcontainers:kafka:1.19.3'
+    testImplementation 'com.redis:testcontainers-redis:2.2.4'
     
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
@@ -69,6 +45,3 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-
-
-

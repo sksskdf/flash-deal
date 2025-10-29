@@ -23,7 +23,6 @@
   "features": {},
   "mounts": [
     "source=${localWorkspaceFolder},target=/workspaces/flashdeal,type=bind,consistency=cached",
-    "source=flashdeal-maven-cache,target=/home/vscode/.m2,type=volume",
     "source=flashdeal-gradle-cache,target=/home/vscode/.gradle,type=volume",
     "source=flashdeal-node-modules,target=/workspaces/flashdeal/src/frontend/node_modules,type=volume"
   ],
@@ -39,6 +38,9 @@
     9090,
     3000
   ],
+  "containerEnv": {
+    "TESTCONTAINERS_HOST_OVERRIDE": "host.docker.internal"
+  },
   "customizations": {
     "vscode": {
       "settings": {
@@ -57,7 +59,8 @@
         "GraphQL.vscode-graphql",
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "bradlc.vscode-tailwindcss"
+        "bradlc.vscode-tailwindcss",
+        "google.geminicodeassist"
       ]
     }
   }
