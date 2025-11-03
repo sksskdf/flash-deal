@@ -37,10 +37,13 @@ public interface OrderMongoRepository extends ReactiveMongoRepository<OrderDocum
     Flux<OrderDocument> findByUserIdAndStatus(String userId, OrderStatus status);
     
     /**
-     * 멱등성 키로 주문 조회
+     * 멱등성 키로 주문 조회 (복수 존재 시 모두 반환)
      */
-    Mono<OrderDocument> findByIdempotencyKey(String idempotencyKey);
+    Flux<OrderDocument> findAllByIdempotencyKey(String idempotencyKey);
     
+    @Query("{ 'status': ?0, 'createdAt': { $lt: ?1 } }")
+    Flux<OrderDocument> findByStatusAndCreatedAtBefore(OrderStatus status, Instant time);
+
     /**
      * 주문 번호로 주문 조회
      */

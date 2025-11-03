@@ -43,6 +43,8 @@ public interface OrderRepository {
      * 멱등성 키로 주문 조회
      */
     Mono<Order> findByIdempotencyKey(String idempotencyKey);
+
+    Flux<Order> findByStatusAndCreatedAtBefore(OrderStatus status, java.time.Instant time);
     
     /**
      * 주문 삭제

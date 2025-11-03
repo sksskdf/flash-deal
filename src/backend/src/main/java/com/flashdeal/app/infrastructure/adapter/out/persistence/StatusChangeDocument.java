@@ -1,72 +1,46 @@
 package com.flashdeal.app.infrastructure.adapter.out.persistence;
 
-import com.flashdeal.app.domain.order.OrderStatus;
 import java.time.Instant;
+import java.util.Map;
 
-/**
- * Status Change MongoDB Document
- */
 public class StatusChangeDocument {
-    
-    private OrderStatus from;
-    private OrderStatus to;
-    private String reason;
+    private String from;
+    private String to;
     private Instant timestamp;
-    private String changedBy;
+    private String reason;
+    private String actor;
+    private Map<String, Object> metadata;
 
-    public StatusChangeDocument() {}
-
-    public StatusChangeDocument(OrderStatus from, OrderStatus to, String reason,
-                              Instant timestamp, String changedBy) {
+    public StatusChangeDocument(String from, String to, Instant timestamp, String reason, String actor, Map<String, Object> metadata) {
         this.from = from;
         this.to = to;
-        this.reason = reason;
         this.timestamp = timestamp;
-        this.changedBy = changedBy;
+        this.reason = reason;
+        this.actor = actor;
+        this.metadata = metadata;
     }
 
-    public OrderStatus getFrom() {
+    public String getFrom() {
         return from;
     }
 
-    public void setFrom(OrderStatus from) {
-        this.from = from;
-    }
-
-    public OrderStatus getTo() {
+    public String getTo() {
         return to;
-    }
-
-    public void setTo(OrderStatus to) {
-        this.to = to;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
     }
 
     public Instant getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Instant timestamp) {
-        this.timestamp = timestamp;
+    public String getReason() {
+        return reason;
     }
 
-    public String getChangedBy() {
-        return changedBy;
+    public String getActor() {
+        return actor;
     }
 
-    public void setChangedBy(String changedBy) {
-        this.changedBy = changedBy;
+    public Map<String, Object> getMetadata() {
+        return metadata;
     }
 }
-
-
-
-
-

@@ -81,7 +81,7 @@ public class TestDataFactory {
     
     public static Inventory createLowStockInventory() {
         Inventory inventory = createInventory();
-        inventory.reserve(95); // available: 5 (기본 안전재고 10보다 적음)
+        inventory.reserve(995); // available: 5 (기본 안전재고 10보다 적음)
         return inventory;
     }
     
@@ -101,7 +101,7 @@ public class TestDataFactory {
         List<OrderItem> items = createOrderItems();
         Shipping shipping = createShipping();
         
-        return new Order(orderId, userId, items, shipping);
+        return new Order(orderId, userId, items, shipping, "idempotencyKey");
     }
     
     public static Order createOrderWithItems(List<OrderItem> items) {
@@ -109,7 +109,7 @@ public class TestDataFactory {
         UserId userId = UserId.generate();
         Shipping shipping = createShipping();
         
-        return new Order(orderId, userId, items, shipping);
+        return new Order(orderId, userId, items, shipping, "idempotencyKey");
     }
     
     public static Order createConfirmedOrder() {

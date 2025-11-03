@@ -14,7 +14,7 @@ import java.util.Objects;
 public class Inventory {
     
     private final InventoryId inventoryId;
-    private final ProductId productId;  // 참조만
+    private final ProductId productId;   
     private Stock stock;
     private Policy policy;
 
@@ -28,7 +28,7 @@ public class Inventory {
         validateNotNull(productId, "ProductId cannot be null");
         validateNotNull(stock, "Stock cannot be null");
         validateNotNull(policy, "Policy cannot be null");
-        
+
         this.inventoryId = inventoryId;
         this.productId = productId;
         this.stock = stock;

@@ -27,7 +27,7 @@ class OrderTest {
         Shipping shipping = createShipping();
         
         // when
-        Order order = new Order(orderId, userId, items, shipping);
+        Order order = new Order(orderId, userId, items, shipping, "test-key");
         
         // then
         assertNotNull(order);
@@ -50,7 +50,8 @@ class OrderTest {
             OrderId.generate(),
             new UserId("user123"),
             items,
-            shipping
+            shipping,
+            "test-key"
         );
         
         // then
@@ -69,13 +70,13 @@ class OrderTest {
         
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> new Order(null, new UserId("user123"), items, shipping));
+            () -> new Order(null, new UserId("user123"), items, shipping, "test-key"));
         assertThrows(IllegalArgumentException.class,
-            () -> new Order(OrderId.generate(), null, items, shipping));
+            () -> new Order(OrderId.generate(), null, items, shipping, "test-key"));
         assertThrows(IllegalArgumentException.class,
-            () -> new Order(OrderId.generate(), new UserId("user123"), null, shipping));
+            () -> new Order(OrderId.generate(), new UserId("user123"), null, shipping, "test-key"));
         assertThrows(IllegalArgumentException.class,
-            () -> new Order(OrderId.generate(), new UserId("user123"), items, null));
+            () -> new Order(OrderId.generate(), new UserId("user123"), items, null, "test-key"));
     }
 
     @Test
@@ -86,7 +87,7 @@ class OrderTest {
         
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> new Order(OrderId.generate(), new UserId("user123"), new ArrayList<>(), shipping));
+            () -> new Order(OrderId.generate(), new UserId("user123"), new ArrayList<>(), shipping, "test-key"));
     }
 
     @Test
@@ -190,7 +191,8 @@ class OrderTest {
             OrderId.generate(),
             new UserId("user123"),
             createOrderItems(),
-            createShipping()
+            createShipping(),
+            "test-key"
         );
     }
 

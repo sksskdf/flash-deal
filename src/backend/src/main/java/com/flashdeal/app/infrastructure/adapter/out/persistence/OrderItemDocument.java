@@ -1,27 +1,19 @@
 package com.flashdeal.app.infrastructure.adapter.out.persistence;
 
+import com.flashdeal.app.domain.order.OrderItemStatus;
 import java.math.BigDecimal;
-import java.util.Map;
 
-/**
- * Order Item MongoDB Document
- */
 public class OrderItemDocument {
-    
     private String productId;
     private String dealType;
     private OrderItemSnapshotDocument snapshot;
-    private int quantity;
+    private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal subtotal;
-    private String status;
-    private TrackingInfoDocument tracking;
+    private OrderItemStatus status;
+    private TrackingDocument tracking;
 
-    public OrderItemDocument() {}
-
-    public OrderItemDocument(String productId, String dealType, OrderItemSnapshotDocument snapshot,
-                           int quantity, BigDecimal unitPrice, BigDecimal subtotal, String status,
-                           TrackingInfoDocument tracking) {
+    public OrderItemDocument(String productId, String dealType, OrderItemSnapshotDocument snapshot, Integer quantity, BigDecimal unitPrice, BigDecimal subtotal, OrderItemStatus status, TrackingDocument tracking) {
         this.productId = productId;
         this.dealType = dealType;
         this.snapshot = snapshot;
@@ -36,68 +28,31 @@ public class OrderItemDocument {
         return productId;
     }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-
     public String getDealType() {
         return dealType;
-    }
-
-    public void setDealType(String dealType) {
-        this.dealType = dealType;
     }
 
     public OrderItemSnapshotDocument getSnapshot() {
         return snapshot;
     }
 
-    public void setSnapshot(OrderItemSnapshotDocument snapshot) {
-        this.snapshot = snapshot;
-    }
-
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
     }
 
     public BigDecimal getUnitPrice() {
         return unitPrice;
     }
 
-    public void setUnitPrice(BigDecimal unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-
     public BigDecimal getSubtotal() {
         return subtotal;
     }
 
-    public void setSubtotal(BigDecimal subtotal) {
-        this.subtotal = subtotal;
-    }
-
-    public String getStatus() {
+    public OrderItemStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public TrackingInfoDocument getTracking() {
+    public TrackingDocument getTracking() {
         return tracking;
     }
-
-    public void setTracking(TrackingInfoDocument tracking) {
-        this.tracking = tracking;
-    }
 }
-
-
-
-
-

@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -31,22 +30,12 @@ public class ImprovedKafkaEventPublisher {
 
     // Kafka Topics
     private static final String ORDER_CREATED_TOPIC = "orders.created";
-    private static final String ORDER_UPDATED_TOPIC = "orders.updated";
     private static final String ORDER_CANCELLED_TOPIC = "orders.cancelled";
-    private static final String ORDER_COMPLETED_TOPIC = "orders.completed";
     
-    private static final String PAYMENT_PENDING_TOPIC = "payments.pending";
     private static final String PAYMENT_COMPLETED_TOPIC = "payments.completed";
-    private static final String PAYMENT_FAILED_TOPIC = "payments.failed";
-    private static final String PAYMENT_REFUNDED_TOPIC = "payments.refunded";
     
     private static final String INVENTORY_RESERVED_TOPIC = "inventory.reserved";
-    private static final String INVENTORY_RELEASED_TOPIC = "inventory.released";
-    private static final String INVENTORY_CONFIRMED_TOPIC = "inventory.confirmed";
     
-    private static final String NOTIFICATIONS_EMAIL_TOPIC = "notifications.email";
-    private static final String NOTIFICATIONS_PUSH_TOPIC = "notifications.push";
-    private static final String NOTIFICATIONS_SMS_TOPIC = "notifications.sms";
 
     public ImprovedKafkaEventPublisher(KafkaTemplate<String, Object> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;

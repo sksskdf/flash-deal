@@ -55,7 +55,14 @@ public class OrderPersistenceAdapter implements OrderRepository {
 
     @Override
     public Mono<Order> findByIdempotencyKey(String idempotencyKey) {
-        return mongoRepository.findByIdempotencyKey(idempotencyKey)
+        return mongoRepository.findAllByIdempotencyKey(idempotencyKey)
+                .map(mapper::toDomain)
+                .next();
+    }
+
+    @Override
+    public Flux<Order> findByStatusAndCreatedAtBefore(OrderStatus status, java.time.Instant time) {
+        return mongoRepository.findByStatusAndCreatedAtBefore(status, time)
                 .map(mapper::toDomain);
     }
 

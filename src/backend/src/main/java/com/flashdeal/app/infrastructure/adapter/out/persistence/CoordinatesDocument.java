@@ -1,38 +1,19 @@
 package com.flashdeal.app.infrastructure.adapter.out.persistence;
 
-/**
- * Coordinates MongoDB Document
- */
 public class CoordinatesDocument {
-    
-    private double lat;
-    private double lng;
+    private Double lat;
+    private Double lng;
 
-    public CoordinatesDocument() {}
-
-    public CoordinatesDocument(double lat, double lng) {
+    public CoordinatesDocument(Double lat, Double lng) {
         this.lat = lat;
         this.lng = lng;
     }
 
-    public double getLat() {
+    public Double getLat() {
         return lat;
     }
 
-    public void setLat(double lat) {
-        this.lat = lat;
-    }
-
-    public double getLng() {
+    public Double getLng() {
         return lng;
     }
-
-    public void setLng(double lng) {
-        this.lng = lng;
-    }
 }
-
-
-
-
-

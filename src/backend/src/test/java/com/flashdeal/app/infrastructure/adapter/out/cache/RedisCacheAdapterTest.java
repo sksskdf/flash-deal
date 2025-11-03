@@ -166,4 +166,3 @@ class RedisCacheAdapterTest extends AbstractRedisIntegrationTest {
                 .verifyComplete();
     }
 }
-

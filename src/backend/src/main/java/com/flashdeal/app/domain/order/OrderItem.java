@@ -14,6 +14,7 @@ public class OrderItem {
     private final ProductId productId;
     private final Snapshot snapshot;
     private int quantity;
+    private OrderItemStatus status;
 
     public OrderItem(ProductId productId, Snapshot snapshot, int quantity) {
         if (productId == null) {
@@ -29,12 +30,20 @@ public class OrderItem {
         this.productId = productId;
         this.snapshot = snapshot;
         this.quantity = quantity;
+        this.status = OrderItemStatus.CONFIRMED;
     }
 
     private void validateQuantity(int quantity) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be positive");
         }
+    }
+
+    /**
+     * 주문 항목 취소
+     */
+    public void cancel() {
+        this.status = OrderItemStatus.CANCELLED;
     }
 
     /**
@@ -62,6 +71,10 @@ public class OrderItem {
 
     public int getQuantity() {
         return quantity;
+    }
+
+    public OrderItemStatus getStatus() {
+        return status;
     }
 
     @Override

@@ -37,6 +37,10 @@ public interface ProductRepository {
      * 활성 상품 목록 조회 (진행 중인 딜)
      */
     Flux<Product> findActiveProducts();
+
+    Flux<Product> findByStatusAndScheduleStartAtBefore(DealStatus status, java.time.Instant time);
+
+    Flux<Product> findByStatusAndScheduleEndAtBefore(DealStatus status, java.time.Instant time);
     
     /**
      * 상품 삭제

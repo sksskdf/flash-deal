@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractReactiveMongoConfiguration;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
+import org.springframework.lang.NonNull;
 
 /**
  * MongoDB Reactive Configuration
@@ -21,6 +22,7 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
     private String mongoUri;
 
     @Override
+    @NonNull
     protected String getDatabaseName() {
         return databaseName;
     }

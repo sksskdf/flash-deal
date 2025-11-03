@@ -1,5 +1,12 @@
 package com.flashdeal.app.infrastructure.adapter.out.messaging;
 
+import com.flashdeal.app.application.port.in.CancelOrderUseCase;
+import com.flashdeal.app.application.port.in.CompletePaymentUseCase;
+import com.flashdeal.app.application.port.in.ConfirmInventoryUseCase;
+import com.flashdeal.app.application.port.in.GetOrderUseCase;
+import com.flashdeal.app.application.port.in.ReleaseInventoryUseCase;
+import com.flashdeal.app.application.port.in.ReserveInventoryUseCase;
+import com.flashdeal.app.domain.order.OrderId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -8,18 +15,41 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
 /**
  * Kafka Event Consumer
- * 
+ * <p>
  * 이벤트 수신 및 처리
  */
 @Component
 public class KafkaEventConsumer {
 
+    private final GetOrderUseCase getOrderUseCase;
+    private final ReserveInventoryUseCase reserveInventoryUseCase;
+    private final CompletePaymentUseCase completePaymentUseCase;
+    private final ConfirmInventoryUseCase confirmInventoryUseCase;
+    private final CancelOrderUseCase cancelOrderUseCase;
+    private final ReleaseInventoryUseCase releaseInventoryUseCase;
+
     private static final Logger logger = LoggerFactory.getLogger(KafkaEventConsumer.class);
+
+    public KafkaEventConsumer(GetOrderUseCase getOrderUseCase, 
+                              ReserveInventoryUseCase reserveInventoryUseCase, 
+                              CompletePaymentUseCase completePaymentUseCase, 
+                              ConfirmInventoryUseCase confirmInventoryUseCase,
+                              CancelOrderUseCase cancelOrderUseCase,
+                              ReleaseInventoryUseCase releaseInventoryUseCase) {
+        this.getOrderUseCase = getOrderUseCase;
+        this.reserveInventoryUseCase = reserveInventoryUseCase;
+        this.completePaymentUseCase = completePaymentUseCase;
+        this.confirmInventoryUseCase = confirmInventoryUseCase;
+        this.cancelOrderUseCase = cancelOrderUseCase;
+        this.releaseInventoryUseCase = releaseInventoryUseCase;
+    }
 
     /**
      * 주문 생성 이벤트 수신
@@ -30,26 +60,30 @@ public class KafkaEventConsumer {
                                  @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
                                  @Header(KafkaHeaders.OFFSET) long offset,
                                  Acknowledgment acknowledgment) {
-        
+
         logger.info("Received OrderCreated event: {}", event);
-        
+
         try {
             // 이벤트 처리 로직
-            String orderId = (String) event.get("orderId");
-            String userId = (String) event.get("userId");
-            String orderNumber = (String) event.get("orderNumber");
-            
-            logger.info("Processing order creation for orderId: {}, userId: {}, orderNumber: {}", 
-                       orderId, userId, orderNumber);
-            
-            // TODO: 실제 비즈니스 로직 구현
-            // - 재고 확인
-            // - 결제 처리
-            // - 알림 발송 등
-            
-            acknowledgment.acknowledge();
-            logger.info("Successfully processed OrderCreated event for orderId: {}", orderId);
-            
+            String orderIdStr = (String) event.get("orderId");
+            OrderId orderId = new OrderId(orderIdStr);
+
+            getOrderUseCase.getOrder(orderId)
+                    .flatMapMany(order -> Flux.fromIterable(order.getItems()))
+                    .flatMap(orderItem -> {
+                        ReserveInventoryUseCase.ReserveInventoryCommand command = new ReserveInventoryUseCase.ReserveInventoryCommand(orderItem.getProductId(), orderItem.getQuantity());
+                        return reserveInventoryUseCase.reserve(command);
+                    })
+                    .doOnComplete(() -> {
+                        acknowledgment.acknowledge();
+                        logger.info("Successfully processed OrderCreated event for orderId: {}", orderIdStr);
+                    })
+                    .doOnError(error -> {
+                        logger.error("Error processing OrderCreated event: {}", event, error);
+                        // 에러 처리 로직 (예: DLQ 전송)
+                    })
+                    .subscribe();
+
         } catch (Exception e) {
             logger.error("Error processing OrderCreated event: {}", event, e);
             // 에러 처리 로직
@@ -67,26 +101,33 @@ public class KafkaEventConsumer {
                                      @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
                                      @Header(KafkaHeaders.OFFSET) long offset,
                                      Acknowledgment acknowledgment) {
-        
+
         logger.info("Received PaymentCompleted event: {}", event);
-        
+
         try {
-            String orderId = (String) event.get("orderId");
-            String paymentMethod = (String) event.get("paymentMethod");
+            String orderIdStr = (String) event.get("orderId");
             String transactionId = (String) event.get("transactionId");
-            String status = (String) event.get("status");
-            
-            logger.info("Processing payment completion for orderId: {}, method: {}, transactionId: {}, status: {}", 
-                       orderId, paymentMethod, transactionId, status);
-            
-            // TODO: 실제 비즈니스 로직 구현
-            // - 주문 상태 업데이트
-            // - 재고 확정
-            // - 배송 준비 등
-            
-            acknowledgment.acknowledge();
-            logger.info("Successfully processed PaymentCompleted event for orderId: {}", orderId);
-            
+            OrderId orderId = new OrderId(orderIdStr);
+
+            CompletePaymentUseCase.CompletePaymentCommand command = new CompletePaymentUseCase.CompletePaymentCommand(orderId, transactionId);
+            completePaymentUseCase.completePayment(command)
+                    .flatMap(order -> Flux.fromIterable(order.getItems())
+                            .flatMap(orderItem -> {
+                                ConfirmInventoryUseCase.ConfirmInventoryCommand confirmCommand = new ConfirmInventoryUseCase.ConfirmInventoryCommand(orderItem.getProductId(), orderItem.getQuantity());
+                                return confirmInventoryUseCase.confirm(confirmCommand);
+                            })
+                            .then(Mono.just(order)) // Pass order to the next step
+                    )
+                    .doOnSuccess(order -> {
+                        acknowledgment.acknowledge();
+                        logger.info("Successfully processed PaymentCompleted event for orderId: {}", order.getOrderId().getValue());
+                    })
+                    .doOnError(error -> {
+                        logger.error("Error processing PaymentCompleted event: {}", event, error);
+                        // 에러 처리 로직 (예: DLQ 전송)
+                    })
+                    .subscribe();
+
         } catch (Exception e) {
             logger.error("Error processing PaymentCompleted event: {}", event, e);
         }
@@ -101,26 +142,16 @@ public class KafkaEventConsumer {
                                      @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
                                      @Header(KafkaHeaders.OFFSET) long offset,
                                      Acknowledgment acknowledgment) {
-        
+
         logger.info("Received InventoryReserved event: {}", event);
-        
+
         try {
             String productId = (String) event.get("productId");
-            String orderId = (String) event.get("orderId");
-            Integer quantity = (Integer) event.get("quantity");
-            String status = (String) event.get("status");
-            
-            logger.info("Processing inventory reservation for productId: {}, orderId: {}, quantity: {}, status: {}", 
-                       productId, orderId, quantity, status);
-            
-            // TODO: 실제 비즈니스 로직 구현
-            // - 재고 상태 업데이트
-            // - 알림 발송
-            // - 모니터링 등
-            
+            logger.info("Inventory reserved for productId: {}", productId);
+
             acknowledgment.acknowledge();
             logger.info("Successfully processed InventoryReserved event for productId: {}", productId);
-            
+
         } catch (Exception e) {
             logger.error("Error processing InventoryReserved event: {}", event, e);
         }
@@ -135,25 +166,33 @@ public class KafkaEventConsumer {
                                    @Header(KafkaHeaders.RECEIVED_PARTITION) int partition,
                                    @Header(KafkaHeaders.OFFSET) long offset,
                                    Acknowledgment acknowledgment) {
-        
+
         logger.info("Received OrderCancelled event: {}", event);
-        
+
         try {
-            String orderId = (String) event.get("orderId");
+            String orderIdStr = (String) event.get("orderId");
             String reason = (String) event.get("reason");
-            String cancelledBy = (String) event.get("cancelledBy");
-            
-            logger.info("Processing order cancellation for orderId: {}, reason: {}, cancelledBy: {}", 
-                       orderId, reason, cancelledBy);
-            
-            // TODO: 실제 비즈니스 로직 구현
-            // - 주문 상태 업데이트
-            // - 재고 복구
-            // - 환불 처리 등
-            
-            acknowledgment.acknowledge();
-            logger.info("Successfully processed OrderCancelled event for orderId: {}", orderId);
-            
+            OrderId orderId = new OrderId(orderIdStr);
+
+            CancelOrderUseCase.CancelOrderCommand command = new CancelOrderUseCase.CancelOrderCommand(orderId, reason);
+            cancelOrderUseCase.cancelOrder(command)
+                    .flatMap(order -> Flux.fromIterable(order.getItems())
+                            .flatMap(orderItem -> {
+                                ReleaseInventoryUseCase.ReleaseInventoryCommand releaseCommand = new ReleaseInventoryUseCase.ReleaseInventoryCommand(orderItem.getProductId(), orderItem.getQuantity());
+                                return releaseInventoryUseCase.release(releaseCommand);
+                            })
+                            .then(Mono.just(order)) // Pass order to the next step
+                    )
+                    .doOnSuccess(order -> {
+                        acknowledgment.acknowledge();
+                        logger.info("Successfully processed OrderCancelled event for orderId: {}", order.getOrderId().getValue());
+                    })
+                    .doOnError(error -> {
+                        logger.error("Error processing OrderCancelled event: {}", event, error);
+                        // 에러 처리 로직 (예: DLQ 전송)
+                    })
+                    .subscribe();
+
         } catch (Exception e) {
             logger.error("Error processing OrderCancelled event: {}", event, e);
         }

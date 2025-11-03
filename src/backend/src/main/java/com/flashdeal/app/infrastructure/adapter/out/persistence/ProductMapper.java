@@ -18,7 +18,7 @@ public class ProductMapper {
     public ProductDocument toDocument(Product product) {
         return new ProductDocument(
             product.getProductId().getValue(),
-            product.getProductId().getValue(), // dealType은 별도 처리 필요
+            "flash", // dealType은 현재 Product 도메인에 없으므로 하드코딩
             product.getTitle(),
             null, // subtitle은 Product에 없음
             product.getDescription(),

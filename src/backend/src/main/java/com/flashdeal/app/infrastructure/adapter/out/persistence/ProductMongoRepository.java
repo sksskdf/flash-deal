@@ -71,6 +71,12 @@ public interface ProductMongoRepository extends ReactiveMongoRepository<ProductD
     @Query("{ 'schedule.endsAt': { $lte: ?0 }, 'status': 'ACTIVE' }")
     Flux<ProductDocument> findEndingSoonProducts(Instant currentTime);
     
+    @Query("{ 'status': ?0, 'schedule.startsAt': { $lte: ?1 } }")
+    Flux<ProductDocument> findByStatusAndScheduleStartAtBefore(DealStatus status, Instant time);
+
+    @Query("{ 'status': ?0, 'schedule.endsAt': { $lte: ?1 } }")
+    Flux<ProductDocument> findByStatusAndScheduleEndAtBefore(DealStatus status, Instant time);
+
     /**
      * 텍스트 검색 (제목, 설명, 카테고리)
      */

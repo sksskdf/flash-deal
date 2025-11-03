@@ -127,6 +127,13 @@ public class Product {
         this.description = newDescription;
     }
 
+    /**
+     * 상태 변경
+     */
+    public void updateStatus(DealStatus newStatus) {
+        this.status = newStatus;
+    }
+
     // Getters
     public ProductId getProductId() {
         return productId;

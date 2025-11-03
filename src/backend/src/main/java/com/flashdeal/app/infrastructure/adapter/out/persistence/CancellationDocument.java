@@ -1,71 +1,40 @@
 package com.flashdeal.app.infrastructure.adapter.out.persistence;
 
 import java.time.Instant;
+import java.util.List;
 
-/**
- * Cancellation MongoDB Document
- */
 public class CancellationDocument {
-    
+    private Boolean isCancelled;
     private String reason;
-    private String requestedBy;
-    private Instant requestedAt;
-    private Instant processedAt;
-    private String status;
+    private String cancelledBy;
+    private Instant cancelledAt;
+    private List<String> items;
 
-    public CancellationDocument() {}
-
-    public CancellationDocument(String reason, String requestedBy, Instant requestedAt,
-                              Instant processedAt, String status) {
+    public CancellationDocument(Boolean isCancelled, String reason, String cancelledBy, Instant cancelledAt, List<String> items) {
+        this.isCancelled = isCancelled;
         this.reason = reason;
-        this.requestedBy = requestedBy;
-        this.requestedAt = requestedAt;
-        this.processedAt = processedAt;
-        this.status = status;
+        this.cancelledBy = cancelledBy;
+        this.cancelledAt = cancelledAt;
+        this.items = items;
+    }
+
+    public Boolean getIsCancelled() {
+        return isCancelled;
     }
 
     public String getReason() {
         return reason;
     }
 
-    public void setReason(String reason) {
-        this.reason = reason;
+    public String getCancelledBy() {
+        return cancelledBy;
     }
 
-    public String getRequestedBy() {
-        return requestedBy;
+    public Instant getCancelledAt() {
+        return cancelledAt;
     }
 
-    public void setRequestedBy(String requestedBy) {
-        this.requestedBy = requestedBy;
-    }
-
-    public Instant getRequestedAt() {
-        return requestedAt;
-    }
-
-    public void setRequestedAt(Instant requestedAt) {
-        this.requestedAt = requestedAt;
-    }
-
-    public Instant getProcessedAt() {
-        return processedAt;
-    }
-
-    public void setProcessedAt(Instant processedAt) {
-        this.processedAt = processedAt;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public List<String> getItems() {
+        return items;
     }
 }
-
-
-
-
-

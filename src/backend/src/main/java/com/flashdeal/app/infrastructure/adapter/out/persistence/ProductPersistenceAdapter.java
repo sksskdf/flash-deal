@@ -54,6 +54,18 @@ public class ProductPersistenceAdapter implements ProductRepository {
     }
 
     @Override
+    public Flux<Product> findByStatusAndScheduleStartAtBefore(DealStatus status, java.time.Instant time) {
+        return mongoRepository.findByStatusAndScheduleStartAtBefore(status, time)
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public Flux<Product> findByStatusAndScheduleEndAtBefore(DealStatus status, java.time.Instant time) {
+        return mongoRepository.findByStatusAndScheduleEndAtBefore(status, time)
+                .map(mapper::toDomain);
+    }
+
+    @Override
     public Mono<Void> deleteById(ProductId id) {
         return mongoRepository.deleteById(id.getValue());
     }

@@ -1,6 +1,7 @@
 package com.flashdeal.app.domain.order;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,18 +22,27 @@ public class Order {
     
     private final OrderId orderId;
     private final UserId userId;
+    private final String idempotencyKey;
     private final List<OrderItem> items;
     private final Shipping shipping;
     private Pricing pricing;
     private Payment payment;
     private OrderStatus status;
+    private final Instant createdAt;
 
-    public Order(OrderId orderId, UserId userId, List<OrderItem> items, Shipping shipping) {
+
+    public Order(OrderId orderId, UserId userId, List<OrderItem> items, Shipping shipping, String idempotencyKey) {
+        this(orderId, userId, items, shipping, idempotencyKey, Instant.now());
+    }
+
+    public Order(OrderId orderId, UserId userId, List<OrderItem> items, Shipping shipping, String idempotencyKey, Instant createdAt) {
         validateNotNull(orderId, "OrderId cannot be null");
         validateNotNull(userId, "UserId cannot be null");
         validateNotNull(items, "Items cannot be null");
         validateNotNull(shipping, "Shipping cannot be null");
-        
+        validateNotNull(idempotencyKey, "IdempotencyKey cannot be null");
+        validateNotNull(createdAt, "CreatedAt cannot be null");
+
         if (items.isEmpty()) {
             throw new IllegalArgumentException("Items cannot be empty");
         }
@@ -41,7 +51,9 @@ public class Order {
         this.userId = userId;
         this.items = new ArrayList<>(items);
         this.shipping = shipping;
+        this.idempotencyKey = idempotencyKey;
         this.status = OrderStatus.PENDING;
+        this.createdAt = createdAt;
         
         // 초기 가격 계산
         this.pricing = calculatePricing(BigDecimal.ZERO);
@@ -49,6 +61,7 @@ public class Order {
         // 초기 결제 정보
         this.payment = new Payment("CreditCard", PaymentStatus.PENDING, null, null);
     }
+
 
     private void validateNotNull(Object value, String message) {
         if (value == null) {
@@ -152,6 +165,10 @@ public class Order {
         return status;
     }
 
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
     /**
      * 상태 전이
      */
@@ -166,11 +183,16 @@ public class Order {
         return "ORD-" + orderId.getValue().substring(0, 8);
     }
 
-    /**
-     * 멱등성 키 생성 (임시 구현)
-     */
     public String getIdempotencyKey() {
-        return "IDEMP-" + orderId.getValue();
+        return idempotencyKey;
+    }
+
+    public void setPricing(Pricing pricing) {
+        this.pricing = pricing;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 
     @Override
