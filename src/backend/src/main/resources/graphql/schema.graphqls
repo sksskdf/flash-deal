@@ -1,0 +1,258 @@
+type Query {
+    # Product Queries
+    product(id: ID!): Product
+    products(status: DealStatus, category: String): [Product!]!
+    activeProducts: [Product!]!
+    
+    # Order Queries
+    order(id: ID!): Order
+    ordersByUser(userId: ID!): [Order!]!
+    orders(status: OrderStatus): [Order!]!
+    
+    # Inventory Queries
+    inventory(id: ID!): Inventory
+    inventoryByProduct(productId: ID!): Inventory
+}
+
+type Mutation {
+    # Product Mutations
+    createProduct(input: CreateProductInput!): Product!
+    updateProduct(id: ID!, input: UpdateProductInput!): Product
+    
+    # Order Mutations
+    createOrder(input: CreateOrderInput!): Order!
+    cancelOrder(id: ID!, reason: String): Order
+    completePayment(id: ID!, transactionId: String!): Order
+    
+    # Inventory Mutations
+    createInventory(input: CreateInventoryInput!): Inventory!
+    reserveInventory(input: ReserveInventoryInput!): Boolean!
+    confirmInventory(input: ReserveInventoryInput!): Boolean!
+    releaseInventory(input: ReserveInventoryInput!): Boolean!
+}
+
+# Product Types
+type Product {
+    productId: ID!
+    title: String!
+    description: String
+    price: Price!
+    schedule: Schedule!
+    specs: [SpecField!]!
+    status: DealStatus!
+    category: String
+}
+
+type Price {
+    original: Decimal!
+    sale: Decimal!
+    currency: String!
+    discountRate: Int!
+}
+
+type Schedule {
+    startsAt: DateTime!
+    endsAt: DateTime!
+    timezone: String!
+}
+
+type SpecField {
+    key: String!
+    value: String!
+}
+
+enum DealStatus {
+    UPCOMING
+    ACTIVE
+    SOLDOUT
+    ENDED
+}
+
+input CreateProductInput {
+    title: String!
+    description: String
+    originalPrice: Decimal!
+    dealPrice: Decimal!
+    currency: String!
+    startAt: DateTime!
+    endAt: DateTime!
+    category: String
+    imageUrl: String
+    specs: [SpecFieldInput!]
+}
+
+input UpdateProductInput {
+    title: String
+    description: String
+    originalPrice: Decimal
+    dealPrice: Decimal
+    startAt: DateTime
+    endAt: DateTime
+}
+
+input SpecFieldInput {
+    key: String!
+    value: String!
+}
+
+# Order Types
+type Order {
+    orderId: ID!
+    userId: ID!
+    orderNumber: String!
+    items: [OrderItem!]!
+    shipping: Shipping!
+    pricing: Pricing!
+    payment: Payment!
+    status: OrderStatus!
+    createdAt: DateTime!
+}
+
+type OrderItem {
+    productId: ID!
+    quantity: Int!
+    snapshot: Snapshot!
+    subtotal: Decimal!
+    status: OrderItemStatus!
+}
+
+type Snapshot {
+    title: String!
+    image: String!
+    price: Price!
+    selectedOptions: [SpecField!]!
+}
+
+type Shipping {
+    method: String!
+    recipient: Recipient!
+    address: Address!
+    instructions: String
+}
+
+type Recipient {
+    name: String!
+    phone: String!
+}
+
+type Address {
+    street: String!
+    city: String!
+    state: String
+    zipCode: String!
+    country: String!
+    detailAddress: String
+}
+
+type Pricing {
+    subtotal: Decimal!
+    shipping: Decimal!
+    discount: Decimal!
+    total: Decimal!
+    currency: String!
+}
+
+type Payment {
+    method: String!
+    status: PaymentStatus!
+    transactionId: String
+    gateway: String
+}
+
+enum OrderStatus {
+    PENDING
+    PROCESSING
+    CONFIRMED
+    SHIPPED
+    DELIVERED
+    CANCELLED
+    PARTIALLY_CANCELLED
+    REFUNDED
+}
+
+enum OrderItemStatus {
+    CONFIRMED
+    CANCELLED
+}
+
+enum PaymentStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    REFUNDED
+}
+
+input CreateOrderInput {
+    userId: ID!
+    items: [OrderItemInput!]!
+    shipping: ShippingInput!
+    idempotencyKey: String!
+    discount: Decimal
+}
+
+input OrderItemInput {
+    productId: ID!
+    quantity: Int!
+}
+
+input ShippingInput {
+    method: String!
+    recipient: RecipientInput!
+    address: AddressInput!
+    instructions: String
+}
+
+input RecipientInput {
+    name: String!
+    phone: String!
+}
+
+input AddressInput {
+    street: String!
+    city: String!
+    state: String
+    zipCode: String!
+    country: String!
+    detailAddress: String
+}
+
+# Inventory Types
+type Inventory {
+    inventoryId: ID!
+    productId: ID!
+    stock: Stock!
+    policy: Policy!
+    isOutOfStock: Boolean!
+    isLowStock: Boolean!
+}
+
+type Stock {
+    total: Int!
+    reserved: Int!
+    available: Int!
+    sold: Int!
+}
+
+type Policy {
+    lowStockThreshold: Int!
+    reservationTimeout: Int!
+    maxPurchasePerUser: Int!
+}
+
+input CreateInventoryInput {
+    productId: ID!
+    totalQuantity: Int!
+    lowStockThreshold: Int!
+    maxPurchaseQuantity: Int!
+    reservationTimeout: Int!
+}
+
+input ReserveInventoryInput {
+    productId: ID!
+    quantity: Int!
+}
+
+# Scalar Types
+scalar Decimal
+scalar DateTime
+

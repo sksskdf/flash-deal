@@ -1,0 +1,12 @@
+query ActiveProducts {
+  activeProducts {
+    productId
+    title
+    price {
+      sale
+      currency
+    }
+    status
+  }
+}
+

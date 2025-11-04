@@ -4,7 +4,6 @@ import com.flashdeal.app.domain.product.*;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.Map;
 
 /**
  * Product Domain ↔ Document Mapper
@@ -52,9 +51,9 @@ public class ProductMapper {
             specs
         );
 
-        // 상태 설정
+        // 상태 설정 (DB에서 읽어온 값이므로 전이 검증 없이 직접 설정)
         if (document.getStatus() != null) {
-            product.transitionTo(document.getStatus());
+            product.updateStatus(document.getStatus());
         }
 
         return product;

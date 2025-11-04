@@ -15,12 +15,42 @@ management:
 spring:
   application:
     name: flashdeal-app
+  graphql:
+    graphiql:
+      enabled: true
+      path: /graphiql
+    schema:
+      printer:
+        enabled: true
+    path: /graphql
+  webflux:
+    cors:
+      allowed-origins: "*"
+      allowed-methods: GET, POST, OPTIONS
+      allowed-headers: "*"
   data:
     mongodb:
       uri: mongodb://flashdeal-mongo:27017/flashdeal
+      database: flashdeal
     redis:
       host: flashdeal-redis
       port: 6379
+  kafka:
+    bootstrap-servers: flashdeal-kafka:9092
+    consumer:
+      group-id: flashdeal-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.flashdeal.app.domain.*
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
+      enable-idempotence: true
 
 logging:
   level:
