@@ -37,8 +37,8 @@ public class OrderMapper {
                 new ArrayList<>(), // statusHistory는 별도 서비스에서 처리
                 new ArrayList<>(), // kafkaEvents는 별도 서비스에서 처리
                 order.getIdempotencyKey(),
-                null, // cancellation은 별도 처리
-                null, // metadata는 현재 미사용
+                null,
+                null,
                 order.getCreatedAt(),
                 Instant.now()
         );
@@ -66,11 +66,9 @@ public class OrderMapper {
                 document.getCreatedAt()
         );
 
-        // 상태, 결제 등 추가 정보 복원
         if (document.getStatus() != null) {
             order.transitionTo(document.getStatus());
         }
-        // pricing, payment 등은 Order 생성자에서 초기화되므로, 필요 시 document 값으로 덮어쓰기
 
         return order;
     }
@@ -78,24 +76,24 @@ public class OrderMapper {
     private OrderItemDocument toOrderItemDocument(OrderItem item) {
         return new OrderItemDocument(
                 item.getProductId().getValue(),
-                "flash", // dealType은 현재 도메인에 없으므로 하드코딩
+                "flash",
                 toOrderItemSnapshotDocument(item.getSnapshot()),
                 item.getQuantity(),
                 item.getSnapshot().getPrice().getSale(),
                 item.getSubtotal(),
                 item.getStatus(),
-                null // tracking은 현재 미사용
+                null
         );
     }
 
     private OrderItemSnapshotDocument toOrderItemSnapshotDocument(Snapshot snapshot) {
         return new OrderItemSnapshotDocument(
                 snapshot.getTitle(),
-                null, // subtitle은 현재 미사용
+                null,
                 snapshot.getImage(),
-                null, // category는 현재 미사용
+                null,
                 toPriceDocument(snapshot.getPrice()),
-                null, // specs는 현재 미사용
+                null,
                 snapshot.getSelectedOptions()
         );
     }
@@ -116,8 +114,12 @@ public class OrderMapper {
     }
 
     private UserInfoDocument toUserInfoDocument(UserId userId) {
-        // 실제 구현에서는 User 서비스를 통해 사용자 정보를 조회해야 함
-        return new UserInfoDocument(userId.getValue(), "user@example.com", "Test User", "010-1234-5678");
+        return new UserInfoDocument(
+            userId.getValue(),
+            "user@example.com",
+            "Test User",
+            "010-1234-5678"
+        );
     }
 
     private PricingDocument toPricingDocument(Pricing pricing) {
@@ -128,7 +130,7 @@ public class OrderMapper {
                 pricing.getDiscount(),
                 pricing.getTotal(),
                 pricing.getCurrency(),
-                null // breakdown은 현재 미사용
+                null
         );
     }
 
@@ -214,42 +216,64 @@ public class OrderMapper {
     }
 
     private Payment toPayment(PaymentDocument document) {
-        if (document == null) return null;
-        return new Payment(document.getMethod(), document.getStatus(), document.getGateway() != null ? document.getGateway().getTransactionId() : null, document.getGateway() != null ? document.getGateway().getProvider() : null);
+        if (document == null) {
+            return null;
+        }
+        String transactionId = document.getGateway() != null ? document.getGateway().getTransactionId() : null;
+        String provider = document.getGateway() != null ? document.getGateway().getProvider() : null;
+        return new Payment(document.getMethod(), document.getStatus(), transactionId, provider);
     }
 
     private Price toPrice(PriceDocument document) {
-        if (document == null) return null;
+        if (document == null) {
+            return null;
+        }
         return new Price(document.getOriginal(), document.getSale(), document.getCurrency());
     }
 
     private PriceDocument toPriceDocument(Price price) {
-        if (price == null) return null;
+        if (price == null) {
+            return null;
+        }
         return new PriceDocument(
-                price.getOriginal(),
-                price.getSale(),
-                price.getCurrency(),
-                price.discountRate()
+            price.getOriginal(),
+            price.getSale(),
+            price.getCurrency(),
+            price.discountRate()
         );
     }
 
     private Pricing toPricing(PricingDocument document) {
-        if (document == null) return null;
-        return new Pricing(document.getSubtotal(), document.getShipping(), document.getDiscount(), document.getCurrency());
+        if (document == null) {
+            return null;
+        }
+        return new Pricing(
+            document.getSubtotal(),
+            document.getShipping(),
+            document.getDiscount(),
+            document.getCurrency()
+        );
     }
 
     private Shipping toShipping(ShippingDocument document) {
-        if (document == null) return null;
+        if (document == null) {
+            return null;
+        }
+        Recipient recipient = new Recipient(
+            document.getRecipient().getName(),
+            document.getRecipient().getPhone()
+        );
+        Address address = new Address(
+            document.getAddress().getStreet(),
+            document.getAddress().getCity(),
+            document.getAddress().getZipCode(),
+            document.getAddress().getCountry()
+        );
         return new Shipping(
-                document.getMethod(),
-                new Recipient(document.getRecipient().getName(), document.getRecipient().getPhone()),
-                new Address(
-                        document.getAddress().getStreet(),
-                        document.getAddress().getCity(),
-                        document.getAddress().getZipCode(),
-                        document.getAddress().getCountry()
-                ),
-                document.getInstructions()
+            document.getMethod(),
+            recipient,
+            address,
+            document.getInstructions()
         );
     }
 }

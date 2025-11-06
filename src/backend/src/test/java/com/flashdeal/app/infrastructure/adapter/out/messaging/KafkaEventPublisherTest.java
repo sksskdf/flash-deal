@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +22,7 @@ import com.flashdeal.app.domain.product.ProductId;
  */
 @SpringBootTest
 @ActiveProfiles("test")
+@DisplayName("KafkaEventPublisher 테스트")
 class KafkaEventPublisherTest extends AbstractKafkaIntegrationTest {
 
     @Autowired
@@ -38,6 +40,7 @@ class KafkaEventPublisherTest extends AbstractKafkaIntegrationTest {
     }
 
     @Test
+    @DisplayName("주문 생성 이벤트를 발행할 수 있다")
     void shouldPublishOrderCreatedEvent() {
         // Given
         String userId = "user-123";
@@ -59,6 +62,7 @@ class KafkaEventPublisherTest extends AbstractKafkaIntegrationTest {
     }
 
     @Test
+    @DisplayName("결제 완료 이벤트를 발행할 수 있다")
     void shouldPublishPaymentCompletedEvent() {
         // Given
         String paymentMethod = "CARD";
@@ -79,6 +83,7 @@ class KafkaEventPublisherTest extends AbstractKafkaIntegrationTest {
     }
 
     @Test
+    @DisplayName("재고 예약 이벤트를 발행할 수 있다")
     void shouldPublishInventoryReservedEvent() {
         // Given
         int quantity = 5;
@@ -98,6 +103,7 @@ class KafkaEventPublisherTest extends AbstractKafkaIntegrationTest {
     }
 
     @Test
+    @DisplayName("주문 취소 이벤트를 발행할 수 있다")
     void shouldPublishOrderCancelledEvent() {
         // Given
         String reason = "Customer request";
@@ -117,6 +123,7 @@ class KafkaEventPublisherTest extends AbstractKafkaIntegrationTest {
     }
 
     @Test
+    @DisplayName("커스텀 이벤트를 발행할 수 있다")
     void shouldPublishCustomEvent() {
         // Given
         String topic = "custom.topic";

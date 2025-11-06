@@ -5,6 +5,7 @@ import com.flashdeal.app.domain.order.*;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -56,41 +57,44 @@ public class OrderResolver {
 
     @MutationMapping
     public Mono<Order> createOrder(@Argument CreateOrderInput input) {
-        CreateOrderUseCase.CreateOrderCommand command = 
-            new CreateOrderUseCase.CreateOrderCommand(
-                new UserId(input.userId()),
-                input.items().stream()
-                    .map(item -> new CreateOrderUseCase.OrderItemDto(
-                        new com.flashdeal.app.domain.product.ProductId(item.productId()),
-                        item.quantity()
-                    ))
-                    .toList(),
-                new CreateOrderUseCase.ShippingDto(
-                    input.shipping().recipient().name(),
-                    input.shipping().recipient().phone(),
-                    input.shipping().address().zipCode(),
-                    input.shipping().address().street(),
-                    input.shipping().address().city(),
-                    input.shipping().address().state(),
-                    input.shipping().address().country(),
-                    input.shipping().address().detailAddress()
-                ),
-                input.idempotencyKey(),
-                input.discount() != null ? input.discount() : BigDecimal.ZERO
-            );
-        
+        CreateOrderUseCase.CreateOrderCommand command = buildCreateOrderCommand(input);
         return createOrderUseCase.createOrder(command);
+    }
+
+    private CreateOrderUseCase.CreateOrderCommand buildCreateOrderCommand(CreateOrderInput input) {
+        return new CreateOrderUseCase.CreateOrderCommand(
+            new UserId(input.userId()),
+            input.items().stream()
+                .map(item -> new CreateOrderUseCase.OrderItemDto(
+                    new com.flashdeal.app.domain.product.ProductId(item.productId()),
+                    item.quantity()
+                ))
+                .toList(),
+            buildShippingDto(input.shipping()),
+            input.idempotencyKey(),
+            input.discount() != null ? input.discount() : BigDecimal.ZERO
+        );
+    }
+
+    private CreateOrderUseCase.ShippingDto buildShippingDto(ShippingInput shipping) {
+        return new CreateOrderUseCase.ShippingDto(
+            shipping.recipient().name(),
+            shipping.recipient().phone(),
+            shipping.address().zipCode(),
+            shipping.address().street(),
+            shipping.address().city(),
+            shipping.address().state(),
+            shipping.address().country(),
+            shipping.address().detailAddress()
+        );
     }
 
     @MutationMapping
     public Mono<Order> cancelOrder(
             @Argument String id,
             @Argument String reason) {
-        
         OrderId orderId = new OrderId(id);
-        CancelOrderUseCase.CancelOrderCommand command = 
-            new CancelOrderUseCase.CancelOrderCommand(orderId, reason);
-        
+        CancelOrderUseCase.CancelOrderCommand command = new CancelOrderUseCase.CancelOrderCommand(orderId, reason);
         return cancelOrderUseCase.cancelOrder(command);
     }
 
@@ -98,12 +102,25 @@ public class OrderResolver {
     public Mono<Order> completePayment(
             @Argument String id,
             @Argument String transactionId) {
-        
         OrderId orderId = new OrderId(id);
         CompletePaymentUseCase.CompletePaymentCommand command = 
             new CompletePaymentUseCase.CompletePaymentCommand(orderId, transactionId);
-        
         return completePaymentUseCase.completePayment(command);
+    }
+
+    @SchemaMapping(typeName = "Order", field = "orderId")
+    public String orderId(Order order) {
+        return order.getOrderId().getValue();
+    }
+
+    @SchemaMapping(typeName = "Order", field = "userId")
+    public String userId(Order order) {
+        return order.getUserId().getValue();
+    }
+
+    @SchemaMapping(typeName = "OrderItem", field = "productId")
+    public String productId(OrderItem orderItem) {
+        return orderItem.getProductId().getValue();
     }
 
     // Input DTOs

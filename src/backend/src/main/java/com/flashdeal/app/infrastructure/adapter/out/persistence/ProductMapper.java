@@ -15,21 +15,22 @@ public class ProductMapper {
      * Domain Product → Document 변환
      */
     public ProductDocument toDocument(Product product) {
+        Instant now = Instant.now();
         return new ProductDocument(
             product.getProductId().getValue(),
-            "flash", // dealType은 현재 Product 도메인에 없으므로 하드코딩
+            "flash",
             product.getTitle(),
-            null, // subtitle은 Product에 없음
+            null,
             product.getDescription(),
-            null, // category는 Product에 없음
-            null, // images는 Product에 없음
+            product.getCategory(),
+            null,
             toPriceDocument(product.getPrice()),
             toScheduleDocument(product.getSchedule()),
             product.getStatus(),
             product.getSpecs().getFields(),
-            null, // metadata는 Product에 없음
-            Instant.now(), // createdAt
-            Instant.now()  // updatedAt
+            null,
+            now,
+            now
         );
     }
 
@@ -46,6 +47,7 @@ public class ProductMapper {
             productId,
             document.getTitle(),
             document.getDescription(),
+            document.getCategory(),
             price,
             schedule,
             specs
@@ -92,8 +94,3 @@ public class ProductMapper {
         );
     }
 }
-
-
-
-
-

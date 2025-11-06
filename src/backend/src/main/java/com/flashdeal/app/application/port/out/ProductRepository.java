@@ -1,8 +1,16 @@
 package com.flashdeal.app.application.port.out;
 
 import com.flashdeal.app.domain.product.Product;
+import com.flashdeal.app.domain.product.ProductFilter;
 import com.flashdeal.app.domain.product.ProductId;
+import com.flashdeal.app.domain.product.ProductPage;
+
+import java.util.List;
+
 import com.flashdeal.app.domain.product.DealStatus;
+import com.flashdeal.app.domain.product.Pagination;
+import com.flashdeal.app.domain.product.SortOption;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -42,6 +50,11 @@ public interface ProductRepository {
 
     Flux<Product> findByStatusAndScheduleEndAtBefore(DealStatus status, java.time.Instant time);
     
+    /**
+     * 필터링 조회
+     */
+    Mono<ProductPage> findByFilter(ProductFilter filter, Pagination pagination, List<SortOption> sort);
+
     /**
      * 상품 삭제
      */

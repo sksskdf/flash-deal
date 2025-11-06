@@ -3,6 +3,7 @@ package com.flashdeal.app.application.service;
 import com.flashdeal.app.application.port.out.ProductRepository;
 import com.flashdeal.app.domain.product.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +22,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("ProductStatusUpdateService 테스트")
 class ProductStatusUpdateServiceTest {
 
     @Mock
@@ -47,6 +49,7 @@ class ProductStatusUpdateServiceTest {
     }
 
     @Test
+    @DisplayName("상품 상태를 업데이트하면 UPCOMING을 ACTIVE로, ACTIVE를 ENDED로 전이한다")
     void updateProductStatuses_movesUpcomingToActive_andActiveToEnded() {
         given(productRepository.findByStatusAndScheduleStartAtBefore(eq(DealStatus.UPCOMING), any()))
             .willReturn(Flux.just(upcoming));

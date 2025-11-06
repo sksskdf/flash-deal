@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,34 +28,37 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
     @Override
     public Mono<Product> createProduct(CreateProductCommand command) {
         ProductId productId = new ProductId(UUID.randomUUID().toString());
-        
-        Price price = new Price(
-            command.originalPrice(),
-            command.dealPrice(),
-            command.currency() != null ? command.currency() : "KRW"
-        );
-        
-        Schedule schedule = new Schedule(
-            command.startAt(),
-            command.endAt(),
-            "Asia/Seoul"
-        );
-        
-        Map<String, Object> specsMap = new java.util.HashMap<>();
-        specsMap.put("category", command.category() != null ? command.category() : "General");
-        specsMap.put("imageUrl", command.imageUrl());
-        Specs specs = new Specs(specsMap);
+        Price price = createPrice(command.originalPrice(), command.dealPrice(), command.currency());
+        Schedule schedule = createSchedule(command.startAt(), command.endAt());
+        Specs specs = createSpecs(command.category(), command.imageUrl());
         
         Product product = new Product(
             productId,
             command.title(),
             command.description(),
+            command.category(),
             price,
             schedule,
             specs
         );
         
         return productRepository.save(product);
+    }
+
+    private Price createPrice(java.math.BigDecimal originalPrice, java.math.BigDecimal dealPrice, String currency) {
+        return new Price(originalPrice, dealPrice, currency != null ? currency : "KRW");
+    }
+
+    private Schedule createSchedule(java.time.ZonedDateTime startAt, java.time.ZonedDateTime endAt) {
+        return new Schedule(startAt, endAt, "Asia/Seoul");
+    }
+
+    private Specs createSpecs(String category, String imageUrl) {
+        Map<String, Object> specsMap = new java.util.HashMap<>();
+        if (imageUrl != null) {
+            specsMap.put("imageUrl", imageUrl);
+        }
+        return new Specs(specsMap);
     }
     
     @Override
@@ -76,6 +80,12 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
     @Override
     public Flux<Product> getActiveProducts() {
         return productRepository.findActiveProducts();
+    }
+
+    @Override
+    public Mono<ProductPage> getProductsByFilter(ProductFilter filter, Pagination pagination,
+            List<SortOption> sortOptions) {
+        return productRepository.findByFilter(filter, pagination, sortOptions);
     }
     
     @Override

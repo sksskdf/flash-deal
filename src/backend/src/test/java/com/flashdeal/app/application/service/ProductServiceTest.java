@@ -5,6 +5,7 @@ import com.flashdeal.app.application.port.in.UpdateProductUseCase.UpdateProductC
 import com.flashdeal.app.application.port.out.ProductRepository;
 import com.flashdeal.app.domain.product.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("ProductService 테스트")
 class ProductServiceTest {
 
     @Mock
@@ -43,6 +45,7 @@ class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("상품을 생성할 수 있다")
     void createProduct_success() {
         CreateProductCommand cmd = new CreateProductCommand(
             "타이틀",
@@ -63,6 +66,7 @@ class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("상품을 조회할 수 있다")
     void getProduct_found() {
         given(productRepository.findById(baseProduct.getProductId())).willReturn(Mono.just(baseProduct));
         StepVerifier.create(productService.getProduct(baseProduct.getProductId()))
@@ -71,6 +75,7 @@ class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("조회 쿼리는 Repository에 위임한다")
     void queries_delegateToRepository() {
         given(productRepository.findByStatus(DealStatus.ACTIVE)).willReturn(Flux.just(baseProduct));
         given(productRepository.findByCategory("General")).willReturn(Flux.just(baseProduct));
@@ -82,6 +87,7 @@ class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("상품 제목, 가격, 일정을 수정할 수 있다")
     void updateProduct_updatesTitlePriceSchedule() {
         given(productRepository.findById(baseProduct.getProductId())).willReturn(Mono.just(baseProduct));
         given(productRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));

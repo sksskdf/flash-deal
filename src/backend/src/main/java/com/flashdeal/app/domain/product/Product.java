@@ -16,6 +16,7 @@ public class Product {
     private final ProductId productId;
     private String title;
     private String description;
+    private String category;
     private Price price;
     private Schedule schedule;
     private Specs specs;
@@ -25,6 +26,17 @@ public class Product {
             ProductId productId,
             String title,
             String description,
+            Price price,
+            Schedule schedule,
+            Specs specs) {
+        this(productId, title, description, null, price, schedule, specs);
+    }
+
+    public Product(
+            ProductId productId,
+            String title,
+            String description,
+            String category,
             Price price,
             Schedule schedule,
             Specs specs) {
@@ -42,6 +54,7 @@ public class Product {
         this.productId = productId;
         this.title = title;
         this.description = description;
+        this.category = category;
         this.price = price;
         this.schedule = schedule;
         this.specs = specs;
@@ -128,6 +141,13 @@ public class Product {
     }
 
     /**
+     * 카테고리 변경
+     */
+    public void updateCategory(String newCategory) {
+        this.category = newCategory;
+    }
+
+    /**
      * 상태 변경
      */
     public void updateStatus(DealStatus newStatus) {
@@ -145,6 +165,10 @@ public class Product {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getCategory() {
+        return category;
     }
 
     public Price getPrice() {
@@ -181,8 +205,12 @@ public class Product {
         return "Product{" +
                 "productId=" + productId +
                 ", title='" + title + '\'' +
+                ", category='" + category + '\'' +
                 ", status=" + status +
+                ", price=" + price +
+                ", schedule=" + schedule +
+                ", specs=" + specs +
+                ", description=" + description +
                 '}';
     }
 }
-

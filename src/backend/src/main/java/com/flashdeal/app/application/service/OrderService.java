@@ -41,35 +41,29 @@ public class OrderService implements
     @Override
     @Transactional
     public Mono<Order> createOrder(CreateOrderCommand command) {
-        // 멱등성 체크
         return orderRepository.findByIdempotencyKey(command.idempotencyKey())
-            .flatMap(existingOrder -> Mono.<Order>just(existingOrder))
-            .switchIfEmpty(Mono.defer(() -> {
-                OrderId orderId = new OrderId(UUID.randomUUID().toString());
+            .switchIfEmpty(createNewOrder(command));
+    }
+
+    private Mono<Order> createNewOrder(CreateOrderCommand command) {
+        OrderId orderId = new OrderId(UUID.randomUUID().toString());
+        
+        return createOrderItems(command.items())
+            .collectList()
+            .flatMap(orderItems -> {
+                Shipping shipping = createShipping(command.shipping());
+                Order order = new Order(
+                    orderId,
+                    command.userId(),
+                    orderItems,
+                    shipping,
+                    command.idempotencyKey()
+                );
+                order.applyDiscount(command.discount());
                 
-                // 주문 아이템 생성
-                return createOrderItems(command.items())
-                    .collectList()
-                    .flatMap(orderItems -> {
-                        // 배송 정보 생성
-                        Shipping shipping = createShipping(command.shipping());
-                        
-                        // 주문 생성
-                        Order order = new Order(
-                            orderId,
-                            command.userId(),
-                            orderItems,
-                            shipping,
-                            command.idempotencyKey()
-                        );
-                        
-                        order.applyDiscount(command.discount());
-                        
-                        // 재고 예약
-                        return reserveInventory(command.items())
-                            .then(orderRepository.save(order));
-                    });
-            }));
+                return reserveInventory(command.items())
+                    .then(orderRepository.save(order));
+            });
     }
     
     private Flux<OrderItem> createOrderItems(List<OrderItemDto> items) {
@@ -121,21 +115,21 @@ public class OrderService implements
                 inventoryRepository.findByProductId(item.productId())
                     .switchIfEmpty(Mono.error(new IllegalArgumentException("Inventory not found for product: " + item.productId())))
                     .flatMap(inventory -> {
-                        if (inventory.isValidPurchaseQuantity(item.quantity()) == false) {
-                            return Mono.error(new IllegalArgumentException(
-                                "Invalid purchase quantity: " + item.quantity()
-                            ));
-                        }
-                        
-                        if (inventory.isOutOfStock()) {
-                            return Mono.error(new IllegalStateException("Product is out of stock"));
-                        }
-                        
+                        validateInventoryForPurchase(inventory, item.quantity());
                         inventory.reserve(item.quantity());
                         return inventoryRepository.save(inventory);
                     })
             )
             .then();
+    }
+
+    private void validateInventoryForPurchase(com.flashdeal.app.domain.inventory.Inventory inventory, int quantity) {
+        if (!inventory.isValidPurchaseQuantity(quantity)) {
+            throw new IllegalArgumentException("Invalid purchase quantity: " + quantity);
+        }
+        if (inventory.isOutOfStock()) {
+            throw new IllegalStateException("Product is out of stock");
+        }
     }
     
     @Override

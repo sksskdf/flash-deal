@@ -4,6 +4,7 @@ import com.flashdeal.app.application.port.in.CancelOrderUseCase;
 import com.flashdeal.app.application.port.out.OrderRepository;
 import com.flashdeal.app.domain.order.*;
 import com.flashdeal.app.domain.product.ProductId;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("OrderTimeoutService 테스트")
 class OrderTimeoutServiceTest {
 
     @Mock
@@ -30,6 +32,7 @@ class OrderTimeoutServiceTest {
     OrderTimeoutService timeoutService;
 
     @Test
+    @DisplayName("타임아웃된 주문에 대해 취소를 호출한다")
     void cancelTimedOutOrders_invokesCancelForPending() {
         Order pending = new Order(new OrderId("O-1"), new UserId("U-1"),
             List.of(new OrderItem(new ProductId("P-1"), new Snapshot("t","", new com.flashdeal.app.domain.product.Price(java.math.BigDecimal.ONE, java.math.BigDecimal.ONE, "KRW"), java.util.Map.of()), 1)),

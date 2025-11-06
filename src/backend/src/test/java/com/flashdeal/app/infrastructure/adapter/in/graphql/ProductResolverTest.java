@@ -68,8 +68,9 @@ class ProductResolverTest {
     @DisplayName("products - 상태별 상품 조회")
     void products_byStatus() {
         // Given
+        Product activeProduct = TestDataFactory.createActiveProduct();
         given(getProductUseCase.getProductsByStatus(DealStatus.ACTIVE))
-            .willReturn(Flux.just(testProduct));
+            .willReturn(Flux.just(activeProduct));
 
         // When
         Flux<Product> result = productResolver.products(DealStatus.ACTIVE, null);

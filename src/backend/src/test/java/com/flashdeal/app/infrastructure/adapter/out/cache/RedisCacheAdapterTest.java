@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Duration;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +21,7 @@ import reactor.test.StepVerifier;
  * Redis Cache Adapter 테스트
  */
 @SpringBootTest
+@DisplayName("RedisCacheAdapter 테스트")
 class RedisCacheAdapterTest extends AbstractRedisIntegrationTest {
 
     @Autowired
@@ -35,6 +37,7 @@ class RedisCacheAdapterTest extends AbstractRedisIntegrationTest {
     }
 
     @Test
+    @DisplayName("재고를 설정하고 조회할 수 있다")
     void shouldSetAndGetInventory() {
         // Given
         int quantity = 100;
@@ -50,6 +53,7 @@ class RedisCacheAdapterTest extends AbstractRedisIntegrationTest {
     }
 
     @Test
+    @DisplayName("재고를 감소시킬 수 있다")
     void shouldDecrementInventory() {
         // Given
         int initialQuantity = 100;
@@ -67,6 +71,7 @@ class RedisCacheAdapterTest extends AbstractRedisIntegrationTest {
     }
 
     @Test
+    @DisplayName("재고를 증가시킬 수 있다")
     void shouldIncrementInventory() {
         // Given
         int initialQuantity = 100;
@@ -84,6 +89,7 @@ class RedisCacheAdapterTest extends AbstractRedisIntegrationTest {
     }
 
     @Test
+    @DisplayName("예약을 설정하고 제거할 수 있다")
     void shouldSetAndRemoveReservation() {
         // Given
         String orderId = "order-123";
@@ -101,6 +107,7 @@ class RedisCacheAdapterTest extends AbstractRedisIntegrationTest {
     }
 
     @Test
+    @DisplayName("예약 개수를 조회할 수 있다")
     void shouldGetReservationCount() {
         // Given
         String orderId1 = "order-123";
@@ -119,6 +126,7 @@ class RedisCacheAdapterTest extends AbstractRedisIntegrationTest {
     }
 
     @Test
+    @DisplayName("재고를 삭제할 수 있다")
     void shouldDeleteInventory() {
         // Given
         int quantity = 100;
@@ -135,6 +143,7 @@ class RedisCacheAdapterTest extends AbstractRedisIntegrationTest {
     }
 
     @Test
+    @DisplayName("재고 존재 여부를 확인할 수 있다")
     void shouldCheckInventoryExists() {
         // Given
         int quantity = 100;
@@ -150,6 +159,7 @@ class RedisCacheAdapterTest extends AbstractRedisIntegrationTest {
     }
 
     @Test
+    @DisplayName("재고 TTL을 설정하고 조회할 수 있다")
     void shouldSetAndGetInventoryTTL() {
         // Given
         int quantity = 100;

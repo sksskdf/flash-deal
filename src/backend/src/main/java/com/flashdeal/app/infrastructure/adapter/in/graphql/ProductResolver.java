@@ -5,6 +5,7 @@ import com.flashdeal.app.domain.product.*;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -55,25 +56,72 @@ public class ProductResolver {
     }
 
     @QueryMapping
+    public Mono<ProductPage> productFiltered(
+            @Argument ProductFilterInput filter,
+            @Argument PaginationInput pagination,
+            @Argument List<SortOptionInput> sort) {
+        ProductFilter domainFilter = mapToProductFilter(filter);
+        Pagination domainPagination = mapToPagination(pagination);
+        List<SortOption> domainSortOptions = mapToSortOptions(sort);
+
+        return getProductUseCase.getProductsByFilter(domainFilter, domainPagination, domainSortOptions);
+    }
+
+    private ProductFilter mapToProductFilter(ProductFilterInput filter) {
+        if (filter == null) {
+            return new ProductFilter(null, null, null, null, null, null);
+        }
+        return new ProductFilter(
+                filter.status(),
+                filter.category(),
+                filter.minPrice(),
+                filter.maxPrice(),
+                filter.minDiscountRate(),
+                filter.searchText()
+        );
+    }
+
+    private Pagination mapToPagination(PaginationInput pagination) {
+        if (pagination == null) {
+            return new Pagination(0, 20);
+        }
+        return new Pagination(pagination.page(), pagination.size());
+    }
+
+    private List<SortOption> mapToSortOptions(List<SortOptionInput> sort) {
+        if (sort == null) {
+            return List.of(new SortOption(ProductSortField.CREATED_AT, SortOrder.DESC));
+        }
+        return sort.stream()
+                .map(s -> new SortOption(
+                        mapSortField(s.field().name()),
+                        mapSortOrder(s.order().name())))
+                .toList();
+    }
+
+    @QueryMapping
     public Flux<Product> activeProducts() {
         return getProductUseCase.getActiveProducts();
     }
 
+    @SchemaMapping(typeName = "Product", field = "productId")
+    public String productId(Product product) {
+        return product.getProductId().getValue();
+    }
+
     @MutationMapping
     public Mono<Product> createProduct(@Argument CreateProductInput input) {
-        CreateProductUseCase.CreateProductCommand command = 
-            new CreateProductUseCase.CreateProductCommand(
-                input.title(),
-                input.description(),
-                input.originalPrice(),
-                input.dealPrice(),
-                input.currency(),
-                input.startAt(),
-                input.endAt(),
-                input.category(),
-                input.imageUrl()
-            );
-        
+        CreateProductUseCase.CreateProductCommand command = new CreateProductUseCase.CreateProductCommand(
+            input.title(),
+            input.description(),
+            input.originalPrice(),
+            input.dealPrice(),
+            input.currency(),
+            input.startAt(),
+            input.endAt(),
+            input.category(),
+            input.imageUrl()
+        );
         return createProductUseCase.createProduct(command);
     }
 
@@ -81,20 +129,16 @@ public class ProductResolver {
     public Mono<Product> updateProduct(
             @Argument String id,
             @Argument UpdateProductInput input) {
-        
         ProductId productId = new ProductId(id);
-        
-        UpdateProductUseCase.UpdateProductCommand command = 
-            new UpdateProductUseCase.UpdateProductCommand(
-                productId,
-                input.title(),
-                input.description(),
-                input.originalPrice(),
-                input.dealPrice(),
-                input.startAt(),
-                input.endAt()
-            );
-        
+        UpdateProductUseCase.UpdateProductCommand command = new UpdateProductUseCase.UpdateProductCommand(
+            productId,
+            input.title(),
+            input.description(),
+            input.originalPrice(),
+            input.dealPrice(),
+            input.startAt(),
+            input.endAt()
+        );
         return updateProductUseCase.updateProduct(command);
     }
 
@@ -125,5 +169,32 @@ public class ProductResolver {
         String key,
         String value
     ) {}
+
+    public record ProductFilterInput(
+            DealStatus status,
+            String category,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Integer minDiscountRate,
+            String searchText) {
+    }
+
+    public record SortOptionInput(
+            ProductSortField field,
+            SortOrder order) {
+    }
+
+    public record PaginationInput(
+            Integer page,
+            Integer size) {
+    }
+
+    private ProductSortField mapSortField(String field) {
+        return ProductSortField.valueOf(field);
+    }
+
+    private SortOrder mapSortOrder(String order) {
+        return SortOrder.valueOf(order);
+    }
 }
 

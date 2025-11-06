@@ -2,6 +2,11 @@ type Query {
     # Product Queries
     product(id: ID!): Product
     products(status: DealStatus, category: String): [Product!]!
+    productsFiltered(
+        filter: ProductFilter!, 
+        pagination: PaginationInput!, 
+        sort: [SortOption!]
+    ): ProductPage!
     activeProducts: [Product!]!
     
     # Order Queries
@@ -256,3 +261,49 @@ input ReserveInventoryInput {
 scalar Decimal
 scalar DateTime
 
+enum SortOrder {
+    ASC
+    DESC
+}
+
+enum ProductSortField {
+    TITLE
+    PRICE
+    DISCOUNT_RATE
+    CREATED_AT
+    STARTS_AT
+    ENDS_AT
+}
+
+input SortOption {
+    field: ProductSortField!
+    order: SortOrder!
+}
+
+input PaginationInput {
+    page: Int! = 0
+    size: Int! = 20
+}
+
+input ProductFilter {
+    status: DealStatus
+    category: String
+    minPrice: Decimal
+    maxPrice: Decimal
+    minDiscountRate: Int
+    searchText: String
+}
+
+type PageInfo {
+    page: Int!
+    size: Int!
+    totalElements: Int!
+    totalPages: Int!
+    hasNext: Boolean!
+    hasPrevious: Boolean!
+}
+
+type ProductPage {
+    content: [Product!]!
+    pageInfo: PageInfo!
+}

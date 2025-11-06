@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Duration;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -31,6 +32,7 @@ import reactor.test.StepVerifier;
 @DataMongoTest
 @Testcontainers
 @ActiveProfiles("test")
+@DisplayName("Inventory Persistence Adapter 테스트")
 class InventoryPersistenceAdapterTest {
 
     @Container
@@ -58,6 +60,7 @@ class InventoryPersistenceAdapterTest {
     }
 
     @Test
+    @DisplayName("재고를 저장하고 조회할 수 있다")
     void shouldSaveAndFindInventory() {
         // Given
         Inventory inventory = TestDataFactory.createInventory();
@@ -80,6 +83,7 @@ class InventoryPersistenceAdapterTest {
     }
 
     @Test
+    @DisplayName("상품 ID로 재고를 조회할 수 있다")
     void shouldFindInventoryByProductId() {
         // Given
         Inventory inventory = TestDataFactory.createInventory();
@@ -100,6 +104,7 @@ class InventoryPersistenceAdapterTest {
     }
 
     @Test
+    @DisplayName("재고를 삭제할 수 있다")
     void shouldDeleteInventory() {
         // Given
         Inventory inventory = TestDataFactory.createInventory();
@@ -120,6 +125,7 @@ class InventoryPersistenceAdapterTest {
     }
 
     @Test
+    @DisplayName("상품 ID로 재고 존재 여부를 확인할 수 있다")
     void shouldCheckInventoryExistsByProductId() {
         // Given
         Inventory inventory = TestDataFactory.createInventory();
@@ -137,6 +143,7 @@ class InventoryPersistenceAdapterTest {
     }
 
     @Test
+    @DisplayName("재고를 예약할 수 있다")
     void shouldReserveInventory() {
         // Given
         Inventory inventory = TestDataFactory.createInventory();

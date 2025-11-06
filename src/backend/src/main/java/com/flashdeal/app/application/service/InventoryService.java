@@ -70,21 +70,23 @@ public class InventoryService implements
         return inventoryRepository.findByProductId(command.productId())
             .switchIfEmpty(Mono.error(new IllegalArgumentException("Inventory not found for product: " + command.productId())))
             .flatMap(inventory -> {
-                if (!inventory.isValidPurchaseQuantity(command.quantity())) {
-                    return Mono.error(new IllegalArgumentException(
-                        "Invalid purchase quantity: " + command.quantity() + 
-                        " (max: " + inventory.getPolicy().getMaxPurchasePerUser() + ")"
-                    ));
-                }
-                
-                if (inventory.isOutOfStock()) {
-                    return Mono.error(new IllegalStateException("Product is out of stock"));
-                }
-                
+                validateInventoryForReservation(inventory, command.quantity());
                 inventory.reserve(command.quantity());
                 return inventoryRepository.save(inventory);
             })
             .then();
+    }
+
+    private void validateInventoryForReservation(Inventory inventory, int quantity) {
+        if (!inventory.isValidPurchaseQuantity(quantity)) {
+            throw new IllegalArgumentException(
+                "Invalid purchase quantity: " + quantity + 
+                " (max: " + inventory.getPolicy().getMaxPurchasePerUser() + ")"
+            );
+        }
+        if (inventory.isOutOfStock()) {
+            throw new IllegalStateException("Product is out of stock");
+        }
     }
     
     @Override

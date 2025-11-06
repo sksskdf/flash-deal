@@ -6,6 +6,7 @@ import com.flashdeal.app.domain.product.ProductId;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
@@ -48,26 +49,22 @@ public class InventoryResolver {
 
     @MutationMapping
     public Mono<Inventory> createInventory(@Argument CreateInventoryInput input) {
-        CreateInventoryUseCase.CreateInventoryCommand command = 
-            new CreateInventoryUseCase.CreateInventoryCommand(
-                new ProductId(input.productId()),
-                input.totalQuantity(),
-                input.lowStockThreshold(),
-                input.maxPurchaseQuantity(),
-                input.reservationTimeout()
-            );
-        
+        CreateInventoryUseCase.CreateInventoryCommand command = new CreateInventoryUseCase.CreateInventoryCommand(
+            new ProductId(input.productId()),
+            input.totalQuantity(),
+            input.lowStockThreshold(),
+            input.maxPurchaseQuantity(),
+            input.reservationTimeout()
+        );
         return createInventoryUseCase.createInventory(command);
     }
 
     @MutationMapping
     public Mono<Boolean> reserveInventory(@Argument ReserveInventoryInput input) {
-        ReserveInventoryUseCase.ReserveInventoryCommand command = 
-            new ReserveInventoryUseCase.ReserveInventoryCommand(
-                new ProductId(input.productId()),
-                input.quantity()
-            );
-        
+        ReserveInventoryUseCase.ReserveInventoryCommand command = new ReserveInventoryUseCase.ReserveInventoryCommand(
+            new ProductId(input.productId()),
+            input.quantity()
+        );
         return reserveInventoryUseCase.reserve(command)
             .thenReturn(true)
             .onErrorReturn(false);
@@ -75,12 +72,10 @@ public class InventoryResolver {
 
     @MutationMapping
     public Mono<Boolean> confirmInventory(@Argument ReserveInventoryInput input) {
-        ConfirmInventoryUseCase.ConfirmInventoryCommand command = 
-            new ConfirmInventoryUseCase.ConfirmInventoryCommand(
-                new ProductId(input.productId()),
-                input.quantity()
-            );
-        
+        ConfirmInventoryUseCase.ConfirmInventoryCommand command = new ConfirmInventoryUseCase.ConfirmInventoryCommand(
+            new ProductId(input.productId()),
+            input.quantity()
+        );
         return confirmInventoryUseCase.confirm(command)
             .thenReturn(true)
             .onErrorReturn(false);
@@ -88,15 +83,23 @@ public class InventoryResolver {
 
     @MutationMapping
     public Mono<Boolean> releaseInventory(@Argument ReserveInventoryInput input) {
-        ReleaseInventoryUseCase.ReleaseInventoryCommand command = 
-            new ReleaseInventoryUseCase.ReleaseInventoryCommand(
-                new ProductId(input.productId()),
-                input.quantity()
-            );
-        
+        ReleaseInventoryUseCase.ReleaseInventoryCommand command = new ReleaseInventoryUseCase.ReleaseInventoryCommand(
+            new ProductId(input.productId()),
+            input.quantity()
+        );
         return releaseInventoryUseCase.release(command)
             .thenReturn(true)
             .onErrorReturn(false);
+    }
+
+    @SchemaMapping(typeName = "Inventory", field = "inventoryId")
+    public String inventoryId(Inventory inventory) {
+        return inventory.getInventoryId().getValue();
+    }
+
+    @SchemaMapping(typeName = "Inventory", field = "productId")
+    public String productId(Inventory inventory) {
+        return inventory.getProductId().getValue();
     }
 
     // Input DTOs

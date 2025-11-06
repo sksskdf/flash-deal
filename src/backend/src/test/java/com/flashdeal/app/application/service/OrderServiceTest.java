@@ -15,6 +15,7 @@ import com.flashdeal.app.domain.inventory.Stock;
 import com.flashdeal.app.domain.order.*;
 import com.flashdeal.app.domain.product.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,6 +35,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@DisplayName("OrderService 테스트")
 class OrderServiceTest {
 
     @Mock
@@ -66,6 +68,7 @@ class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("주문을 생성하면 재고를 예약하고 주문을 저장한다")
     void createOrder_success_reservesInventory_andSavesOrder() {
         UserId userId = new UserId("U-1");
         List<OrderItemDto> items = List.of(new OrderItemDto(sampleProduct.getProductId(), 2));
@@ -103,6 +106,7 @@ class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("멱등성 키가 있으면 기존 주문을 반환한다")
     void createOrder_idempotent_returnsExisting() {
         UserId userId = new UserId("U-1");
         List<OrderItemDto> items = List.of(new OrderItemDto(sampleProduct.getProductId(), 1));
@@ -127,6 +131,7 @@ class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("대기 중인 주문을 취소하면 재고를 해제하고 저장한다")
     void cancelOrder_whenPending_releasesInventory_andSaves() {
         OrderId orderId = new OrderId("O-2");
         Order pending = new Order(orderId, new UserId("U-1"), List.of(
@@ -147,6 +152,7 @@ class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("대기 중인 주문의 결제를 완료하면 재고를 확정하고 저장한다")
     void completePayment_whenPending_confirmsInventory_andSaves() {
         OrderId orderId = new OrderId("O-3");
         Order pending = new Order(orderId, new UserId("U-1"), List.of(
@@ -167,6 +173,7 @@ class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("유효하지 않은 수량으로 주문 생성 시 예외가 발생한다")
     void createOrder_invalidQuantity_throws() {
         UserId userId = new UserId("U-1");
         org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {

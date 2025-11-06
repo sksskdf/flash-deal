@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Duration;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
@@ -33,6 +34,7 @@ import reactor.test.StepVerifier;
 @DataMongoTest
 @Testcontainers
 @ActiveProfiles("test")
+@DisplayName("Order Persistence Adapter 테스트")
 class OrderPersistenceAdapterTest {
 
         @Container
@@ -61,6 +63,7 @@ class OrderPersistenceAdapterTest {
         }
 
         @Test
+        @DisplayName("주문을 저장하고 조회할 수 있다")
         void shouldSaveAndFindOrder() {
                 // Given
                 Order order = TestDataFactory.createOrder();
@@ -82,6 +85,7 @@ class OrderPersistenceAdapterTest {
         }
 
         @Test
+        @DisplayName("사용자 ID로 주문 목록을 조회할 수 있다")
         void shouldFindOrdersByUserId() {
                 // Given
                 Order order1 = TestDataFactory.createOrder();
@@ -103,6 +107,7 @@ class OrderPersistenceAdapterTest {
         }
 
         @Test
+        @DisplayName("상태로 주문 목록을 조회할 수 있다")
         void shouldFindOrdersByStatus() {
                 // Given
                 Order order = TestDataFactory.createOrder();
@@ -121,6 +126,7 @@ class OrderPersistenceAdapterTest {
         }
 
         @Test
+        @DisplayName("멱등성 키로 주문을 조회할 수 있다")
         void shouldFindOrderByIdempotencyKey() {
                 // Given
                 Order order = TestDataFactory.createOrder();
@@ -139,6 +145,7 @@ class OrderPersistenceAdapterTest {
         }
 
         @Test
+        @DisplayName("주문을 삭제할 수 있다")
         void shouldDeleteOrder() {
                 // Given
                 Order order = TestDataFactory.createOrder();
@@ -159,6 +166,7 @@ class OrderPersistenceAdapterTest {
         }
 
         @Test
+        @DisplayName("주문 존재 여부를 확인할 수 있다")
         void shouldCheckOrderExists() {
                 // Given
                 Order order = TestDataFactory.createOrder();

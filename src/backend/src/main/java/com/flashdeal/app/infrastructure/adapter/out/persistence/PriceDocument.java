@@ -1,13 +1,17 @@
 package com.flashdeal.app.infrastructure.adapter.out.persistence;
 
 import java.math.BigDecimal;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 
 /**
  * Price MongoDB Document
  */
 public class PriceDocument {
     
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal original;
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal sale;
     private String currency;
     private Integer rate;
@@ -53,8 +57,3 @@ public class PriceDocument {
         this.rate = rate;
     }
 }
-
-
-
-
-
