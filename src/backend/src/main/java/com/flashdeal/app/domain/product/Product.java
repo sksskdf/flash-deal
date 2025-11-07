@@ -3,14 +3,6 @@ package com.flashdeal.app.domain.product;
 import java.time.ZonedDateTime;
 import java.util.Objects;
 
-/**
- * Product Aggregate Root
- * 
- * 책임:
- * - 상품 정보 관리
- * - 딜 상태 전이 (upcoming → active → ended/soldout)
- * - 가격 계산
- */
 public class Product {
     
     private final ProductId productId;
@@ -67,16 +59,11 @@ public class Product {
         }
     }
 
-    /**
-     * 현재 시각 기준으로 딜 상태를 계산
-     */
     public DealStatus calculateStatus(ZonedDateTime now) {
-        // SOLDOUT이나 ENDED는 유지
         if (status == DealStatus.SOLDOUT || status == DealStatus.ENDED) {
             return status;
         }
-        
-        // 일정 기반으로 상태 계산
+
         if (!schedule.hasStarted(now)) {
             return DealStatus.UPCOMING;
         } else if (schedule.isActive(now)) {
@@ -86,9 +73,6 @@ public class Product {
         }
     }
 
-    /**
-     * 딜 상태를 전이
-     */
     public void transitionTo(DealStatus newStatus) {
         if (!status.canTransitionTo(newStatus)) {
             throw new IllegalStateException(
@@ -98,33 +82,21 @@ public class Product {
         this.status = newStatus;
     }
 
-    /**
-     * 가격 변경
-     */
     public void updatePrice(Price newPrice) {
         validateNotNull(newPrice, "Price cannot be null");
         this.price = newPrice;
     }
 
-    /**
-     * 일정 변경
-     */
     public void updateSchedule(Schedule newSchedule) {
         validateNotNull(newSchedule, "Schedule cannot be null");
         this.schedule = newSchedule;
     }
 
-    /**
-     * 스펙 변경
-     */
     public void updateSpecs(Specs newSpecs) {
         validateNotNull(newSpecs, "Specs cannot be null");
         this.specs = newSpecs;
     }
 
-    /**
-     * 제목 변경
-     */
     public void updateTitle(String newTitle) {
         validateNotNull(newTitle, "Title cannot be null");
         if (newTitle.trim().isEmpty()) {
@@ -133,28 +105,18 @@ public class Product {
         this.title = newTitle;
     }
 
-    /**
-     * 설명 변경
-     */
     public void updateDescription(String newDescription) {
         this.description = newDescription;
     }
 
-    /**
-     * 카테고리 변경
-     */
     public void updateCategory(String newCategory) {
         this.category = newCategory;
     }
 
-    /**
-     * 상태 변경
-     */
     public void updateStatus(DealStatus newStatus) {
         this.status = newStatus;
     }
 
-    // Getters
     public ProductId getProductId() {
         return productId;
     }

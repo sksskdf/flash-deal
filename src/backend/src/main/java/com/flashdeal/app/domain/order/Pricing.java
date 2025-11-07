@@ -71,13 +71,6 @@ public final class Pricing {
         return currency;
     }
 
-    /**
-     * 세금 계산 (임시 구현 - 총액의 10%)
-     */
-    public BigDecimal getTax() {
-        return total.multiply(new BigDecimal("0.1"));
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

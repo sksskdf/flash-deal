@@ -7,15 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Order Aggregate Root
- * 
- * 책임:
- * - 주문 생성 및 관리
- * - 상태 전이
- * - 금액 계산
- * - 취소/환불
- */
 public class Order {
     
     private static final BigDecimal DEFAULT_SHIPPING_FEE = new BigDecimal("3000");
@@ -28,6 +19,7 @@ public class Order {
     private Pricing pricing;
     private Payment payment;
     private OrderStatus status;
+    private Cancellation cancellation;
     private final Instant createdAt;
 
 
@@ -55,10 +47,8 @@ public class Order {
         this.status = OrderStatus.PENDING;
         this.createdAt = createdAt;
         
-        // 초기 가격 계산
         this.pricing = calculatePricing(BigDecimal.ZERO);
         
-        // 초기 결제 정보
         this.payment = new Payment("CreditCard", PaymentStatus.PENDING, null, null);
     }
 
@@ -79,64 +69,47 @@ public class Order {
         return new Pricing(subtotal, DEFAULT_SHIPPING_FEE, discount, currency);
     }
 
-    /**
-     * 주문 확정
-     */
     public void confirm() {
         this.status = OrderStatus.CONFIRMED;
     }
 
-    /**
-     * 배송 시작
-     */
     public void ship() {
         this.status = OrderStatus.SHIPPED;
     }
 
-    /**
-     * 배송 완료
-     */
     public void deliver() {
         this.status = OrderStatus.DELIVERED;
     }
 
-    /**
-     * 주문 취소
-     */
     public void cancel() {
-        this.status = OrderStatus.CANCELLED;
+        cancel("User requested", "system");
     }
 
-    /**
-     * 환불
-     */
+    public void cancel(String reason, String cancelledBy) {
+        this.status = OrderStatus.CANCELLED;
+        List<String> cancelledItemIds = items.stream()
+                .map(item -> item.getProductId().getValue())
+                .collect(java.util.stream.Collectors.toList());
+        this.cancellation = new Cancellation(reason, cancelledBy, cancelledItemIds);
+    }
+
     public void refund() {
         this.status = OrderStatus.REFUNDED;
         this.payment = payment.refund();
     }
 
-    /**
-     * 결제 완료
-     */
     public void completePayment(String transactionId) {
         this.payment = payment.complete(transactionId);
     }
 
-    /**
-     * 결제 실패
-     */
     public void failPayment() {
         this.payment = payment.fail();
     }
 
-    /**
-     * 할인 적용
-     */
     public void applyDiscount(BigDecimal discount) {
         this.pricing = calculatePricing(discount);
     }
 
-    // Getters
     public OrderId getOrderId() {
         return orderId;
     }
@@ -169,22 +142,24 @@ public class Order {
         return createdAt;
     }
 
-    /**
-     * 상태 전이
-     */
     public void transitionTo(OrderStatus newStatus) {
         this.status = newStatus;
     }
 
-    /**
-     * 주문 번호 생성 (임시 구현)
-     */
     public String getOrderNumber() {
         return "ORD-" + orderId.getValue().substring(0, 8);
     }
 
     public String getIdempotencyKey() {
         return idempotencyKey;
+    }
+
+    public Cancellation getCancellation() {
+        return cancellation;
+    }
+
+    public void setCancellation(Cancellation cancellation) {
+        this.cancellation = cancellation;
     }
 
     public void setPricing(Pricing pricing) {

@@ -22,7 +22,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import com.flashdeal.app.TestDataFactory;
+import com.flashdeal.app.domain.common.Pagination;
+import com.flashdeal.app.domain.common.SortOrder;
 import com.flashdeal.app.domain.product.*;
+import com.flashdeal.app.infrastructure.adapter.out.persistence.documents.ProductDocument;
+import com.flashdeal.app.infrastructure.adapter.out.persistence.mapper.ProductMapper;
+import com.flashdeal.app.infrastructure.adapter.out.persistence.repository.ProductMongoRepository;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -374,8 +379,8 @@ class ProductPersistenceAdapterTest {
 
         ProductFilter filter = new ProductFilter(null, null, null, null, null, null);
         Pagination pagination = new Pagination(0, 10);
-        List<SortOption> sortOptions = List.of(
-                new SortOption(ProductSortField.TITLE, SortOrder.ASC)
+        List<ProductSortOption> sortOptions = List.of(
+                new ProductSortOption(ProductSortField.TITLE, SortOrder.ASC)
         );
 
         // When
@@ -406,8 +411,8 @@ class ProductPersistenceAdapterTest {
 
         ProductFilter filter = new ProductFilter(null, null, null, null, null, null);
         Pagination pagination = new Pagination(0, 10);
-        List<SortOption> sortOptions = List.of(
-                new SortOption(ProductSortField.PRICE, SortOrder.DESC)
+        List<ProductSortOption> sortOptions = List.of(
+                new ProductSortOption(ProductSortField.PRICE, SortOrder.DESC)
         );
 
         // When

@@ -1,7 +1,13 @@
 package com.flashdeal.app.infrastructure.adapter.out.persistence;
 
 import com.flashdeal.app.application.port.out.ProductRepository;
+import com.flashdeal.app.domain.common.PageInfo;
+import com.flashdeal.app.domain.common.Pagination;
+import com.flashdeal.app.domain.common.SortOrder;
 import com.flashdeal.app.domain.product.*;
+import com.flashdeal.app.infrastructure.adapter.out.persistence.documents.ProductDocument;
+import com.flashdeal.app.infrastructure.adapter.out.persistence.mapper.ProductMapper;
+import com.flashdeal.app.infrastructure.adapter.out.persistence.repository.ProductMongoRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -81,7 +87,7 @@ public class ProductPersistenceAdapter implements ProductRepository {
     }
 
     @Override
-    public Mono<ProductPage> findByFilter(ProductFilter filter, Pagination pagination, List<SortOption> sortOptions) {
+    public Mono<ProductPage> findByFilter(ProductFilter filter, Pagination pagination, List<ProductSortOption> sortOptions) {
         Query query = buildQuery(filter);
         Sort sort = buildSort(sortOptions);
         Pageable pageable = PageRequest.of(pagination.page(), pagination.size(), sort);
@@ -185,7 +191,7 @@ public class ProductPersistenceAdapter implements ProductRepository {
         }
     }
 
-    private Sort buildSort(List<SortOption> sortOptions) {
+    private Sort buildSort(List<ProductSortOption> sortOptions) {
         if (sortOptions == null || sortOptions.isEmpty()) {
             return Sort.by(Sort.Direction.DESC, "createdAt");
         }

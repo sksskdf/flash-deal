@@ -3,9 +3,6 @@ package com.flashdeal.app.domain.inventory;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Inventory의 식별자 Value Object
- */
 public final class InventoryId {
     
     private final String value;

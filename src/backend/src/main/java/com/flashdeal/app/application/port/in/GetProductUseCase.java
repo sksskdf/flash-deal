@@ -4,12 +4,12 @@ import com.flashdeal.app.domain.product.Product;
 import com.flashdeal.app.domain.product.ProductFilter;
 import com.flashdeal.app.domain.product.ProductId;
 import com.flashdeal.app.domain.product.ProductPage;
-import com.flashdeal.app.domain.product.SortOption;
+import com.flashdeal.app.domain.product.ProductSortOption;
 
 import java.util.List;
 
+import com.flashdeal.app.domain.common.Pagination;
 import com.flashdeal.app.domain.product.DealStatus;
-import com.flashdeal.app.domain.product.Pagination;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,7 +25,7 @@ public interface GetProductUseCase {
     
     Flux<Product> getProductsByCategory(String category);
 
-    Mono<ProductPage> getProductsByFilter(ProductFilter filter, Pagination pagination, List<SortOption> sortOptions);
+    Mono<ProductPage> getProductsByFilter(ProductFilter filter, Pagination pagination, List<ProductSortOption> sortOptions);
     
     Flux<Product> getActiveProducts();
 }

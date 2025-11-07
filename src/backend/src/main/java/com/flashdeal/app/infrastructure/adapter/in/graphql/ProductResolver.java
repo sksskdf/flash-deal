@@ -1,6 +1,8 @@
 package com.flashdeal.app.infrastructure.adapter.in.graphql;
 
 import com.flashdeal.app.application.port.in.*;
+import com.flashdeal.app.domain.common.Pagination;
+import com.flashdeal.app.domain.common.SortOrder;
 import com.flashdeal.app.domain.product.*;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -62,7 +64,7 @@ public class ProductResolver {
             @Argument List<SortOptionInput> sort) {
         ProductFilter domainFilter = mapToProductFilter(filter);
         Pagination domainPagination = mapToPagination(pagination);
-        List<SortOption> domainSortOptions = mapToSortOptions(sort);
+        List<ProductSortOption> domainSortOptions = mapToSortOptions(sort);
 
         return getProductUseCase.getProductsByFilter(domainFilter, domainPagination, domainSortOptions);
     }
@@ -88,12 +90,12 @@ public class ProductResolver {
         return new Pagination(pagination.page(), pagination.size());
     }
 
-    private List<SortOption> mapToSortOptions(List<SortOptionInput> sort) {
+    private List<ProductSortOption> mapToSortOptions(List<SortOptionInput> sort) {
         if (sort == null) {
-            return List.of(new SortOption(ProductSortField.CREATED_AT, SortOrder.DESC));
+            return List.of(new ProductSortOption(ProductSortField.CREATED_AT, SortOrder.DESC));
         }
         return sort.stream()
-                .map(s -> new SortOption(
+                .map(s -> new ProductSortOption(
                         mapSortField(s.field().name()),
                         mapSortOrder(s.order().name())))
                 .toList();

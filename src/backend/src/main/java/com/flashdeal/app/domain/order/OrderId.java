@@ -3,9 +3,6 @@ package com.flashdeal.app.domain.order;
 import java.util.Objects;
 import java.util.UUID;
 
-/**
- * Order의 식별자 Value Object
- */
 public final class OrderId {
     
     private final String value;

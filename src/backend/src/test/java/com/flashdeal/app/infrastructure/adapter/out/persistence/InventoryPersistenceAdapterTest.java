@@ -22,6 +22,8 @@ import com.flashdeal.app.TestDataFactory;
 import com.flashdeal.app.domain.inventory.Inventory;
 import com.flashdeal.app.domain.inventory.InventoryId;
 import com.flashdeal.app.domain.product.ProductId;
+import com.flashdeal.app.infrastructure.adapter.out.persistence.mapper.InventoryMapper;
+import com.flashdeal.app.infrastructure.adapter.out.persistence.repository.InventoryMongoRepository;
 
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -152,10 +154,7 @@ class InventoryPersistenceAdapterTest {
         // When
         Mono<Inventory> saveResult = adapter.save(inventory);
         Mono<Inventory> reserveResult = saveResult
-                .map(inv -> {
-                    inv.reserve(reserveQuantity);
-                    return inv;
-                })
+                .map(inv -> inv.reserve(reserveQuantity))
                 .flatMap(adapter::save);
 
         // Then

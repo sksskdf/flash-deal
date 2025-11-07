@@ -5,7 +5,6 @@ import com.flashdeal.app.application.port.out.InventoryRepository;
 import com.flashdeal.app.application.port.out.OrderRepository;
 import com.flashdeal.app.application.port.out.ProductRepository;
 import com.flashdeal.app.domain.order.*;
-import com.flashdeal.app.domain.product.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -165,7 +164,9 @@ public class OrderService implements
                     ));
                 }
                 
-                order.cancel();
+                String reason = command.reason() != null ? command.reason() : "User requested";
+                String cancelledBy = order.getUserId().getValue(); // 사용자 ID 사용
+                order.cancel(reason, cancelledBy);
                 
                 // 재고 복구
                 return releaseInventory(order.getItems())

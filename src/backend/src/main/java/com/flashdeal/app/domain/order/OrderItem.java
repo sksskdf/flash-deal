@@ -4,11 +4,6 @@ import com.flashdeal.app.domain.product.ProductId;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-/**
- * OrderItem Entity
- * 
- * 주문 항목
- */
 public class OrderItem {
     
     private final ProductId productId;
@@ -39,24 +34,15 @@ public class OrderItem {
         }
     }
 
-    /**
-     * 주문 항목 취소
-     */
     public void cancel() {
         this.status = OrderItemStatus.CANCELLED;
     }
 
-    /**
-     * 수량 변경
-     */
     public void updateQuantity(int newQuantity) {
         validateQuantity(newQuantity);
         this.quantity = newQuantity;
     }
 
-    /**
-     * 소계 계산 (할인가 × 수량)
-     */
     public BigDecimal getSubtotal() {
         return snapshot.getPrice().getSale().multiply(BigDecimal.valueOf(quantity));
     }

@@ -6,11 +6,10 @@ package com.flashdeal.app.domain.order;
 public enum OrderStatus {
     PENDING,
     PROCESSING,
-            CONFIRMED,
+    CONFIRMED,
     SHIPPED,
     DELIVERED,
     CANCELLED,
     PARTIALLY_CANCELLED,
     REFUNDED
 }
-

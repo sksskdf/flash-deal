@@ -4,6 +4,10 @@ import com.flashdeal.app.application.port.out.InventoryRepository;
 import com.flashdeal.app.domain.inventory.Inventory;
 import com.flashdeal.app.domain.inventory.InventoryId;
 import com.flashdeal.app.domain.product.ProductId;
+import com.flashdeal.app.infrastructure.adapter.out.persistence.documents.InventoryDocument;
+import com.flashdeal.app.infrastructure.adapter.out.persistence.mapper.InventoryMapper;
+import com.flashdeal.app.infrastructure.adapter.out.persistence.repository.InventoryMongoRepository;
+
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 

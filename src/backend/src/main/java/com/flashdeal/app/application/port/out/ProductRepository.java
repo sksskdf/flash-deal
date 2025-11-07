@@ -7,9 +7,9 @@ import com.flashdeal.app.domain.product.ProductPage;
 
 import java.util.List;
 
+import com.flashdeal.app.domain.common.Pagination;
 import com.flashdeal.app.domain.product.DealStatus;
-import com.flashdeal.app.domain.product.Pagination;
-import com.flashdeal.app.domain.product.SortOption;
+import com.flashdeal.app.domain.product.ProductSortOption;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -53,7 +53,7 @@ public interface ProductRepository {
     /**
      * 필터링 조회
      */
-    Mono<ProductPage> findByFilter(ProductFilter filter, Pagination pagination, List<SortOption> sort);
+    Mono<ProductPage> findByFilter(ProductFilter filter, Pagination pagination, List<ProductSortOption> sort);
 
     /**
      * 상품 삭제

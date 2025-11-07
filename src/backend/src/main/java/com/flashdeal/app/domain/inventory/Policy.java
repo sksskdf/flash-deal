@@ -31,23 +31,14 @@ public final class Policy {
         this.maxPurchasePerUser = maxPurchasePerUser;
     }
 
-    /**
-     * 기본 정책 생성
-     */
     public static Policy defaultPolicy() {
         return new Policy(10, 600, 10);
     }
 
-    /**
-     * 재고가 안전 재고량 이하인지 확인
-     */
     public boolean isLowStock(int available) {
         return available < safetyStock;
     }
 
-    /**
-     * 구매 가능한 수량인지 확인
-     */
     public boolean isValidPurchaseQuantity(int quantity) {
         return quantity > 0 && quantity <= maxPurchasePerUser;
     }

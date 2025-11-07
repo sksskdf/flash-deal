@@ -47,13 +47,6 @@ public final class Shipping {
         return instructions;
     }
 
-    /**
-     * 선호 배송 시간 (임시 구현)
-     */
-    public String getPreferredTime() {
-        return "09:00-18:00";
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

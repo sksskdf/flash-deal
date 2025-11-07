@@ -2,13 +2,6 @@ package com.flashdeal.app.domain.inventory;
 
 import java.util.Objects;
 
-/**
- * 재고 Value Object
- * 
- * 불변식:
- * - total, reserved, available, sold >= 0 (모두 음수 불가)
- * - total = reserved + available + sold
- */
 public final class Stock {
     
     private final int total;
@@ -43,17 +36,10 @@ public final class Stock {
         }
     }
 
-    /**
-     * 초기 재고 생성
-     */
     public static Stock initial(int total) {
         return new Stock(total, 0, total, 0);
     }
 
-    /**
-     * 재고 감소 (예약)
-     * available - quantity, reserved + quantity
-     */
     public Stock decrease(int quantity) {
         if (quantity < 0) {
             throw new IllegalArgumentException("Quantity cannot be negative");
@@ -73,10 +59,6 @@ public final class Stock {
         );
     }
 
-    /**
-     * 예약 확정 (판매)
-     * reserved - quantity, sold + quantity
-     */
     public Stock confirm(int quantity) {
         if (quantity < 0) {
             throw new IllegalArgumentException("Quantity cannot be negative");
@@ -96,10 +78,6 @@ public final class Stock {
         );
     }
 
-    /**
-     * 예약 해제
-     * reserved - quantity, available + quantity
-     */
     public Stock release(int quantity) {
         if (quantity < 0) {
             throw new IllegalArgumentException("Quantity cannot be negative");
@@ -119,9 +97,6 @@ public final class Stock {
         );
     }
 
-    /**
-     * 품절 여부
-     */
     public boolean isOutOfStock() {
         return available == 0;
     }

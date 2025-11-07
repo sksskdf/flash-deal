@@ -4,6 +4,7 @@ import com.flashdeal.app.application.port.in.CreateProductUseCase;
 import com.flashdeal.app.application.port.in.GetProductUseCase;
 import com.flashdeal.app.application.port.in.UpdateProductUseCase;
 import com.flashdeal.app.application.port.out.ProductRepository;
+import com.flashdeal.app.domain.common.Pagination;
 import com.flashdeal.app.domain.product.*;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -84,7 +85,7 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
 
     @Override
     public Mono<ProductPage> getProductsByFilter(ProductFilter filter, Pagination pagination,
-            List<SortOption> sortOptions) {
+            List<ProductSortOption> sortOptions) {
         return productRepository.findByFilter(filter, pagination, sortOptions);
     }
     
