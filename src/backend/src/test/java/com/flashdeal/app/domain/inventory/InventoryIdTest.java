@@ -19,7 +19,7 @@ class InventoryIdTest {
         
         // then
         assertNotNull(inventoryId);
-        assertEquals(validUuid, inventoryId.getValue());
+        assertEquals(validUuid, inventoryId.value());
     }
 
     @Test
@@ -45,8 +45,8 @@ class InventoryIdTest {
         
         // then
         assertNotNull(inventoryId);
-        assertNotNull(inventoryId.getValue());
-        assertFalse(inventoryId.getValue().isEmpty());
+        assertNotNull(inventoryId.value());
+        assertFalse(inventoryId.value().isEmpty());
     }
 
     @Test

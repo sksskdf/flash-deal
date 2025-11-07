@@ -81,7 +81,7 @@ public class InventoryService implements
         if (!inventory.isValidPurchaseQuantity(quantity)) {
             throw new IllegalArgumentException(
                 "Invalid purchase quantity: " + quantity + 
-                " (max: " + inventory.getPolicy().getMaxPurchasePerUser() + ")"
+                            " (max: " + inventory.policy().maxPurchasePerUser() + ")"
             );
         }
         if (inventory.isOutOfStock()) {

@@ -78,8 +78,8 @@ class InventoryPersistenceAdapterTest {
                 .assertNext(foundInventory -> {
                     assertThat(foundInventory.getInventoryId()).isEqualTo(inventory.getInventoryId());
                     assertThat(foundInventory.getProductId()).isEqualTo(inventory.getProductId());
-                    assertThat(foundInventory.getStock().getTotal()).isEqualTo(inventory.getStock().getTotal());
-                    assertThat(foundInventory.getStock().getAvailable()).isEqualTo(inventory.getStock().getAvailable());
+                    assertThat(foundInventory.getStock().total()).isEqualTo(inventory.getStock().total());
+                    assertThat(foundInventory.getStock().available()).isEqualTo(inventory.getStock().available());
                 })
                 .verifyComplete();
     }
@@ -100,7 +100,7 @@ class InventoryPersistenceAdapterTest {
         StepVerifier.create(findByProductIdResult)
                 .assertNext(foundInventory -> {
                     assertThat(foundInventory.getProductId()).isEqualTo(productId);
-                    assertThat(foundInventory.getStock().getTotal()).isEqualTo(1000);
+                    assertThat(foundInventory.getStock().total()).isEqualTo(1000);
                 })
                 .verifyComplete();
     }
@@ -160,9 +160,9 @@ class InventoryPersistenceAdapterTest {
         // Then
         StepVerifier.create(reserveResult)
                 .assertNext(reservedInventory -> {
-                    assertThat(reservedInventory.getStock().getAvailable()).isEqualTo(995); // 1000 - 5
-                    assertThat(reservedInventory.getStock().getReserved()).isEqualTo(5);
-                    assertThat(reservedInventory.getStock().getTotal()).isEqualTo(1000);
+                    assertThat(reservedInventory.getStock().available()).isEqualTo(995); // 1000 - 5
+                    assertThat(reservedInventory.getStock().reserved()).isEqualTo(5);
+                    assertThat(reservedInventory.getStock().total()).isEqualTo(1000);
                 })
                 .verifyComplete();
     }

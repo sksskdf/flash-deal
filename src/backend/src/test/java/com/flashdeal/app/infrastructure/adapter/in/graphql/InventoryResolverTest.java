@@ -51,7 +51,7 @@ class InventoryResolverTest {
     @DisplayName("inventory - 재고 조회 성공")
     void inventory_success() {
         // Given
-        String inventoryId = testInventory.getInventoryId().getValue();
+        String inventoryId = testInventory.inventoryId().value();
         given(getInventoryUseCase.getInventory(any(InventoryId.class)))
             .willReturn(Mono.just(testInventory));
 
@@ -62,7 +62,7 @@ class InventoryResolverTest {
         StepVerifier.create(result)
             .assertNext(inventory -> {
                 assertThat(inventory.getInventoryId()).isEqualTo(testInventory.getInventoryId());
-                assertThat(inventory.getStock().getTotal()).isEqualTo(testInventory.getStock().getTotal());
+                    assertThat(inventory.getStock().total()).isEqualTo(testInventory.getStock().total());
             })
             .verifyComplete();
     }

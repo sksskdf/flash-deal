@@ -25,8 +25,8 @@ public class InventoryMapper {
      */
     public InventoryDocument toDocument(Inventory inventory) {
         return new InventoryDocument(
-                inventory.getInventoryId().getValue(),
-                inventory.getProductId().getValue(),
+                inventory.inventoryId().value(),
+                        inventory.getProductId().getValue(),
                 toStockDocument(inventory.getStock()),
                 calculateLevel(inventory.getStock()),
                 toRedisInfoDocument(inventory),
@@ -53,10 +53,10 @@ public class InventoryMapper {
 
     private StockDocument toStockDocument(Stock stock) {
         return new StockDocument(
-                stock.getTotal(),
-                stock.getReserved(),
-                stock.getAvailable(),
-                stock.getSold()
+                stock.total(),
+                stock.reserved(),
+                stock.available(),
+                stock.sold()
         );
     }
 
@@ -73,10 +73,10 @@ public class InventoryMapper {
     }
 
     private String calculateLevel(Stock stock) {
-        if (stock.getTotal() == 0) {
+        if (stock.total() == 0) {
             return "LOW";
         }
-        double ratio = (double) stock.getAvailable() / stock.getTotal();
+        double ratio = (double) stock.available() / stock.total();
         if (ratio >= 0.5) {
             return "HIGH";
         }
@@ -89,8 +89,8 @@ public class InventoryMapper {
     private RedisInfoDocument toRedisInfoDocument(Inventory inventory) {
         return new RedisInfoDocument(
                 "inventory:" + inventory.getProductId().getValue(),
-                inventory.getStock().getAvailable(),
-                Instant.now(),
+                inventory.getStock().available(),
+                        Instant.now(),
                 1L
         );
     }
@@ -100,10 +100,10 @@ public class InventoryMapper {
             return null;
         }
         return new PolicyDocument(
-            policy.getSafetyStock(),
-            new RestockPolicyDocument(false, 0, 0, null),
-            policy.getReservationTimeout(),
-            policy.getMaxPurchasePerUser()
+                policy.safetyStock(),
+                    new RestockPolicyDocument(false, 0, 0, null),
+                policy.reservationTimeout(),
+                policy.maxPurchasePerUser()
         );
     }
 

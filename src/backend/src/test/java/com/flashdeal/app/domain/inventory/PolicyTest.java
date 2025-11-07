@@ -16,9 +16,9 @@ class PolicyTest {
         
         // then
         assertNotNull(policy);
-        assertEquals(50, policy.getSafetyStock());
-        assertEquals(600, policy.getReservationTimeout());
-        assertEquals(5, policy.getMaxPurchasePerUser());
+        assertEquals(50, policy.safetyStock());
+        assertEquals(600, policy.reservationTimeout());
+        assertEquals(5, policy.maxPurchasePerUser());
     }
 
     @Test
@@ -93,9 +93,9 @@ class PolicyTest {
         
         // then
         assertNotNull(policy);
-        assertEquals(10, policy.getSafetyStock());
-        assertEquals(600, policy.getReservationTimeout());
-        assertEquals(10, policy.getMaxPurchasePerUser());
+        assertEquals(10, policy.safetyStock());
+        assertEquals(600, policy.reservationTimeout());
+        assertEquals(10, policy.maxPurchasePerUser());
     }
 
     @Test

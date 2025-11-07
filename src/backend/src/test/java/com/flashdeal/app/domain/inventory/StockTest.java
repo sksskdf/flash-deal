@@ -16,10 +16,10 @@ class StockTest {
         
         // then
         assertNotNull(stock);
-        assertEquals(100, stock.getTotal());
-        assertEquals(20, stock.getReserved());
-        assertEquals(60, stock.getAvailable());
-        assertEquals(20, stock.getSold());
+        assertEquals(100, stock.total());
+        assertEquals(20, stock.reserved());
+        assertEquals(60, stock.available());
+        assertEquals(20, stock.sold());
     }
 
     @Test
@@ -29,10 +29,10 @@ class StockTest {
         Stock stock = Stock.initial(100);
         
         // then
-        assertEquals(100, stock.getTotal());
-        assertEquals(0, stock.getReserved());
-        assertEquals(100, stock.getAvailable());
-        assertEquals(0, stock.getSold());
+        assertEquals(100, stock.total());
+        assertEquals(0, stock.reserved());
+        assertEquals(100, stock.available());
+        assertEquals(0, stock.sold());
     }
 
     @Test
@@ -67,10 +67,10 @@ class StockTest {
         Stock decreased = stock.decrease(30);
         
         // then
-        assertEquals(100, decreased.getTotal());
-        assertEquals(30, decreased.getReserved());
-        assertEquals(70, decreased.getAvailable());
-        assertEquals(0, decreased.getSold());
+        assertEquals(100, decreased.total());
+        assertEquals(30, decreased.reserved());
+        assertEquals(70, decreased.available());
+        assertEquals(0, decreased.sold());
     }
 
     @Test
@@ -105,10 +105,10 @@ class StockTest {
         Stock confirmed = stock.confirm(20);
         
         // then
-        assertEquals(100, confirmed.getTotal());
-        assertEquals(10, confirmed.getReserved());
-        assertEquals(70, confirmed.getAvailable());
-        assertEquals(20, confirmed.getSold());
+        assertEquals(100, confirmed.total());
+        assertEquals(10, confirmed.reserved());
+        assertEquals(70, confirmed.available());
+        assertEquals(20, confirmed.sold());
     }
 
     @Test
@@ -132,10 +132,10 @@ class StockTest {
         Stock released = stock.release(10);
         
         // then
-        assertEquals(100, released.getTotal());
-        assertEquals(20, released.getReserved());
-        assertEquals(80, released.getAvailable());
-        assertEquals(0, released.getSold());
+        assertEquals(100, released.total());
+        assertEquals(20, released.reserved());
+        assertEquals(80, released.available());
+        assertEquals(0, released.sold());
     }
 
     @Test
@@ -183,10 +183,10 @@ class StockTest {
             .decrease(25);   // available: 50, reserved: 30, sold: 20
         
         // then
-        assertEquals(100, result.getTotal());
-        assertEquals(30, result.getReserved());
-        assertEquals(50, result.getAvailable());
-        assertEquals(20, result.getSold());
+        assertEquals(100, result.total());
+        assertEquals(30, result.reserved());
+        assertEquals(50, result.available());
+        assertEquals(20, result.sold());
     }
 
     @Test

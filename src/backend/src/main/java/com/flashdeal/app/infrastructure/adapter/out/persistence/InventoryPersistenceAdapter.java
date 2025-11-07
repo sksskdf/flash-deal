@@ -36,7 +36,7 @@ public class InventoryPersistenceAdapter implements InventoryRepository {
 
     @Override
     public Mono<Inventory> findById(InventoryId id) {
-        return mongoRepository.findById(id.getValue())
+        return mongoRepository.findById(id.value())
                 .map(mapper::toDomain);
     }
 
@@ -48,7 +48,7 @@ public class InventoryPersistenceAdapter implements InventoryRepository {
 
     @Override
     public Mono<Void> deleteById(InventoryId id) {
-        return mongoRepository.deleteById(id.getValue());
+        return mongoRepository.deleteById(id.value());
     }
 
     @Override

@@ -38,14 +38,14 @@ public record Inventory(
             throw new IllegalArgumentException("Quantity cannot be negative");
         }
         
-        int newTotal = stock.getTotal() + quantity;
-        int newAvailable = stock.getAvailable() + quantity;
+        int newTotal = stock.total() + quantity;
+        int newAvailable = stock.available() + quantity;
         
         Stock newStock = new Stock(
             newTotal,
-            stock.getReserved(),
-            newAvailable,
-            stock.getSold()
+                stock.reserved(),
+                    newAvailable,
+                stock.sold()
         );
 
         return new Inventory(inventoryId, productId, newStock, policy);
@@ -56,7 +56,7 @@ public record Inventory(
     }
 
     public boolean isLowStock() {
-        return policy.isLowStock(stock.getAvailable());
+        return policy.isLowStock(stock.available());
     }
 
     public boolean isValidPurchaseQuantity(int quantity) {

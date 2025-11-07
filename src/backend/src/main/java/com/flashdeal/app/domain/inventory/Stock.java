@@ -1,15 +1,12 @@
 package com.flashdeal.app.domain.inventory;
 
-import java.util.Objects;
+public record Stock(
+        int total,
+        int reserved,
+        int available,
+        int sold) {
 
-public final class Stock {
-    
-    private final int total;
-    private final int reserved;
-    private final int available;
-    private final int sold;
-
-    public Stock(int total, int reserved, int available, int sold) {
+    public Stock {
         validateNonNegative(total, "Total");
         validateNonNegative(reserved, "Reserved");
         validateNonNegative(available, "Available");
@@ -23,11 +20,6 @@ public final class Stock {
                 )
             );
         }
-        
-        this.total = total;
-        this.reserved = reserved;
-        this.available = available;
-        this.sold = sold;
     }
 
     private void validateNonNegative(int value, String fieldName) {
@@ -99,48 +91,6 @@ public final class Stock {
 
     public boolean isOutOfStock() {
         return available == 0;
-    }
-
-    public int getTotal() {
-        return total;
-    }
-
-    public int getReserved() {
-        return reserved;
-    }
-
-    public int getAvailable() {
-        return available;
-    }
-
-    public int getSold() {
-        return sold;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Stock stock = (Stock) o;
-        return total == stock.total &&
-               reserved == stock.reserved &&
-               available == stock.available &&
-               sold == stock.sold;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(total, reserved, available, sold);
-    }
-
-    @Override
-    public String toString() {
-        return "Stock{" +
-                "total=" + total +
-                ", reserved=" + reserved +
-                ", available=" + available +
-                ", sold=" + sold +
-                '}';
     }
 }
 

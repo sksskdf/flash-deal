@@ -94,7 +94,7 @@ public class InventoryResolver {
 
     @SchemaMapping(typeName = "Inventory", field = "inventoryId")
     public String inventoryId(Inventory inventory) {
-        return inventory.getInventoryId().getValue();
+        return inventory.inventoryId().value();
     }
 
     @SchemaMapping(typeName = "Inventory", field = "productId")
