@@ -42,7 +42,7 @@ public class InventoryPersistenceAdapter implements InventoryRepository {
 
     @Override
     public Mono<Inventory> findByProductId(ProductId productId) {
-        return mongoRepository.findByProductId(productId.getValue())
+        return mongoRepository.findByProductId(productId.value())
                 .map(mapper::toDomain);
     }
 
@@ -53,7 +53,7 @@ public class InventoryPersistenceAdapter implements InventoryRepository {
 
     @Override
     public Mono<Boolean> existsByProductId(ProductId productId) {
-        return mongoRepository.existsByProductId(productId.getValue());
+        return mongoRepository.existsByProductId(productId.value());
     }
 }
 

@@ -10,11 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Kafka Event Publisher
- * 
- * .doc/data/3.kafka-events.md의 이벤트 스키마를 기반으로 구현
- */
 @Component
 public class KafkaEventPublisher {
 
@@ -37,14 +32,14 @@ public class KafkaEventPublisher {
         Map<String, Object> event = new HashMap<>();
         event.put("eventId", UUID.randomUUID().toString());
         event.put("eventType", "OrderCreated");
-        event.put("orderId", orderId.getValue());
+        event.put("orderId", orderId.value());
         event.put("userId", userId);
         event.put("orderNumber", orderNumber);
         event.put("idempotencyKey", idempotencyKey);
         event.put("timestamp", ZonedDateTime.now());
         event.put("correlationId", UUID.randomUUID().toString());
 
-        kafkaTemplate.send(ORDER_CREATED_TOPIC, orderId.getValue(), event);
+        kafkaTemplate.send(ORDER_CREATED_TOPIC, orderId.value(), event);
     }
 
     /**
@@ -54,14 +49,14 @@ public class KafkaEventPublisher {
         Map<String, Object> event = new HashMap<>();
         event.put("eventId", UUID.randomUUID().toString());
         event.put("eventType", "PaymentCompleted");
-        event.put("orderId", orderId.getValue());
+        event.put("orderId", orderId.value());
         event.put("paymentMethod", paymentMethod);
         event.put("transactionId", transactionId);
         event.put("status", status);
         event.put("timestamp", ZonedDateTime.now());
         event.put("correlationId", UUID.randomUUID().toString());
 
-        kafkaTemplate.send(PAYMENT_COMPLETED_TOPIC, orderId.getValue(), event);
+        kafkaTemplate.send(PAYMENT_COMPLETED_TOPIC, orderId.value(), event);
     }
 
     /**
@@ -71,14 +66,14 @@ public class KafkaEventPublisher {
         Map<String, Object> event = new HashMap<>();
         event.put("eventId", UUID.randomUUID().toString());
         event.put("eventType", "InventoryReserved");
-        event.put("productId", productId.getValue());
-        event.put("orderId", orderId.getValue());
+        event.put("productId", productId.value());
+        event.put("orderId", orderId.value());
         event.put("quantity", quantity);
         event.put("status", status);
         event.put("timestamp", ZonedDateTime.now());
         event.put("correlationId", UUID.randomUUID().toString());
 
-        kafkaTemplate.send(INVENTORY_RESERVED_TOPIC, productId.getValue(), event);
+        kafkaTemplate.send(INVENTORY_RESERVED_TOPIC, productId.value(), event);
     }
 
     /**
@@ -88,13 +83,13 @@ public class KafkaEventPublisher {
         Map<String, Object> event = new HashMap<>();
         event.put("eventId", UUID.randomUUID().toString());
         event.put("eventType", "OrderCancelled");
-        event.put("orderId", orderId.getValue());
+        event.put("orderId", orderId.value());
         event.put("reason", reason);
         event.put("cancelledBy", cancelledBy);
         event.put("timestamp", ZonedDateTime.now());
         event.put("correlationId", UUID.randomUUID().toString());
 
-        kafkaTemplate.send(ORDER_CANCELLED_TOPIC, orderId.getValue(), event);
+        kafkaTemplate.send(ORDER_CANCELLED_TOPIC, orderId.value(), event);
     }
 
     /**

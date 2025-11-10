@@ -35,13 +35,13 @@ public class OrderPersistenceAdapter implements OrderRepository {
 
     @Override
     public Mono<Order> findById(OrderId id) {
-        return mongoRepository.findById(id.getValue())
+        return mongoRepository.findById(id.value())
                 .map(mapper::toDomain);
     }
 
     @Override
     public Flux<Order> findByUserId(UserId userId) {
-        return mongoRepository.findByUserId(userId.getValue())
+        return mongoRepository.findByUserId(userId.value())
                 .map(mapper::toDomain);
     }
 
@@ -53,7 +53,7 @@ public class OrderPersistenceAdapter implements OrderRepository {
 
     @Override
     public Flux<Order> findByUserIdAndStatus(UserId userId, OrderStatus status) {
-        return mongoRepository.findByUserIdAndStatus(userId.getValue(), status)
+        return mongoRepository.findByUserIdAndStatus(userId.value(), status)
                 .map(mapper::toDomain);
     }
 
@@ -72,12 +72,12 @@ public class OrderPersistenceAdapter implements OrderRepository {
 
     @Override
     public Mono<Void> deleteById(OrderId id) {
-        return mongoRepository.deleteById(id.getValue());
+        return mongoRepository.deleteById(id.value());
     }
 
     @Override
     public Mono<Boolean> existsById(OrderId id) {
-        return mongoRepository.existsById(id.getValue());
+        return mongoRepository.existsById(id.value());
     }
 }
 

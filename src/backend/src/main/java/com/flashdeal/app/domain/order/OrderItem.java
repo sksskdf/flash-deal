@@ -4,14 +4,13 @@ import com.flashdeal.app.domain.product.ProductId;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class OrderItem {
-    
-    private final ProductId productId;
-    private final Snapshot snapshot;
-    private int quantity;
-    private OrderItemStatus status;
-
-    public OrderItem(ProductId productId, Snapshot snapshot, int quantity) {
+public record OrderItem(
+    ProductId productId,
+    Snapshot snapshot,
+    int quantity,
+    OrderItemStatus status
+) {
+    public OrderItem {
         if (productId == null) {
             throw new IllegalArgumentException("ProductId cannot be null");
         }
@@ -21,46 +20,29 @@ public class OrderItem {
         }
         
         validateQuantity(quantity);
-        
-        this.productId = productId;
-        this.snapshot = snapshot;
-        this.quantity = quantity;
-        this.status = OrderItemStatus.CONFIRMED;
     }
 
-    private void validateQuantity(int quantity) {
+    public OrderItem(ProductId productId, Snapshot snapshot, int quantity) {
+        this(productId, snapshot, quantity, OrderItemStatus.CONFIRMED);
+    }
+
+    private static void validateQuantity(int quantity) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be positive");
         }
     }
 
-    public void cancel() {
-        this.status = OrderItemStatus.CANCELLED;
+    public OrderItem cancel() {
+        return new OrderItem(productId, snapshot, quantity, OrderItemStatus.CANCELLED);
     }
 
-    public void updateQuantity(int newQuantity) {
+    public OrderItem updateQuantity(int newQuantity) {
         validateQuantity(newQuantity);
-        this.quantity = newQuantity;
+        return new OrderItem(productId, snapshot, newQuantity, status);
     }
 
     public BigDecimal getSubtotal() {
-        return snapshot.getPrice().getSale().multiply(BigDecimal.valueOf(quantity));
-    }
-
-    public ProductId getProductId() {
-        return productId;
-    }
-
-    public Snapshot getSnapshot() {
-        return snapshot;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public OrderItemStatus getStatus() {
-        return status;
+        return snapshot.price().sale().multiply(BigDecimal.valueOf(quantity));
     }
 
     @Override

@@ -51,14 +51,14 @@ public class OrderService implements
             .collectList()
             .flatMap(orderItems -> {
                 Shipping shipping = createShipping(command.shipping());
-                Order order = new Order(
+                    Order order = Order.create(
                     orderId,
                     command.userId(),
                     orderItems,
                     shipping,
                     command.idempotencyKey()
                 );
-                order.applyDiscount(command.discount());
+                    order = order.applyDiscount(command.discount());
                 
                 return reserveInventory(command.items())
                     .then(orderRepository.save(order));
@@ -165,21 +165,21 @@ public class OrderService implements
                 }
                 
                 String reason = command.reason() != null ? command.reason() : "User requested";
-                String cancelledBy = order.getUserId().getValue(); // 사용자 ID 사용
-                order.cancel(reason, cancelledBy);
+                    String cancelledBy = order.getUserId().value(); // 사용자 ID 사용
+                Order cancelledOrder = order.cancel(reason, cancelledBy);
                 
                 // 재고 복구
-                return releaseInventory(order.getItems())
-                    .then(orderRepository.save(order));
+                return releaseInventory(cancelledOrder.getItems())
+                    .then(orderRepository.save(cancelledOrder));
             });
     }
     
     private Mono<Void> releaseInventory(List<OrderItem> items) {
         return Flux.fromIterable(items)
             .flatMap(item ->
-                inventoryRepository.findByProductId(item.getProductId())
+                inventoryRepository.findByProductId(item.productId())
                     .flatMap(inventory -> {
-                        inventory.release(item.getQuantity());
+                            inventory.release(item.quantity());
                         return inventoryRepository.save(inventory);
                     })
             )
@@ -198,21 +198,21 @@ public class OrderService implements
                     ));
                 }
                 
-                order.completePayment(command.transactionId());
-                order.confirm();
+                Order completedOrder = order.completePayment(command.transactionId());
+                Order confirmedOrder = completedOrder.confirm();
                 
                 // 재고 확정
-                return confirmInventory(order.getItems())
-                    .then(orderRepository.save(order));
+                return confirmInventory(confirmedOrder.getItems())
+                    .then(orderRepository.save(confirmedOrder));
             });
     }
     
     private Mono<Void> confirmInventory(List<OrderItem> items) {
         return Flux.fromIterable(items)
             .flatMap(item ->
-                inventoryRepository.findByProductId(item.getProductId())
+                inventoryRepository.findByProductId(item.productId())
                     .flatMap(inventory -> {
-                        inventory.confirm(item.getQuantity());
+                            inventory.confirm(item.quantity());
                         return inventoryRepository.save(inventory);
                     })
             )

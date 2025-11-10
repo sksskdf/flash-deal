@@ -27,7 +27,7 @@ class OrderTest {
         Shipping shipping = createShipping();
         
         // when
-        Order order = new Order(orderId, userId, items, shipping, "test-key");
+        Order order = Order.create(orderId, userId, items, shipping, "test-key");
         
         // then
         assertNotNull(order);
@@ -46,7 +46,7 @@ class OrderTest {
         Shipping shipping = createShipping();
         
         // when
-        Order order = new Order(
+        Order order = Order.create(
             OrderId.generate(),
             new UserId("user123"),
             items,
@@ -56,9 +56,9 @@ class OrderTest {
         
         // then
         Pricing pricing = order.getPricing();
-        assertEquals(new BigDecimal("160000"), pricing.getSubtotal());
-        assertEquals(new BigDecimal("3000"), pricing.getShipping());
-        assertEquals(new BigDecimal("163000"), pricing.getTotal());
+        assertEquals(new BigDecimal("160000"), pricing.subtotal());
+        assertEquals(new BigDecimal("3000"), pricing.shipping());
+        assertEquals(new BigDecimal("163000"), pricing.total());
     }
 
     @Test
@@ -70,13 +70,13 @@ class OrderTest {
         
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> new Order(null, new UserId("user123"), items, shipping, "test-key"));
+            () -> Order.create(null, new UserId("user123"), items, shipping, "test-key"));
         assertThrows(IllegalArgumentException.class,
-            () -> new Order(OrderId.generate(), null, items, shipping, "test-key"));
+            () -> Order.create(OrderId.generate(), null, items, shipping, "test-key"));
         assertThrows(IllegalArgumentException.class,
-            () -> new Order(OrderId.generate(), new UserId("user123"), null, shipping, "test-key"));
+            () -> Order.create(OrderId.generate(), new UserId("user123"), null, shipping, "test-key"));
         assertThrows(IllegalArgumentException.class,
-            () -> new Order(OrderId.generate(), new UserId("user123"), items, null, "test-key"));
+            () -> Order.create(OrderId.generate(), new UserId("user123"), items, null, "test-key"));
     }
 
     @Test
@@ -87,7 +87,7 @@ class OrderTest {
         
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> new Order(OrderId.generate(), new UserId("user123"), new ArrayList<>(), shipping, "test-key"));
+            () -> Order.create(OrderId.generate(), new UserId("user123"), new ArrayList<>(), shipping, "test-key"));
     }
 
     @Test
@@ -97,10 +97,10 @@ class OrderTest {
         Order order = createOrder();
         
         // when
-        order.confirm();
+        Order confirmed = order.confirm();
         
         // then
-        assertEquals(OrderStatus.CONFIRMED, order.getStatus());
+        assertEquals(OrderStatus.CONFIRMED, confirmed.getStatus());
     }
 
     @Test
@@ -108,13 +108,13 @@ class OrderTest {
     void canShipOrder() {
         // given
         Order order = createOrder();
-        order.confirm();
+        Order confirmed = order.confirm();
         
         // when
-        order.ship();
+        Order shipped = confirmed.ship();
         
         // then
-        assertEquals(OrderStatus.SHIPPED, order.getStatus());
+        assertEquals(OrderStatus.SHIPPED, shipped.getStatus());
     }
 
     @Test
@@ -122,14 +122,14 @@ class OrderTest {
     void canDeliverOrder() {
         // given
         Order order = createOrder();
-        order.confirm();
-        order.ship();
+        Order confirmed = order.confirm();
+        Order shipped = confirmed.ship();
         
         // when
-        order.deliver();
+        Order delivered = shipped.deliver();
         
         // then
-        assertEquals(OrderStatus.DELIVERED, order.getStatus());
+        assertEquals(OrderStatus.DELIVERED, delivered.getStatus());
     }
 
     @Test
@@ -139,10 +139,10 @@ class OrderTest {
         Order order = createOrder();
         
         // when
-        order.cancel();
+        Order cancelled = order.cancel();
         
         // then
-        assertEquals(OrderStatus.CANCELLED, order.getStatus());
+        assertEquals(OrderStatus.CANCELLED, cancelled.getStatus());
     }
 
     @Test
@@ -152,11 +152,11 @@ class OrderTest {
         Order order = createOrder();
         
         // when
-        order.completePayment("txn_12345");
+        Order completed = order.completePayment("txn_12345");
         
         // then
-        assertEquals(PaymentStatus.COMPLETED, order.getPayment().getStatus());
-        assertEquals("txn_12345", order.getPayment().getTransactionId());
+        assertEquals(PaymentStatus.COMPLETED, completed.getPayment().status());
+        assertEquals("txn_12345", completed.getPayment().transactionId());
     }
 
     @Test
@@ -166,10 +166,10 @@ class OrderTest {
         Order order = createOrder();
         
         // when
-        order.failPayment();
+        Order failed = order.failPayment();
         
         // then
-        assertEquals(PaymentStatus.FAILED, order.getPayment().getStatus());
+        assertEquals(PaymentStatus.FAILED, failed.getPayment().status());
     }
 
     @Test
@@ -179,15 +179,15 @@ class OrderTest {
         Order order = createOrder();
         
         // when
-        order.applyDiscount(new BigDecimal("10000"));
+        Order discounted = order.applyDiscount(new BigDecimal("10000"));
         
         // then
-        assertEquals(new BigDecimal("10000"), order.getPricing().getDiscount());
-        assertEquals(new BigDecimal("153000"), order.getPricing().getTotal());
+        assertEquals(new BigDecimal("10000"), discounted.getPricing().discount());
+        assertEquals(new BigDecimal("153000"), discounted.getPricing().total());
     }
 
     private Order createOrder() {
-        return new Order(
+        return Order.create(
             OrderId.generate(),
             new UserId("user123"),
             createOrderItems(),

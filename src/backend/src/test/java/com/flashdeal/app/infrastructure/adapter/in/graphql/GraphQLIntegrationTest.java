@@ -77,7 +77,7 @@ class GraphQLIntegrationTest {
     @DisplayName("product Query - 상품 조회")
     void productQuery() {
         // Given
-        String productId = testProduct.getProductId().getValue();
+        String productId = testProduct.getProductId().value();
         given(getProductUseCase.getProduct(any(ProductId.class)))
             .willReturn(Mono.just(testProduct));
 

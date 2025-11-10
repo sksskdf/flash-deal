@@ -48,7 +48,7 @@ class ProductResolverTest {
     @DisplayName("product - 상품 조회 성공")
     void product_success() {
         // Given
-        String productId = testProduct.getProductId().getValue();
+        String productId = testProduct.getProductId().value();
         given(getProductUseCase.getProduct(any(ProductId.class)))
             .willReturn(Mono.just(testProduct));
 
@@ -162,7 +162,7 @@ class ProductResolverTest {
     @DisplayName("updateProduct - 상품 수정 성공")
     void updateProduct_success() {
         // Given
-        String productId = testProduct.getProductId().getValue();
+        String productId = testProduct.getProductId().value();
         ProductResolver.UpdateProductInput input = new ProductResolver.UpdateProductInput(
             "Updated Title",
             "Updated Description",

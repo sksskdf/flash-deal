@@ -29,10 +29,10 @@ class OrderItemTest {
         
         // then
         assertNotNull(orderItem);
-        assertEquals(productId, orderItem.getProductId());
-        assertEquals(snapshot, orderItem.getSnapshot());
-        assertEquals(2, orderItem.getQuantity());
-        assertEquals(new BigDecimal("160000"), orderItem.getSubtotal());
+        assertEquals(productId, orderItem.productId());
+        assertEquals(snapshot, orderItem.snapshot());
+        assertEquals(2, orderItem.quantity());
+        assertEquals(new BigDecimal("160000"), orderItem.snapshot().price().sale().multiply(BigDecimal.valueOf(orderItem.quantity())));
     }
 
     @Test
@@ -74,7 +74,7 @@ class OrderItemTest {
         OrderItem orderItem = new OrderItem(ProductId.generate(), snapshot, 3);
         
         // then
-        assertEquals(new BigDecimal("240000"), orderItem.getSubtotal());
+        assertEquals(new BigDecimal("240000"), orderItem.snapshot().price().sale().multiply(BigDecimal.valueOf(orderItem.quantity())));
     }
 
     @Test
@@ -86,11 +86,13 @@ class OrderItemTest {
         OrderItem orderItem = new OrderItem(ProductId.generate(), snapshot, 2);
         
         // when
-        orderItem.updateQuantity(5);
+        OrderItem updated = orderItem.updateQuantity(5);
         
         // then
-        assertEquals(5, orderItem.getQuantity());
-        assertEquals(new BigDecimal("400000"), orderItem.getSubtotal());
+        assertEquals(5, updated.quantity());
+        assertEquals(new BigDecimal("400000"), updated.snapshot().price().sale().multiply(BigDecimal.valueOf(updated.quantity())));
+        // 원본은 변경되지 않음
+        assertEquals(2, orderItem.quantity());
     }
 
     @Test

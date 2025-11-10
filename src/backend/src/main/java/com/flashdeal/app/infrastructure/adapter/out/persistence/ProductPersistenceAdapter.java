@@ -52,7 +52,7 @@ public class ProductPersistenceAdapter implements ProductRepository {
 
     @Override
     public Mono<Product> findById(ProductId id) {
-        return mongoRepository.findById(id.getValue())
+        return mongoRepository.findById(id.value())
                 .map(mapper::toDomain);
     }
 
@@ -124,12 +124,12 @@ public class ProductPersistenceAdapter implements ProductRepository {
 
     @Override
     public Mono<Void> deleteById(ProductId id) {
-        return mongoRepository.deleteById(id.getValue());
+        return mongoRepository.deleteById(id.value());
     }
 
     @Override
     public Mono<Boolean> existsById(ProductId id) {
-        return mongoRepository.existsById(id.getValue());
+        return mongoRepository.existsById(id.value());
     }
 
     private Query buildQuery(ProductFilter filter) {

@@ -50,7 +50,7 @@ class OrderResolverTest {
     @DisplayName("order - 주문 조회 성공")
     void order_success() {
         // Given
-        String orderId = testOrder.getOrderId().getValue();
+        String orderId = testOrder.getOrderId().value();
         given(getOrderUseCase.getOrder(any(OrderId.class)))
             .willReturn(Mono.just(testOrder));
 
@@ -70,7 +70,7 @@ class OrderResolverTest {
     @DisplayName("ordersByUser - 사용자별 주문 목록 조회")
     void ordersByUser_success() {
         // Given
-        String userId = testOrder.getUserId().getValue();
+        String userId = testOrder.getUserId().value();
         given(getOrderUseCase.getOrdersByUserId(any(UserId.class)))
             .willReturn(Flux.just(testOrder));
 
@@ -190,7 +190,7 @@ class OrderResolverTest {
     @DisplayName("cancelOrder - 주문 취소 성공")
     void cancelOrder_success() {
         // Given
-        String orderId = testOrder.getOrderId().getValue();
+        String orderId = testOrder.getOrderId().value();
         Order cancelledOrder = TestDataFactory.createCancelledOrder();
 
         given(cancelOrderUseCase.cancelOrder(any(CancelOrderUseCase.CancelOrderCommand.class)))
@@ -209,7 +209,7 @@ class OrderResolverTest {
     @DisplayName("completePayment - 결제 완료 성공")
     void completePayment_success() {
         // Given
-        String orderId = testOrder.getOrderId().getValue();
+        String orderId = testOrder.getOrderId().value();
         Order confirmedOrder = TestDataFactory.createConfirmedOrder();
 
         given(completePaymentUseCase.completePayment(any(CompletePaymentUseCase.CompletePaymentCommand.class)))

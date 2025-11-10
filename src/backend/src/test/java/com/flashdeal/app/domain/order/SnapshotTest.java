@@ -33,10 +33,10 @@ class SnapshotTest {
         
         // then
         assertNotNull(snapshot);
-        assertEquals("AirPods Pro", snapshot.getTitle());
-        assertEquals("https://example.com/image.jpg", snapshot.getImage());
-        assertEquals(price, snapshot.getPrice());
-        assertEquals("black", snapshot.getSelectedOptions().get("color"));
+        assertEquals("AirPods Pro", snapshot.title());
+        assertEquals("https://example.com/image.jpg", snapshot.image());
+        assertEquals(price, snapshot.price());
+        assertEquals("black", snapshot.selectedOptions().get("color"));
     }
 
     @Test

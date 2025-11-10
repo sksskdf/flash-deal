@@ -96,8 +96,8 @@ class OrderServiceTest {
             .assertNext(order -> {
                 assertThat(order.getUserId()).isEqualTo(userId);
                 assertThat(order.getItems()).hasSize(1);
-                assertThat(order.getStatus()).isEqualTo(OrderStatus.PENDING);
-                assertThat(order.getPricing().getDiscount()).isEqualTo(new BigDecimal("1000"));
+                    assertThat(order.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
+                    assertThat(order.getPricing().discount()).isEqualTo(new BigDecimal("1000"));
             })
             .verifyComplete();
 
@@ -115,7 +115,7 @@ class OrderServiceTest {
         );
         CreateOrderCommand cmd = new CreateOrderCommand(userId, items, shipping, "idem-dup", BigDecimal.ZERO);
 
-        Order existing = new Order(new OrderId("O-1"), userId, List.of(
+        Order existing = Order.create(new OrderId("O-1"), userId, List.of(
             new OrderItem(sampleProduct.getProductId(),
                 new Snapshot(sampleProduct.getTitle(), "", sampleProduct.getPrice(), Map.of()), 1)
         ), new Shipping("Standard", new Recipient("홍길동", "010"), new Address("s", "c", "z", "KR"), null), "idem-dup");
@@ -134,7 +134,7 @@ class OrderServiceTest {
     @DisplayName("대기 중인 주문을 취소하면 재고를 해제하고 저장한다")
     void cancelOrder_whenPending_releasesInventory_andSaves() {
         OrderId orderId = new OrderId("O-2");
-        Order pending = new Order(orderId, new UserId("U-1"), List.of(
+        Order pending = Order.create(orderId, new UserId("U-1"), List.of(
             new OrderItem(sampleProduct.getProductId(), new Snapshot("t", "", sampleProduct.getPrice(), Map.of()), 3)
         ), new Shipping("Standard", new Recipient("n", "p"), new Address("s","c","z","KR"), null), "idem");
 
@@ -155,7 +155,7 @@ class OrderServiceTest {
     @DisplayName("대기 중인 주문의 결제를 완료하면 재고를 확정하고 저장한다")
     void completePayment_whenPending_confirmsInventory_andSaves() {
         OrderId orderId = new OrderId("O-3");
-        Order pending = new Order(orderId, new UserId("U-1"), List.of(
+        Order pending = Order.create(orderId, new UserId("U-1"), List.of(
             new OrderItem(sampleProduct.getProductId(), new Snapshot("t", "", sampleProduct.getPrice(), Map.of()), 2)
         ), new Shipping("Standard", new Recipient("n", "p"), new Address("s","c","z","KR"), null), "idem");
 

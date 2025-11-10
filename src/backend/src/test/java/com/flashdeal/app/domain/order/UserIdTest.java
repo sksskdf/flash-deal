@@ -19,7 +19,7 @@ class UserIdTest {
         
         // then
         assertNotNull(userId);
-        assertEquals(value, userId.getValue());
+        assertEquals(value, userId.value());
     }
 
     @Test

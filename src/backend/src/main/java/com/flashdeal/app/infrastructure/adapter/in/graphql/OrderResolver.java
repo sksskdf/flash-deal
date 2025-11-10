@@ -110,17 +110,17 @@ public class OrderResolver {
 
     @SchemaMapping(typeName = "Order", field = "orderId")
     public String orderId(Order order) {
-        return order.getOrderId().getValue();
+        return order.getOrderId().value();
     }
 
     @SchemaMapping(typeName = "Order", field = "userId")
     public String userId(Order order) {
-        return order.getUserId().getValue();
+        return order.getUserId().value();
     }
 
     @SchemaMapping(typeName = "OrderItem", field = "productId")
     public String productId(OrderItem orderItem) {
-        return orderItem.getProductId().getValue();
+        return orderItem.productId().value();
     }
 
     // Input DTOs

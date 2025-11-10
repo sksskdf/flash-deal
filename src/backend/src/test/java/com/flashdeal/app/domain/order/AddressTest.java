@@ -21,10 +21,10 @@ class AddressTest {
         
         // then
         assertNotNull(address);
-        assertEquals("테헤란로 427", address.getStreet());
-        assertEquals("서울", address.getCity());
-        assertEquals("06158", address.getZipCode());
-        assertEquals("KR", address.getCountry());
+        assertEquals("테헤란로 427", address.street());
+        assertEquals("서울", address.city());
+        assertEquals("06158", address.zipCode());
+        assertEquals("KR", address.country());
     }
 
     @Test

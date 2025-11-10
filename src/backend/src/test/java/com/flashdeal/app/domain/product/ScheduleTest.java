@@ -24,9 +24,9 @@ class ScheduleTest {
         
         // then
         assertNotNull(schedule);
-        assertEquals(startsAt, schedule.getStartsAt());
-        assertEquals(endsAt, schedule.getEndsAt());
-        assertEquals(timezone, schedule.getTimezone());
+        assertEquals(startsAt, schedule.startsAt());
+        assertEquals(endsAt, schedule.endsAt());
+        assertEquals(timezone, schedule.timezone());
     }
 
     @Test

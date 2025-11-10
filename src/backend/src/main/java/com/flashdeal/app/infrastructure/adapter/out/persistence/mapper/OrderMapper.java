@@ -17,6 +17,7 @@ import com.flashdeal.app.infrastructure.adapter.out.persistence.documents.UserIn
 
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class OrderMapper {
                 .collect(Collectors.toList());
 
         return new OrderDocument(
-                order.getOrderId().getValue(),
+                order.getOrderId().value(),
                 order.getOrderNumber(),
                 toUserInfoDocument(order.getUserId()),
                 itemDocuments,
@@ -67,47 +68,48 @@ public class OrderMapper {
                 .collect(Collectors.toList());
 
         Shipping shipping = toShipping(document.getShipping());
+        Pricing pricing = toPricing(document.getPricing());
+        Payment payment = toPayment(document.getPayment());
+        OrderStatus status = document.getStatus() != null ? document.getStatus() : OrderStatus.PENDING;
+        Cancellation cancellation = toCancellation(document.getCancellation());
+        Instant createdAt = document.getCreatedAt() != null ? document.getCreatedAt() : Instant.now();
 
         Order order = new Order(
                 orderId,
                 userId,
+                document.getIdempotencyKey(),
                 items,
                 shipping,
-                document.getIdempotencyKey(),
-                document.getCreatedAt()
+                pricing,
+                payment,
+                status,
+                cancellation,
+                createdAt
         );
-
-        if (document.getStatus() != null) {
-            order.transitionTo(document.getStatus());
-        }
-
-        if (document.getCancellation() != null) {
-            order.setCancellation(toCancellation(document.getCancellation()));
-        }
 
         return order;
     }
 
     private OrderItemDocument toOrderItemDocument(OrderItem item) {
         return new OrderItemDocument(
-                item.getProductId().getValue(),
+                item.productId().value(),
                 "flash",
-                toOrderItemSnapshotDocument(item.getSnapshot()),
-                item.getQuantity(),
-                item.getSnapshot().getPrice().getSale(),
-                item.getSubtotal(),
-                item.getStatus(),
+                toOrderItemSnapshotDocument(item.snapshot()),
+                item.quantity(),
+                item.snapshot().price().sale(),
+                item.snapshot().price().sale().multiply(BigDecimal.valueOf(item.quantity())),
+                item.status(),
                 null
         );
     }
 
     private OrderItemSnapshotDocument toOrderItemSnapshotDocument(Snapshot snapshot) {
         return new OrderItemSnapshotDocument(
-                snapshot.getTitle(),
+                snapshot.title(),
                 null,
-                snapshot.getImage(),
+                snapshot.image(),
                 null,
-                toPriceDocument(snapshot.getPrice()),
+                toPriceDocument(snapshot.price()),
                 null,
                 snapshot.getSelectedOptions()
         );
@@ -130,7 +132,7 @@ public class OrderMapper {
 
     private UserInfoDocument toUserInfoDocument(UserId userId) {
         return new UserInfoDocument(
-            userId.getValue(),
+            userId.value(),
             "user@example.com",
             "Test User",
             "010-1234-5678"
@@ -139,42 +141,71 @@ public class OrderMapper {
 
     private PricingDocument toPricingDocument(Pricing pricing) {
         return new PricingDocument(
-                pricing.getSubtotal(),
-                pricing.getShipping(),
-                pricing.getDiscount(),
-                pricing.getTotal(),
-                pricing.getCurrency(),
+                pricing.subtotal(),
+                pricing.shipping(),
+                pricing.discount(),
+                pricing.total(),
+                pricing.currency(),
                 null
         );
     }
 
     private ShippingDocument toShippingDocument(Shipping shipping) {
         return new ShippingDocument(
-                shipping.getMethod(),
-                toRecipientDocument(shipping.getRecipient()),
-                toAddressDocument(shipping.getAddress()),
-                shipping.getInstructions()
+                shipping.method(),
+                toRecipientDocument(shipping.recipient()),
+                toAddressDocument(shipping.address()),
+                shipping.instructions()
         );
     }
 
     private RecipientDocument toRecipientDocument(Recipient recipient) {
-        return new RecipientDocument(recipient.getName(), recipient.getPhone());
+        return new RecipientDocument(recipient.name(), recipient.phone());
     }
 
     private AddressDocument toAddressDocument(Address address) {
         return new AddressDocument(
-                address.getStreet(),
-                address.getCity(),
-                address.getZipCode(),
-                address.getCountry()
+                address.street(),
+                address.city(),
+                address.zipCode(),
+                address.country()
         );
     }
 
     private PaymentDocument toPaymentDocument(Payment payment) {
         if (payment == null) return null;
         return new PaymentDocument(
-                payment.getMethod(),
-                payment.getStatus()
+                payment.method(),
+                payment.status()
+        );
+    }
+
+    private Pricing toPricing(PricingDocument document) {
+        if (document == null) {
+            return new Pricing(
+                    java.math.BigDecimal.ZERO,
+                    java.math.BigDecimal.ZERO,
+                    java.math.BigDecimal.ZERO,
+                    "KRW"
+            );
+        }
+        return new Pricing(
+                document.getSubtotal(),
+                document.getShipping(),
+                document.getDiscount(),
+                document.getCurrency()
+        );
+    }
+
+    private Payment toPayment(PaymentDocument document) {
+        if (document == null) {
+            return new Payment("CARD", PaymentStatus.PENDING, null, null);
+        }
+        return new Payment(
+                document.getMethod(),
+                document.getStatus(),
+                null, // transactionId는 별도 필드에 저장될 수 있음
+                null  // gateway는 별도 필드에 저장될 수 있음
         );
     }
 
@@ -190,9 +221,9 @@ public class OrderMapper {
             return null;
         }
         return new PriceDocument(
-            price.getOriginal(),
-            price.getSale(),
-            price.getCurrency(),
+            price.original(),
+            price.sale(),
+            price.currency(),
             price.discountRate()
         );
     }
@@ -224,11 +255,11 @@ public class OrderMapper {
             return null;
         }
         return new CancellationDocument(
-                cancellation.getIsCancelled(),
-                cancellation.getReason(),
-                cancellation.getCancelledBy(),
-                cancellation.getCancelledAt(),
-                cancellation.getItems()
+                cancellation.isCancelled(),
+                cancellation.reason(),
+                cancellation.cancelledBy(),
+                cancellation.cancelledAt(),
+                cancellation.items()
         );
     }
 

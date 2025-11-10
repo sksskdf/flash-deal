@@ -19,7 +19,7 @@ class OrderIdTest {
         
         // then
         assertNotNull(orderId);
-        assertEquals(validUuid, orderId.getValue());
+        assertEquals(validUuid, orderId.value());
     }
 
     @Test
@@ -42,7 +42,7 @@ class OrderIdTest {
         
         // then
         assertNotNull(orderId);
-        assertNotNull(orderId.getValue());
+        assertNotNull(orderId.value());
     }
 
     @Test

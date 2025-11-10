@@ -21,10 +21,10 @@ class PaymentTest {
         
         // then
         assertNotNull(payment);
-        assertEquals("CreditCard", payment.getMethod());
-        assertEquals(PaymentStatus.PENDING, payment.getStatus());
-        assertNull(payment.getTransactionId());
-        assertEquals("Stripe", payment.getGateway());
+        assertEquals("CreditCard", payment.method());
+        assertEquals(PaymentStatus.PENDING, payment.status());
+        assertNull(payment.transactionId());
+        assertEquals("Stripe", payment.gateway());
     }
 
     @Test
@@ -39,7 +39,7 @@ class PaymentTest {
         );
         
         // then
-        assertEquals("txn_12345", payment.getTransactionId());
+        assertEquals("txn_12345", payment.transactionId());
     }
 
     @Test
@@ -69,8 +69,8 @@ class PaymentTest {
         Payment completed = payment.complete("txn_12345");
         
         // then
-        assertEquals(PaymentStatus.COMPLETED, completed.getStatus());
-        assertEquals("txn_12345", completed.getTransactionId());
+        assertEquals(PaymentStatus.COMPLETED, completed.status());
+        assertEquals("txn_12345", completed.transactionId());
     }
 
     @Test
@@ -83,7 +83,7 @@ class PaymentTest {
         Payment failed = payment.fail();
         
         // then
-        assertEquals(PaymentStatus.FAILED, failed.getStatus());
+        assertEquals(PaymentStatus.FAILED, failed.status());
     }
 }
 

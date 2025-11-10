@@ -113,10 +113,10 @@ class OrderPersistenceAdapterTest {
         void shouldFindOrdersByStatus() {
                 // Given
                 Order order = TestDataFactory.createOrder();
-                order.transitionTo(OrderStatus.PROCESSING);
+                Order processingOrder = order.transitionTo(OrderStatus.PROCESSING);
 
                 // When
-                Mono<Order> saveResult = adapter.save(order);
+                Mono<Order> saveResult = adapter.save(processingOrder);
                 Flux<Order> findByStatus = saveResult
                                 .thenMany(adapter.findByStatus(OrderStatus.PROCESSING));
 

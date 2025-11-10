@@ -23,9 +23,9 @@ class PriceTest {
         
         // then
         assertNotNull(price);
-        assertEquals(original, price.getOriginal());
-        assertEquals(sale, price.getSale());
-        assertEquals(currency, price.getCurrency());
+        assertEquals(original, price.original());
+        assertEquals(sale, price.sale());
+        assertEquals(currency, price.currency());
     }
 
     @Test

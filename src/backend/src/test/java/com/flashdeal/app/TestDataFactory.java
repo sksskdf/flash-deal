@@ -101,7 +101,7 @@ public class TestDataFactory {
         List<OrderItem> items = createOrderItems();
         Shipping shipping = createShipping();
         
-        return new Order(orderId, userId, items, shipping, "idempotencyKey");
+        return Order.create(orderId, userId, items, shipping, "idempotencyKey");
     }
     
     public static Order createOrderWithItems(List<OrderItem> items) {
@@ -109,34 +109,29 @@ public class TestDataFactory {
         UserId userId = UserId.generate();
         Shipping shipping = createShipping();
         
-        return new Order(orderId, userId, items, shipping, "idempotencyKey");
+        return Order.create(orderId, userId, items, shipping, "idempotencyKey");
     }
     
     public static Order createConfirmedOrder() {
         Order order = createOrder();
-        order.confirm();
-        return order;
+        return order.confirm();
     }
     
     public static Order createShippedOrder() {
         Order order = createOrder();
-        order.confirm();
-        order.ship();
-        return order;
+        Order confirmedOrder = order.confirm();
+        return confirmedOrder.ship();
     }
     
     public static Order createDeliveredOrder() {
         Order order = createOrder();
-        order.confirm();
-        order.ship();
-        order.deliver();
-        return order;
+        Order confirmedOrder = order.confirm();
+        return confirmedOrder.ship().deliver();
     }
     
     public static Order createCancelledOrder() {
         Order order = createOrder();
-        order.cancel();
-        return order;
+        return order.cancel();
     }
 
     // ========== OrderItem 관련 ==========

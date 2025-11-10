@@ -34,9 +34,9 @@ class OrderTimeoutServiceTest {
     @Test
     @DisplayName("타임아웃된 주문에 대해 취소를 호출한다")
     void cancelTimedOutOrders_invokesCancelForPending() {
-        Order pending = new Order(new OrderId("O-1"), new UserId("U-1"),
+        Order pending = Order.create(new OrderId("O-1"), new UserId("U-1"),
             List.of(new OrderItem(new ProductId("P-1"), new Snapshot("t","", new com.flashdeal.app.domain.product.Price(java.math.BigDecimal.ONE, java.math.BigDecimal.ONE, "KRW"), java.util.Map.of()), 1)),
-            new Shipping("Standard", new Recipient("n","p"), new Address("s","c","z","KR"), null), "idem", Instant.now().minusSeconds(3600)
+            new Shipping("Standard", new Recipient("n","p"), new Address("s","c","z","KR"), null), "idem"
         );
 
         when(orderRepository.findByStatusAndCreatedAtBefore(eq(OrderStatus.PENDING), any())).thenReturn(Flux.just(pending));

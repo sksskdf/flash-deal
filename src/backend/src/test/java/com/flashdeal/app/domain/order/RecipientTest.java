@@ -16,8 +16,8 @@ class RecipientTest {
         
         // then
         assertNotNull(recipient);
-        assertEquals("홍길동", recipient.getName());
-        assertEquals("+82-10-1234-5678", recipient.getPhone());
+        assertEquals("홍길동", recipient.name());
+        assertEquals("+82-10-1234-5678", recipient.phone());
     }
 
     @Test

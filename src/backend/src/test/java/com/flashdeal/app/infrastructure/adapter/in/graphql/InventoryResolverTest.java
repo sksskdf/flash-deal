@@ -71,7 +71,7 @@ class InventoryResolverTest {
     @DisplayName("inventoryByProduct - 상품별 재고 조회 성공")
     void inventoryByProduct_success() {
         // Given
-        String productId = testInventory.getProductId().getValue();
+        String productId = testInventory.getProductId().value();
         given(getInventoryUseCase.getInventoryByProductId(any(ProductId.class)))
             .willReturn(Mono.just(testInventory));
 

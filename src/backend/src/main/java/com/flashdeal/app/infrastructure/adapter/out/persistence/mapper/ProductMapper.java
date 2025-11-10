@@ -21,7 +21,7 @@ public class ProductMapper {
     public ProductDocument toDocument(Product product) {
         Instant now = Instant.now();
         return new ProductDocument(
-            product.getProductId().getValue(),
+            product.getProductId().value(),
             "flash",
             product.getTitle(),
             null,
@@ -67,9 +67,9 @@ public class ProductMapper {
 
     private PriceDocument toPriceDocument(Price price) {
         return new PriceDocument(
-            price.getOriginal(),
-            price.getSale(),
-            price.getCurrency(),
+            price.original(),
+            price.sale(),
+            price.currency(),
             price.discountRate()
         );
     }
@@ -84,9 +84,9 @@ public class ProductMapper {
 
     private ScheduleDocument toScheduleDocument(Schedule schedule) {
         return new ScheduleDocument(
-            schedule.getStartsAt().toInstant(),
-            schedule.getEndsAt().toInstant(),
-            schedule.getTimezone()
+            schedule.startsAt().toInstant(),
+            schedule.endsAt().toInstant(),
+            schedule.timezone()
         );
     }
 

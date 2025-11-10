@@ -103,7 +103,7 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
                 }
                 
                 if (command.originalPrice() != null && command.dealPrice() != null) {
-                    String currency = product.getPrice().getCurrency();
+                    String currency = product.getPrice().currency();
                     Price newPrice = new Price(
                         command.originalPrice(),
                         command.dealPrice(),

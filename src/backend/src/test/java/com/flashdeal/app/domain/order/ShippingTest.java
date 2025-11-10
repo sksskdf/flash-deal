@@ -20,10 +20,10 @@ class ShippingTest {
         
         // then
         assertNotNull(shipping);
-        assertEquals("Standard", shipping.getMethod());
-        assertEquals(recipient, shipping.getRecipient());
-        assertEquals(address, shipping.getAddress());
-        assertEquals("문 앞에 놔주세요", shipping.getInstructions());
+        assertEquals("Standard", shipping.method());
+        assertEquals(recipient, shipping.recipient());
+        assertEquals(address, shipping.address());
+        assertEquals("문 앞에 놔주세요", shipping.instructions());
     }
 
     @Test
@@ -37,7 +37,7 @@ class ShippingTest {
         Shipping shipping = new Shipping("Standard", recipient, address, null);
         
         // then
-        assertNull(shipping.getInstructions());
+        assertNull(shipping.instructions());
     }
 
     @Test

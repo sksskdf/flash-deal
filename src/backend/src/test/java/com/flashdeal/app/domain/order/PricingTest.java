@@ -23,11 +23,11 @@ class PricingTest {
         
         // then
         assertNotNull(pricing);
-        assertEquals(new BigDecimal("100000"), pricing.getSubtotal());
-        assertEquals(new BigDecimal("3000"), pricing.getShipping());
-        assertEquals(new BigDecimal("5000"), pricing.getDiscount());
-        assertEquals(new BigDecimal("98000"), pricing.getTotal());
-        assertEquals("KRW", pricing.getCurrency());
+        assertEquals(new BigDecimal("100000"), pricing.subtotal());
+        assertEquals(new BigDecimal("3000"), pricing.shipping());
+        assertEquals(new BigDecimal("5000"), pricing.discount());
+        assertEquals(new BigDecimal("98000"), pricing.total());
+        assertEquals("KRW", pricing.currency());
     }
 
     @Test
@@ -42,7 +42,7 @@ class PricingTest {
         );
         
         // then
-        assertEquals(new BigDecimal("103000"), pricing.getTotal());
+        assertEquals(new BigDecimal("103000"), pricing.total());
     }
 
     @Test
@@ -57,7 +57,7 @@ class PricingTest {
         );
         
         // then
-        assertEquals(new BigDecimal("95000"), pricing.getTotal());
+        assertEquals(new BigDecimal("95000"), pricing.total());
     }
 
     @Test

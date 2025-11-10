@@ -15,12 +15,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * 개선된 Kafka Event Publisher
- * 
- * .doc/data/3.kafka-events.md의 이벤트 스키마를 기반으로 구현
- * 멱등성 처리 및 에러 핸들링 포함
- */
 @Component
 public class ImprovedKafkaEventPublisher {
 
@@ -54,15 +48,15 @@ public class ImprovedKafkaEventPublisher {
         metadata.put("idempotencyKey", idempotencyKey);
         
         OrderCreatedEvent.OrderData orderData = new OrderCreatedEvent.OrderData(
-            orderId.getValue(), orderNumber, userId, 
-            convertToOrderItems(orderItems), total, currency
+                orderId.value(), orderNumber, userId,
+                    convertToOrderItems(orderItems), total, currency
         );
         
         OrderCreatedEvent event = new OrderCreatedEvent(
-            orderId.getValue(), correlationId, null, metadata, orderData
+                orderId.value(), correlationId, null, metadata, orderData
         );
         
-        return publishEvent(ORDER_CREATED_TOPIC, orderId.getValue(), event);
+        return publishEvent(ORDER_CREATED_TOPIC, orderId.value(), event);
     }
 
     /**
@@ -77,14 +71,14 @@ public class ImprovedKafkaEventPublisher {
         metadata.put("source", "payment-service");
         
         PaymentCompletedEvent.PaymentData paymentData = new PaymentCompletedEvent.PaymentData(
-            orderId.getValue(), amount, currency, paymentMethod, transactionId, gateway
+                orderId.value(), amount, currency, paymentMethod, transactionId, gateway
         );
         
         PaymentCompletedEvent event = new PaymentCompletedEvent(
-            orderId.getValue(), correlationId, null, metadata, paymentData
+                orderId.value(), correlationId, null, metadata, paymentData
         );
         
-        return publishEvent(PAYMENT_COMPLETED_TOPIC, orderId.getValue(), event);
+        return publishEvent(PAYMENT_COMPLETED_TOPIC, orderId.value(), event);
     }
 
     /**
@@ -99,14 +93,14 @@ public class ImprovedKafkaEventPublisher {
         
         ZonedDateTime expiresAt = ZonedDateTime.now().plus(reservationTimeout);
         InventoryReservedEvent.InventoryData inventoryData = new InventoryReservedEvent.InventoryData(
-            productId.getValue(), quantity, orderId.getValue(), expiresAt
+                productId.value(), quantity, orderId.value(), expiresAt
         );
         
         InventoryReservedEvent event = new InventoryReservedEvent(
-            productId.getValue(), correlationId, null, metadata, inventoryData
+                productId.value(), correlationId, null, metadata, inventoryData
         );
         
-        return publishEvent(INVENTORY_RESERVED_TOPIC, productId.getValue(), event);
+        return publishEvent(INVENTORY_RESERVED_TOPIC, productId.value(), event);
     }
 
     /**
@@ -126,14 +120,14 @@ public class ImprovedKafkaEventPublisher {
         event.put("eventType", "OrderCancelled");
         event.put("eventVersion", "1.0");
         event.put("timestamp", ZonedDateTime.now());
-        event.put("aggregateId", orderId.getValue());
+        event.put("aggregateId", orderId.value());
         event.put("correlationId", correlationId);
-        event.put("orderId", orderId.getValue());
+        event.put("orderId", orderId.value());
         event.put("reason", reason);
         event.put("cancelledBy", cancelledBy);
         event.put("metadata", metadata);
         
-        return publishEvent(ORDER_CANCELLED_TOPIC, orderId.getValue(), event);
+        return publishEvent(ORDER_CANCELLED_TOPIC, orderId.value(), event);
     }
 
     /**

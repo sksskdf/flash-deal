@@ -19,7 +19,7 @@ class ProductIdTest {
         
         // then
         assertNotNull(productId);
-        assertEquals(validUuid, productId.getValue());
+        assertEquals(validUuid, productId.value());
     }
 
     @Test
@@ -45,8 +45,8 @@ class ProductIdTest {
         
         // then
         assertNotNull(productId);
-        assertNotNull(productId.getValue());
-        assertFalse(productId.getValue().isEmpty());
+        assertNotNull(productId.value());
+        assertFalse(productId.value().isEmpty());
     }
 
     @Test

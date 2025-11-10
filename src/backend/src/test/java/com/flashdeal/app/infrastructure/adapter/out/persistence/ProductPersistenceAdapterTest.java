@@ -426,11 +426,11 @@ class ProductPersistenceAdapterTest {
         StepVerifier.create(findByFilter)
                 .assertNext(page -> {
                     assertThat(page.content()).hasSize(3);
-                    assertThat(page.content().get(0).getPrice().getSale())
+                    assertThat(page.content().get(0).getPrice().sale())
                             .isEqualByComparingTo(new BigDecimal("120000"));
-                    assertThat(page.content().get(1).getPrice().getSale())
+                    assertThat(page.content().get(1).getPrice().sale())
                             .isEqualByComparingTo(new BigDecimal("80000"));
-                    assertThat(page.content().get(2).getPrice().getSale())
+                    assertThat(page.content().get(2).getPrice().sale())
                             .isEqualByComparingTo(new BigDecimal("40000"));
                 })
                 .verifyComplete();

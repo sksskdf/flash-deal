@@ -29,7 +29,7 @@ public class RedisCacheAdapter {
      * 재고 조회
      */
     public Mono<Integer> getInventory(ProductId productId) {
-        String key = INVENTORY_KEY_PREFIX + productId.getValue();
+        String key = INVENTORY_KEY_PREFIX + productId.value();
         return redisTemplate.opsForValue()
                 .get(key)
                 .cast(Integer.class)
@@ -40,7 +40,7 @@ public class RedisCacheAdapter {
      * 재고 설정
      */
     public Mono<Boolean> setInventory(ProductId productId, int quantity) {
-        String key = INVENTORY_KEY_PREFIX + productId.getValue();
+        String key = INVENTORY_KEY_PREFIX + productId.value();
         return redisTemplate.opsForValue()
                 .set(key, quantity);
     }
@@ -49,7 +49,7 @@ public class RedisCacheAdapter {
      * 재고 감소 (원자적 연산)
      */
     public Mono<Long> decrementInventory(ProductId productId, int quantity) {
-        String key = INVENTORY_KEY_PREFIX + productId.getValue();
+        String key = INVENTORY_KEY_PREFIX + productId.value();
         return redisTemplate.opsForValue()
                 .decrement(key, quantity);
     }
@@ -58,7 +58,7 @@ public class RedisCacheAdapter {
      * 재고 증가 (원자적 연산)
      */
     public Mono<Long> incrementInventory(ProductId productId, int quantity) {
-        String key = INVENTORY_KEY_PREFIX + productId.getValue();
+        String key = INVENTORY_KEY_PREFIX + productId.value();
         return redisTemplate.opsForValue()
                 .increment(key, quantity);
     }
@@ -67,7 +67,7 @@ public class RedisCacheAdapter {
      * 재고 예약 설정
      */
     public Mono<Boolean> setReservation(ProductId productId, String orderId, int quantity) {
-        String key = RESERVATION_KEY_PREFIX + productId.getValue();
+        String key = RESERVATION_KEY_PREFIX + productId.value();
         return redisTemplate.opsForZSet()
                 .add(key, orderId, System.currentTimeMillis())
                 .then(redisTemplate.expire(key, RESERVATION_TTL))
@@ -78,7 +78,7 @@ public class RedisCacheAdapter {
      * 재고 예약 해제
      */
     public Mono<Long> removeReservation(ProductId productId, String orderId) {
-        String key = RESERVATION_KEY_PREFIX + productId.getValue();
+        String key = RESERVATION_KEY_PREFIX + productId.value();
         return redisTemplate.opsForZSet()
                 .remove(key, orderId);
     }
@@ -87,7 +87,7 @@ public class RedisCacheAdapter {
      * 재고 예약 조회
      */
     public Mono<Long> getReservationCount(ProductId productId) {
-        String key = RESERVATION_KEY_PREFIX + productId.getValue();
+        String key = RESERVATION_KEY_PREFIX + productId.value();
         return redisTemplate.opsForZSet()
                 .count(key, org.springframework.data.domain.Range.closed(0.0, (double) System.currentTimeMillis()));
     }
@@ -96,7 +96,7 @@ public class RedisCacheAdapter {
      * 재고 키 삭제
      */
     public Mono<Boolean> deleteInventory(ProductId productId) {
-        String key = INVENTORY_KEY_PREFIX + productId.getValue();
+        String key = INVENTORY_KEY_PREFIX + productId.value();
         return redisTemplate.delete(key)
                 .map(count -> count > 0);
     }
@@ -105,7 +105,7 @@ public class RedisCacheAdapter {
      * 재고 키 존재 여부 확인
      */
     public Mono<Boolean> existsInventory(ProductId productId) {
-        String key = INVENTORY_KEY_PREFIX + productId.getValue();
+        String key = INVENTORY_KEY_PREFIX + productId.value();
         return redisTemplate.hasKey(key);
     }
 
@@ -113,7 +113,7 @@ public class RedisCacheAdapter {
      * 재고 TTL 설정
      */
     public Mono<Boolean> setInventoryTTL(ProductId productId, Duration ttl) {
-        String key = INVENTORY_KEY_PREFIX + productId.getValue();
+        String key = INVENTORY_KEY_PREFIX + productId.value();
         return redisTemplate.expire(key, ttl);
     }
 
@@ -121,7 +121,7 @@ public class RedisCacheAdapter {
      * 재고 TTL 조회
      */
     public Mono<Duration> getInventoryTTL(ProductId productId) {
-        String key = INVENTORY_KEY_PREFIX + productId.getValue();
+        String key = INVENTORY_KEY_PREFIX + productId.value();
         return redisTemplate.getExpire(key);
     }
 
@@ -251,7 +251,7 @@ public class RedisCacheAdapter {
      * @return 감소 후 재고 수량
      */
     public Mono<Long> safeDecrementInventory(ProductId productId, int quantity, String lockId) {
-        String resourceId = productId.getValue();
+        String resourceId = productId.value();
         String inventoryKey = INVENTORY_KEY_PREFIX + resourceId;
         
         // Lua 스크립트로 원자적 재고 감소 (락 확인 포함)
@@ -293,7 +293,7 @@ public class RedisCacheAdapter {
      * 분산 락을 사용한 안전한 재고 증가
      */
     public Mono<Long> safeIncrementInventory(ProductId productId, int quantity, String lockId) {
-        String resourceId = productId.getValue();
+        String resourceId = productId.value();
         String inventoryKey = INVENTORY_KEY_PREFIX + resourceId;
         
         String luaScript = 
