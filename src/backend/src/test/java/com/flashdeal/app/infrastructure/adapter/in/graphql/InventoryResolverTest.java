@@ -61,8 +61,8 @@ class InventoryResolverTest {
         // Then
         StepVerifier.create(result)
             .assertNext(inventory -> {
-                assertThat(inventory.getInventoryId()).isEqualTo(testInventory.getInventoryId());
-                    assertThat(inventory.getStock().total()).isEqualTo(testInventory.getStock().total());
+                assertThat(inventory.inventoryId()).isEqualTo(testInventory.inventoryId());
+                    assertThat(inventory.stock().total()).isEqualTo(testInventory.stock().total());
             })
             .verifyComplete();
     }
@@ -71,7 +71,7 @@ class InventoryResolverTest {
     @DisplayName("inventoryByProduct - 상품별 재고 조회 성공")
     void inventoryByProduct_success() {
         // Given
-        String productId = testInventory.getProductId().value();
+        String productId = testInventory.productId().value();
         given(getInventoryUseCase.getInventoryByProductId(any(ProductId.class)))
             .willReturn(Mono.just(testInventory));
 
@@ -81,7 +81,7 @@ class InventoryResolverTest {
         // Then
         StepVerifier.create(result)
             .assertNext(inventory -> {
-                assertThat(inventory.getProductId()).isEqualTo(testInventory.getProductId());
+                assertThat(inventory.productId()).isEqualTo(testInventory.productId());
             })
             .verifyComplete();
     }

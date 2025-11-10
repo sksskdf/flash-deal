@@ -78,13 +78,13 @@ public class InventoryService implements
     }
 
     private void validateInventoryForReservation(Inventory inventory, int quantity) {
-        if (!inventory.isValidPurchaseQuantity(quantity)) {
+        if (!inventory.policy().isValidPurchaseQuantity(quantity)) {
             throw new IllegalArgumentException(
                 "Invalid purchase quantity: " + quantity + 
                             " (max: " + inventory.policy().maxPurchasePerUser() + ")"
             );
         }
-        if (inventory.isOutOfStock()) {
+        if (inventory.stock().outOfStock()) {
             throw new IllegalStateException("Product is out of stock");
         }
     }

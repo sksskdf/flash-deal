@@ -123,10 +123,10 @@ public class OrderService implements
     }
 
     private void validateInventoryForPurchase(com.flashdeal.app.domain.inventory.Inventory inventory, int quantity) {
-        if (!inventory.isValidPurchaseQuantity(quantity)) {
+        if (!inventory.policy().isValidPurchaseQuantity(quantity)) {
             throw new IllegalArgumentException("Invalid purchase quantity: " + quantity);
         }
-        if (inventory.isOutOfStock()) {
+        if (inventory.stock().outOfStock()) {
             throw new IllegalStateException("Product is out of stock");
         }
     }

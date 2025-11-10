@@ -99,7 +99,7 @@ public class InventoryResolver {
 
     @SchemaMapping(typeName = "Inventory", field = "productId")
     public String productId(Inventory inventory) {
-        return inventory.getProductId().value();
+        return inventory.productId().value();
     }
 
     // Input DTOs

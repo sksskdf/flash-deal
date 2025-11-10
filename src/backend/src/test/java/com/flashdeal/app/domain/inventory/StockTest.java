@@ -64,7 +64,7 @@ class StockTest {
         Stock stock = Stock.initial(100);
         
         // when
-        Stock decreased = stock.decrease(30);
+        Stock decreased = stock.reserve(30);
         
         // then
         assertEquals(100, decreased.total());
@@ -81,7 +81,7 @@ class StockTest {
         
         // when & then
         assertThrows(IllegalArgumentException.class, 
-            () -> stock.decrease(101));
+                () -> stock.reserve(101));
     }
 
     @Test
@@ -92,14 +92,14 @@ class StockTest {
         
         // when & then
         assertThrows(IllegalArgumentException.class, 
-            () -> stock.decrease(-10));
+                () -> stock.reserve(-10));
     }
 
     @Test
     @DisplayName("예약을 확정할 수 있다 - reserved 감소, sold 증가")
     void confirmReservation() {
         // given
-        Stock stock = Stock.initial(100).decrease(30);
+        Stock stock = Stock.initial(100).reserve(30);
         
         // when
         Stock confirmed = stock.confirm(20);
@@ -115,7 +115,7 @@ class StockTest {
     @DisplayName("예약량보다 많이 확정하면 예외가 발생한다")
     void throwsExceptionWhenConfirmMoreThanReserved() {
         // given
-        Stock stock = Stock.initial(100).decrease(30);
+        Stock stock = Stock.initial(100).reserve(30);
         
         // when & then
         assertThrows(IllegalArgumentException.class, 
@@ -126,7 +126,7 @@ class StockTest {
     @DisplayName("예약을 해제할 수 있다 - reserved 감소, available 증가")
     void releaseReservation() {
         // given
-        Stock stock = Stock.initial(100).decrease(30);
+        Stock stock = Stock.initial(100).reserve(30);
         
         // when
         Stock released = stock.release(10);
@@ -142,7 +142,7 @@ class StockTest {
     @DisplayName("예약량보다 많이 해제하면 예외가 발생한다")
     void throwsExceptionWhenReleaseMoreThanReserved() {
         // given
-        Stock stock = Stock.initial(100).decrease(30);
+        Stock stock = Stock.initial(100).reserve(30);
         
         // when & then
         assertThrows(IllegalArgumentException.class, 
@@ -153,20 +153,20 @@ class StockTest {
     @DisplayName("재고가 0개이면 품절 상태다")
     void isOutOfStockWhenAvailableIsZero() {
         // given
-        Stock stock = Stock.initial(100).decrease(100);
+        Stock stock = Stock.initial(100).reserve(100);
         
         // when & then
-        assertTrue(stock.isOutOfStock());
+        assertTrue(stock.outOfStock());
     }
 
     @Test
     @DisplayName("재고가 1개 이상이면 품절이 아니다")
     void isNotOutOfStockWhenAvailableIsPositive() {
         // given
-        Stock stock = Stock.initial(100).decrease(99);
+        Stock stock = Stock.initial(100).reserve(99);
         
         // when & then
-        assertFalse(stock.isOutOfStock());
+        assertFalse(stock.outOfStock());
     }
 
     @Test
@@ -177,10 +177,10 @@ class StockTest {
         
         // when
         Stock result = stock
-            .decrease(30)    // available: 70, reserved: 30
+                .reserve(30) // available: 70, reserved: 30
             .confirm(20)     // available: 70, reserved: 10, sold: 20
             .release(5)      // available: 75, reserved: 5, sold: 20
-            .decrease(25);   // available: 50, reserved: 30, sold: 20
+                .reserve(25); // available: 50, reserved: 30, sold: 20
         
         // then
         assertEquals(100, result.total());

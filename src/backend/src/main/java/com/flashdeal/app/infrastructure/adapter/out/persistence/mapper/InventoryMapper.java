@@ -26,11 +26,11 @@ public class InventoryMapper {
     public InventoryDocument toDocument(Inventory inventory) {
         return new InventoryDocument(
                 inventory.inventoryId().value(),
-                        inventory.getProductId().value(),
-                toStockDocument(inventory.getStock()),
-                calculateLevel(inventory.getStock()),
+                        inventory.productId().value(),
+                toStockDocument(inventory.stock()),
+                calculateLevel(inventory.stock()),
                 toRedisInfoDocument(inventory),
-                toPolicyDocument(inventory.getPolicy()),
+                toPolicyDocument(inventory.policy()),
                 toThresholdsDocument(),
                 new ArrayList<>(),
                 new ArrayList<>(),
@@ -88,8 +88,8 @@ public class InventoryMapper {
 
     private RedisInfoDocument toRedisInfoDocument(Inventory inventory) {
         return new RedisInfoDocument(
-                "inventory:" + inventory.getProductId().value(),
-                inventory.getStock().available(),
+                "inventory:" + inventory.productId().value(),
+                inventory.stock().available(),
                         Instant.now(),
                 1L
         );

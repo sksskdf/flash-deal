@@ -22,7 +22,7 @@ public record Inventory(
     }
 
     public Inventory reserve(int quantity) {
-        return new Inventory(inventoryId, productId, stock.decrease(quantity), policy);
+        return new Inventory(inventoryId, productId, stock.reserve(quantity), policy);
     }
 
     public Inventory confirm(int quantity) {
@@ -43,24 +43,12 @@ public record Inventory(
         
         Stock newStock = new Stock(
             newTotal,
-                stock.reserved(),
-                    newAvailable,
-                stock.sold()
+            stock.reserved(),
+            newAvailable,
+            stock.sold()
         );
 
         return new Inventory(inventoryId, productId, newStock, policy);
-    }
-
-    public boolean isOutOfStock() {
-        return stock.isOutOfStock();
-    }
-
-    public boolean isLowStock() {
-        return policy.isLowStock(stock.available());
-    }
-
-    public boolean isValidPurchaseQuantity(int quantity) {
-        return policy.isValidPurchaseQuantity(quantity);
     }
 
     public Inventory updatePolicy(Policy newPolicy) {
@@ -68,19 +56,7 @@ public record Inventory(
         return new Inventory(inventoryId, productId, stock, newPolicy);
     }
 
-    public InventoryId getInventoryId() {
-        return inventoryId;
-    }
-
-    public ProductId getProductId() {
-        return productId;
-    }
-
-    public Stock getStock() {
-        return stock;
-    }
-
-    public Policy getPolicy() {
-        return policy;
+    public boolean lowStock() {
+        return policy.isLowStock(stock.available());
     }
 }

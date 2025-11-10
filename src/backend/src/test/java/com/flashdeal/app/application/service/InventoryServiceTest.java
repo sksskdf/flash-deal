@@ -52,8 +52,8 @@ class InventoryServiceTest {
 
         StepVerifier.create(inventoryService.createInventory(cmd))
             .assertNext(inv -> {
-                org.assertj.core.api.Assertions.assertThat(inv.getProductId()).isEqualTo(productId);
-                org.assertj.core.api.Assertions.assertThat(inv.getStock().total()).isEqualTo(100);
+                org.assertj.core.api.Assertions.assertThat(inv.productId()).isEqualTo(productId);
+                org.assertj.core.api.Assertions.assertThat(inv.stock().total()).isEqualTo(100);
             })
             .verifyComplete();
     }
@@ -61,9 +61,9 @@ class InventoryServiceTest {
     @Test
     @DisplayName("재고를 조회할 수 있다")
     void getInventory_found() {
-        given(inventoryRepository.findById(baseInventory.getInventoryId())).willReturn(Mono.just(baseInventory));
+        given(inventoryRepository.findById(baseInventory.inventoryId())).willReturn(Mono.just(baseInventory));
 
-        StepVerifier.create(inventoryService.getInventory(baseInventory.getInventoryId()))
+        StepVerifier.create(inventoryService.getInventory(baseInventory.inventoryId()))
             .expectNext(baseInventory)
             .verifyComplete();
     }
@@ -94,8 +94,8 @@ class InventoryServiceTest {
     @DisplayName("예약된 재고를 판매로 확정할 수 있다")
     void confirm_movesFromReservedToSold() {
         Inventory withReserved = new Inventory(
-            baseInventory.getInventoryId(), productId,
-            new Stock(100, 5, 95, 0), baseInventory.getPolicy()
+            baseInventory.inventoryId(), productId,
+            new Stock(100, 5, 95, 0), baseInventory.policy()
         );
         given(inventoryRepository.findByProductId(productId)).willReturn(Mono.just(withReserved));
         given(inventoryRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
@@ -109,8 +109,8 @@ class InventoryServiceTest {
     @DisplayName("예약된 재고를 사용 가능 상태로 해제할 수 있다")
     void release_returnsToAvailable() {
         Inventory withReserved = new Inventory(
-            baseInventory.getInventoryId(), productId,
-            new Stock(100, 5, 95, 0), baseInventory.getPolicy()
+            baseInventory.inventoryId(), productId,
+            new Stock(100, 5, 95, 0), baseInventory.policy()
         );
         given(inventoryRepository.findByProductId(productId)).willReturn(Mono.just(withReserved));
         given(inventoryRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));

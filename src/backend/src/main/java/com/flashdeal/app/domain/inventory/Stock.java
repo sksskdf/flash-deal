@@ -32,10 +32,8 @@ public record Stock(
         return new Stock(total, 0, total, 0);
     }
 
-    public Stock decrease(int quantity) {
-        if (quantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
-        }
+    public Stock reserve(int quantity) {
+        quantityMustOverZero(quantity);
         
         if (quantity > available) {
             throw new IllegalArgumentException(
@@ -52,9 +50,7 @@ public record Stock(
     }
 
     public Stock confirm(int quantity) {
-        if (quantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
-        }
+        quantityMustOverZero(quantity);
         
         if (quantity > reserved) {
             throw new IllegalArgumentException(
@@ -71,9 +67,7 @@ public record Stock(
     }
 
     public Stock release(int quantity) {
-        if (quantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
-        }
+        quantityMustOverZero(quantity);
         
         if (quantity > reserved) {
             throw new IllegalArgumentException(
@@ -89,8 +83,14 @@ public record Stock(
         );
     }
 
-    public boolean isOutOfStock() {
+    public boolean outOfStock() {
         return available == 0;
+    }
+
+    private void quantityMustOverZero(int quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative");
+        }
     }
 }
 

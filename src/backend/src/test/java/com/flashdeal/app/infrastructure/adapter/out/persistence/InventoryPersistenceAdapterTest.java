@@ -70,16 +70,16 @@ class InventoryPersistenceAdapterTest {
         // When
         Mono<Inventory> saveResult = adapter.save(inventory);
         Mono<Inventory> findResult = saveResult
-                .map(Inventory::getInventoryId)
+                .map(Inventory::inventoryId)
                 .flatMap(adapter::findById);
 
         // Then
         StepVerifier.create(findResult)
                 .assertNext(foundInventory -> {
-                    assertThat(foundInventory.getInventoryId()).isEqualTo(inventory.getInventoryId());
-                    assertThat(foundInventory.getProductId()).isEqualTo(inventory.getProductId());
-                    assertThat(foundInventory.getStock().total()).isEqualTo(inventory.getStock().total());
-                    assertThat(foundInventory.getStock().available()).isEqualTo(inventory.getStock().available());
+                    assertThat(foundInventory.inventoryId()).isEqualTo(inventory.inventoryId());
+                    assertThat(foundInventory.productId()).isEqualTo(inventory.productId());
+                    assertThat(foundInventory.stock().total()).isEqualTo(inventory.stock().total());
+                    assertThat(foundInventory.stock().available()).isEqualTo(inventory.stock().available());
                 })
                 .verifyComplete();
     }
@@ -89,7 +89,7 @@ class InventoryPersistenceAdapterTest {
     void shouldFindInventoryByProductId() {
         // Given
         Inventory inventory = TestDataFactory.createInventory();
-        ProductId productId = inventory.getProductId();
+        ProductId productId = inventory.productId();
 
         // When
         Mono<Inventory> saveResult = adapter.save(inventory);
@@ -99,8 +99,8 @@ class InventoryPersistenceAdapterTest {
         // Then
         StepVerifier.create(findByProductIdResult)
                 .assertNext(foundInventory -> {
-                    assertThat(foundInventory.getProductId()).isEqualTo(productId);
-                    assertThat(foundInventory.getStock().total()).isEqualTo(1000);
+                    assertThat(foundInventory.productId()).isEqualTo(productId);
+                    assertThat(foundInventory.stock().total()).isEqualTo(1000);
                 })
                 .verifyComplete();
     }
@@ -110,7 +110,7 @@ class InventoryPersistenceAdapterTest {
     void shouldDeleteInventory() {
         // Given
         Inventory inventory = TestDataFactory.createInventory();
-        InventoryId inventoryId = inventory.getInventoryId();
+        InventoryId inventoryId = inventory.inventoryId();
 
         // When
         Mono<Inventory> saveResult = adapter.save(inventory);
@@ -118,7 +118,7 @@ class InventoryPersistenceAdapterTest {
                 .then(adapter.deleteById(inventoryId));
 
         Mono<Boolean> existsResult = deleteResult
-                .then(adapter.existsByProductId(inventory.getProductId()));
+                .then(adapter.existsByProductId(inventory.productId()));
 
         // Then
         StepVerifier.create(existsResult)
@@ -131,7 +131,7 @@ class InventoryPersistenceAdapterTest {
     void shouldCheckInventoryExistsByProductId() {
         // Given
         Inventory inventory = TestDataFactory.createInventory();
-        ProductId productId = inventory.getProductId();
+        ProductId productId = inventory.productId();
 
         // When
         Mono<Inventory> saveResult = adapter.save(inventory);
@@ -160,9 +160,9 @@ class InventoryPersistenceAdapterTest {
         // Then
         StepVerifier.create(reserveResult)
                 .assertNext(reservedInventory -> {
-                    assertThat(reservedInventory.getStock().available()).isEqualTo(995); // 1000 - 5
-                    assertThat(reservedInventory.getStock().reserved()).isEqualTo(5);
-                    assertThat(reservedInventory.getStock().total()).isEqualTo(1000);
+                    assertThat(reservedInventory.stock().available()).isEqualTo(995); // 1000 - 5
+                    assertThat(reservedInventory.stock().reserved()).isEqualTo(5);
+                    assertThat(reservedInventory.stock().total()).isEqualTo(1000);
                 })
                 .verifyComplete();
     }
