@@ -41,7 +41,7 @@ class ProductServiceTest {
         Price price = new Price(new BigDecimal("10000"), new BigDecimal("9000"), "KRW");
         Schedule schedule = new Schedule(ZonedDateTime.now().minusDays(1), ZonedDateTime.now().plusDays(1), "Asia/Seoul");
         Specs specs = new Specs(Map.of("imageUrl", "http://img", "category", "General"));
-        baseProduct = new Product(productId, "타이틀", "설명", price, schedule, specs);
+        baseProduct = new Product(productId, "타이틀", "설명", "카테고리", price, schedule, specs, DealStatus.UPCOMING);
     }
 
     @Test
@@ -61,15 +61,15 @@ class ProductServiceTest {
         given(productRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         StepVerifier.create(productService.createProduct(cmd))
-            .assertNext(p -> assertThat(p.getTitle()).isEqualTo("타이틀"))
+            .assertNext(p -> assertThat(p.title()).isEqualTo("타이틀"))
             .verifyComplete();
     }
 
     @Test
     @DisplayName("상품을 조회할 수 있다")
     void getProduct_found() {
-        given(productRepository.findById(baseProduct.getProductId())).willReturn(Mono.just(baseProduct));
-        StepVerifier.create(productService.getProduct(baseProduct.getProductId()))
+        given(productRepository.findById(baseProduct.productId())).willReturn(Mono.just(baseProduct));
+        StepVerifier.create(productService.getProduct(baseProduct.productId()))
             .expectNext(baseProduct)
             .verifyComplete();
     }
@@ -89,11 +89,11 @@ class ProductServiceTest {
     @Test
     @DisplayName("상품 제목, 가격, 일정을 수정할 수 있다")
     void updateProduct_updatesTitlePriceSchedule() {
-        given(productRepository.findById(baseProduct.getProductId())).willReturn(Mono.just(baseProduct));
+        given(productRepository.findById(baseProduct.productId())).willReturn(Mono.just(baseProduct));
         given(productRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         UpdateProductCommand cmd = new UpdateProductCommand(
-            baseProduct.getProductId(),
+            baseProduct.productId(),
             "새 타이틀",
             null,
             new BigDecimal("12000"), new BigDecimal("10000"),
@@ -101,7 +101,7 @@ class ProductServiceTest {
         );
 
         StepVerifier.create(productService.updateProduct(cmd))
-            .assertNext(p -> assertThat(p.getTitle()).isEqualTo("새 타이틀"))
+            .assertNext(p -> assertThat(p.title()).isEqualTo("새 타이틀"))
             .verifyComplete();
     }
 }

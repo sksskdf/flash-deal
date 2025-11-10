@@ -36,6 +36,7 @@ import reactor.test.StepVerifier;
 @DataMongoTest
 @Testcontainers
 @ActiveProfiles("test")
+@SuppressWarnings("resource")
 @DisplayName("Order Persistence Adapter 테스트")
 class OrderPersistenceAdapterTest {
 

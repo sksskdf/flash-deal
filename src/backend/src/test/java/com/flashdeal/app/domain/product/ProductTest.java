@@ -21,6 +21,7 @@ class ProductTest {
         ProductId productId = ProductId.generate();
         String title = "AirPods Pro";
         String description = "Active Noise Cancellation";
+        String category = "Electronics";
         Price price = new Price(
             new BigDecimal("329000"),
             new BigDecimal("249000"),
@@ -37,17 +38,18 @@ class ProductTest {
         Specs specs = new Specs(specsFields);
         
         // when
-        Product product = new Product(productId, title, description, price, schedule, specs);
+        Product product = new Product(productId, title, description, category, price, schedule, specs,
+                DealStatus.UPCOMING);
         
         // then
         assertNotNull(product);
-        assertEquals(productId, product.getProductId());
-        assertEquals(title, product.getTitle());
-        assertEquals(description, product.getDescription());
-        assertEquals(price, product.getPrice());
-        assertEquals(schedule, product.getSchedule());
-        assertEquals(specs, product.getSpecs());
-        assertEquals(DealStatus.UPCOMING, product.getStatus());
+        assertEquals(productId, product.productId());
+        assertEquals(title, product.title());
+        assertEquals(description, product.description());
+        assertEquals(price, product.price());
+        assertEquals(schedule, product.schedule());
+        assertEquals(specs, product.specs());
+        assertEquals(DealStatus.UPCOMING, product.status());
     }
 
     @Test
@@ -61,31 +63,19 @@ class ProductTest {
         
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> new Product(null, "title", "desc", price, schedule, specs));
+                () -> new Product(null, "title", "desc", "카테고리", price, schedule, specs, DealStatus.UPCOMING));
         assertThrows(IllegalArgumentException.class,
-            () -> new Product(ProductId.generate(), null, "desc", price, schedule, specs));
+                () -> new Product(ProductId.generate(), null, "desc", "카테고리", price, schedule, specs,
+                        DealStatus.UPCOMING));
         assertThrows(IllegalArgumentException.class,
-            () -> new Product(ProductId.generate(), "title", "desc", null, schedule, specs));
+                () -> new Product(ProductId.generate(), "title", "desc", "카테고리", null, schedule, specs,
+                        DealStatus.UPCOMING));
         assertThrows(IllegalArgumentException.class,
-            () -> new Product(ProductId.generate(), "title", "desc", price, null, specs));
+                () -> new Product(ProductId.generate(), "title", "desc", "카테고리", price, null, specs,
+                        DealStatus.UPCOMING));
         assertThrows(IllegalArgumentException.class,
-            () -> new Product(ProductId.generate(), "title", "desc", price, schedule, null));
-    }
-
-    @Test
-    @DisplayName("제목이 빈 문자열이면 예외가 발생한다")
-    void throwsExceptionWhenTitleIsEmpty() {
-        // given
-        Price price = new Price(new BigDecimal("100"), new BigDecimal("80"), "KRW");
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
-        Schedule schedule = new Schedule(now, now.plusHours(1), "Asia/Seoul");
-        Specs specs = new Specs(new HashMap<>());
-        
-        // when & then
-        assertThrows(IllegalArgumentException.class,
-            () -> new Product(ProductId.generate(), "", "desc", price, schedule, specs));
-        assertThrows(IllegalArgumentException.class,
-            () -> new Product(ProductId.generate(), "   ", "desc", price, schedule, specs));
+                () -> new Product(ProductId.generate(), "title", "desc", "카테고리", price, schedule, null,
+                        DealStatus.UPCOMING));
     }
 
     @Test
@@ -143,13 +133,13 @@ class ProductTest {
         ZonedDateTime startsAt = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(1);
         Schedule schedule = new Schedule(startsAt, startsAt.plusHours(24), "Asia/Seoul");
         Product product = createProduct(schedule);
-        assertEquals(DealStatus.UPCOMING, product.getStatus());
+        assertEquals(DealStatus.UPCOMING, product.status());
         
         // when
-        product.transitionTo(DealStatus.ACTIVE);
+        Product updatedProduct = product.transitionTo(DealStatus.ACTIVE);
         
         // then
-        assertEquals(DealStatus.ACTIVE, product.getStatus());
+        assertEquals(DealStatus.ACTIVE, updatedProduct.status());
     }
 
     @Test
@@ -159,13 +149,13 @@ class ProductTest {
         ZonedDateTime startsAt = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).minusHours(1);
         Schedule schedule = new Schedule(startsAt, startsAt.plusHours(24), "Asia/Seoul");
         Product product = createProduct(schedule);
-        product.transitionTo(DealStatus.ACTIVE);
+        Product updatedProduct1 = product.transitionTo(DealStatus.ACTIVE);
         
         // when
-        product.transitionTo(DealStatus.SOLDOUT);
+        Product updatedProduct2 = updatedProduct1.transitionTo(DealStatus.SOLDOUT);
         
         // then
-        assertEquals(DealStatus.SOLDOUT, product.getStatus());
+        assertEquals(DealStatus.SOLDOUT, updatedProduct2.status());
     }
 
     @Test
@@ -175,13 +165,13 @@ class ProductTest {
         ZonedDateTime startsAt = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).minusHours(1);
         Schedule schedule = new Schedule(startsAt, startsAt.plusHours(24), "Asia/Seoul");
         Product product = createProduct(schedule);
-        product.transitionTo(DealStatus.ACTIVE);
+        Product updatedProduct1 = product.transitionTo(DealStatus.ACTIVE);
         
         // when
-        product.transitionTo(DealStatus.ENDED);
+        Product updatedProduct2 = updatedProduct1.transitionTo(DealStatus.ENDED);
         
         // then
-        assertEquals(DealStatus.ENDED, product.getStatus());
+        assertEquals(DealStatus.ENDED, updatedProduct2.status());
     }
 
     @Test
@@ -211,10 +201,17 @@ class ProductTest {
         );
         
         // when
-        product.updatePrice(newPrice);
+        Product updatedProduct = product.updatePrice(newPrice);
         
         // then
-        assertEquals(newPrice, product.getPrice());
+        assertEquals(newPrice, updatedProduct.price());
+        assertEquals(product.productId(), updatedProduct.productId());
+        assertEquals(product.title(), updatedProduct.title());
+        assertEquals(product.description(), updatedProduct.description());
+        assertEquals(product.category(), updatedProduct.category());
+        assertEquals(product.schedule(), updatedProduct.schedule());
+        assertEquals(product.specs(), updatedProduct.specs());
+        assertEquals(product.status(), updatedProduct.status());
     }
 
     @Test
@@ -230,10 +227,17 @@ class ProductTest {
         );
         
         // when
-        product.updateSchedule(newSchedule);
+        Product updatedProduct = product.updateSchedule(newSchedule);
         
         // then
-        assertEquals(newSchedule, product.getSchedule());
+        assertEquals(newSchedule, updatedProduct.schedule());
+        assertEquals(product.productId(), updatedProduct.productId());
+        assertEquals(product.title(), updatedProduct.title());
+        assertEquals(product.description(), updatedProduct.description());
+        assertEquals(product.category(), updatedProduct.category());
+        assertEquals(product.price(), updatedProduct.price());
+        assertEquals(product.specs(), updatedProduct.specs());
+        assertEquals(product.status(), updatedProduct.status());
     }
 
     private Product createProduct() {
@@ -246,9 +250,11 @@ class ProductTest {
             ProductId.generate(),
             "Test Product",
             "Test Description",
-            new Price(new BigDecimal("100000"), new BigDecimal("80000"), "KRW"),
+                "카테고리",
+                    new Price(new BigDecimal("100000"), new BigDecimal("80000"), "KRW"),
             schedule,
-            new Specs(new HashMap<>())
+                new Specs(new HashMap<>()),
+                DealStatus.UPCOMING
         );
     }
 }

@@ -72,9 +72,9 @@ public class OrderService implements
                     .switchIfEmpty(Mono.error(new IllegalArgumentException("Product not found: " + item.productId())))
                     .map(product -> {
                         Snapshot snapshot = new Snapshot(
-                            product.getTitle(),
-                            product.getSpecs().get("imageUrl") != null ? product.getSpecs().get("imageUrl").toString() : "",
-                            product.getPrice(),
+                            product.title(),
+                            product.specs().get("imageUrl") != null ? product.specs().get("imageUrl").toString() : "",
+                            product.price(),
                             Map.of()
                         );
                         

@@ -48,7 +48,7 @@ class ProductResolverTest {
     @DisplayName("product - 상품 조회 성공")
     void product_success() {
         // Given
-        String productId = testProduct.getProductId().value();
+        String productId = testProduct.productId().value();
         given(getProductUseCase.getProduct(any(ProductId.class)))
             .willReturn(Mono.just(testProduct));
 
@@ -58,8 +58,8 @@ class ProductResolverTest {
         // Then
         StepVerifier.create(result)
             .assertNext(product -> {
-                assertThat(product.getProductId()).isEqualTo(testProduct.getProductId());
-                assertThat(product.getTitle()).isEqualTo(testProduct.getTitle());
+                assertThat(product.productId()).isEqualTo(testProduct.productId());
+                assertThat(product.title()).isEqualTo(testProduct.title());
             })
             .verifyComplete();
     }
@@ -77,7 +77,7 @@ class ProductResolverTest {
 
         // Then
         StepVerifier.create(result)
-            .assertNext(product -> assertThat(product.getStatus()).isEqualTo(DealStatus.ACTIVE))
+            .assertNext(product -> assertThat(product.status()).isEqualTo(DealStatus.ACTIVE))
             .verifyComplete();
     }
 
@@ -162,7 +162,7 @@ class ProductResolverTest {
     @DisplayName("updateProduct - 상품 수정 성공")
     void updateProduct_success() {
         // Given
-        String productId = testProduct.getProductId().value();
+        String productId = testProduct.productId().value();
         ProductResolver.UpdateProductInput input = new ProductResolver.UpdateProductInput(
             "Updated Title",
             "Updated Description",
@@ -173,7 +173,7 @@ class ProductResolverTest {
         );
 
         Product updatedProduct = TestDataFactory.createProduct();
-        updatedProduct.updateTitle("Updated Title");
+        updatedProduct = updatedProduct.updateTitle("Updated Title");
 
         given(updateProductUseCase.updateProduct(any(UpdateProductUseCase.UpdateProductCommand.class)))
             .willReturn(Mono.just(updatedProduct));
@@ -183,7 +183,7 @@ class ProductResolverTest {
 
         // Then
         StepVerifier.create(result)
-            .assertNext(product -> assertThat(product.getTitle()).isEqualTo("Updated Title"))
+            .assertNext(product -> assertThat(product.title()).isEqualTo("Updated Title"))
             .verifyComplete();
     }
 }

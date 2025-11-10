@@ -40,7 +40,8 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
             command.category(),
             price,
             schedule,
-            specs
+            specs,
+            DealStatus.UPCOMING
         );
         
         return productRepository.save(product);
@@ -95,21 +96,21 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
             .switchIfEmpty(Mono.error(new IllegalArgumentException("Product not found: " + command.productId())))
             .flatMap(product -> {
                 if (command.title() != null) {
-                    product.updateTitle(command.title());
+                    product = product.updateTitle(command.title());
                 }
                 
                 if (command.description() != null) {
-                    product.updateDescription(command.description());
+                    product = product.updateDescription(command.description());
                 }
                 
                 if (command.originalPrice() != null && command.dealPrice() != null) {
-                    String currency = product.getPrice().currency();
+                    String currency = product.price().currency();
                     Price newPrice = new Price(
                         command.originalPrice(),
                         command.dealPrice(),
                         currency
                     );
-                    product.updatePrice(newPrice);
+                    product = product.updatePrice(newPrice);
                 }
                 
                 if (command.startAt() != null && command.endAt() != null) {
@@ -118,7 +119,7 @@ public class ProductService implements CreateProductUseCase, GetProductUseCase, 
                         command.endAt(),
                         "Asia/Seoul"
                     );
-                    product.updateSchedule(newSchedule);
+                    product = product.updateSchedule(newSchedule);
                 }
                 
                 return productRepository.save(product);

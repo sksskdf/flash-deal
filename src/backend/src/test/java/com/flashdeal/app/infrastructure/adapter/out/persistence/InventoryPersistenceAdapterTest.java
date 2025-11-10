@@ -34,6 +34,7 @@ import reactor.test.StepVerifier;
 @DataMongoTest
 @Testcontainers
 @ActiveProfiles("test")
+@SuppressWarnings("resource")
 @DisplayName("Inventory Persistence Adapter 테스트")
 class InventoryPersistenceAdapterTest {
 

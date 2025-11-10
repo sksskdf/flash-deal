@@ -46,20 +46,20 @@ public class TestDataFactory {
         specsFields.put("weight", "200g");
         Specs specs = new Specs(specsFields);
         
-        return new Product(productId, title, description, price, schedule, specs);
+        return new Product(productId, title, description, "카테고리", price, schedule, specs, DealStatus.UPCOMING);
     }
     
     public static Product createActiveProduct() {
         Product product = createProduct();
-        product.transitionTo(DealStatus.ACTIVE);
-        return product;
+        Product updatedProduct = product.transitionTo(DealStatus.ACTIVE);
+        return updatedProduct;
     }
     
     public static Product createSoldOutProduct() {
         Product product = createProduct();
-        product.transitionTo(DealStatus.ACTIVE);
-        product.transitionTo(DealStatus.SOLDOUT);
-        return product;
+        Product updatedProduct = product.transitionTo(DealStatus.ACTIVE);
+        Product updatedProduct2 = updatedProduct.transitionTo(DealStatus.SOLDOUT);
+        return updatedProduct2;
     }
 
     // ========== Inventory 관련 ==========

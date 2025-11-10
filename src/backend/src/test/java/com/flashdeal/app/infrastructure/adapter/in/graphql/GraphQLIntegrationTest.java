@@ -24,6 +24,7 @@ import static org.mockito.BDDMockito.given;
 @SpringBootTest
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
+@SuppressWarnings("null")
 @DisplayName("GraphQL 통합 테스트")
 class GraphQLIntegrationTest {
 
@@ -77,7 +78,7 @@ class GraphQLIntegrationTest {
     @DisplayName("product Query - 상품 조회")
     void productQuery() {
         // Given
-        String productId = testProduct.getProductId().value();
+        String productId = testProduct.productId().value();
         given(getProductUseCase.getProduct(any(ProductId.class)))
             .willReturn(Mono.just(testProduct));
 
@@ -102,7 +103,7 @@ class GraphQLIntegrationTest {
             .expectStatus().isOk()
             .expectBody()
             .jsonPath("$.data.product.productId").isEqualTo(productId)
-            .jsonPath("$.data.product.title").isEqualTo(testProduct.getTitle());
+            .jsonPath("$.data.product.title").isEqualTo(testProduct.title());
     }
 
     @Test
@@ -133,7 +134,7 @@ class GraphQLIntegrationTest {
             .expectStatus().isOk()
             .expectBody()
             .jsonPath("$.data.activeProducts[0].productId").exists()
-            .jsonPath("$.data.activeProducts[0].title").isEqualTo(testProduct.getTitle());
+            .jsonPath("$.data.activeProducts[0].title").isEqualTo(testProduct.title());
     }
 
     @Test
@@ -171,7 +172,7 @@ class GraphQLIntegrationTest {
             .expectStatus().isOk()
             .expectBody()
             .jsonPath("$.data.createProduct.productId").exists()
-            .jsonPath("$.data.createProduct.title").isEqualTo(testProduct.getTitle());
+            .jsonPath("$.data.createProduct.title").isEqualTo(testProduct.title());
     }
 }
 

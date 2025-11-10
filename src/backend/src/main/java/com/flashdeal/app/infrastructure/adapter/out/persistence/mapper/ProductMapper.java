@@ -21,17 +21,17 @@ public class ProductMapper {
     public ProductDocument toDocument(Product product) {
         Instant now = Instant.now();
         return new ProductDocument(
-            product.getProductId().value(),
+            product.productId().value(),
             "flash",
-            product.getTitle(),
+            product.title(),
             null,
-            product.getDescription(),
-            product.getCategory(),
+            product.description(),
+            product.category(),
             null,
-            toPriceDocument(product.getPrice()),
-            toScheduleDocument(product.getSchedule()),
-            product.getStatus(),
-            product.getSpecs().getFields(),
+            toPriceDocument(product.price()),
+            toScheduleDocument(product.schedule()),
+            product.status(),
+            product.specs().getFields(),
             null,
             now,
             now
@@ -54,7 +54,8 @@ public class ProductMapper {
             document.getCategory(),
             price,
             schedule,
-            specs
+            specs,
+            document.getStatus() != null ? document.getStatus() : DealStatus.UPCOMING
         );
 
         // 상태 설정 (DB에서 읽어온 값이므로 전이 검증 없이 직접 설정)

@@ -24,6 +24,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Product Persistence Adapter
  * 
@@ -46,13 +48,13 @@ public class ProductPersistenceAdapter implements ProductRepository {
     @Override
     public Mono<Product> save(Product product) {
         ProductDocument document = mapper.toDocument(product);
-        return mongoRepository.save(document)
+        return mongoRepository.save(requireNonNull(document))
                 .map(mapper::toDomain);
     }
 
     @Override
     public Mono<Product> findById(ProductId id) {
-        return mongoRepository.findById(id.value())
+        return mongoRepository.findById(requireNonNull(id.value()))
                 .map(mapper::toDomain);
     }
 
@@ -90,7 +92,7 @@ public class ProductPersistenceAdapter implements ProductRepository {
     public Mono<ProductPage> findByFilter(ProductFilter filter, Pagination pagination, List<ProductSortOption> sortOptions) {
         Query query = buildQuery(filter);
         Sort sort = buildSort(sortOptions);
-        Pageable pageable = PageRequest.of(pagination.page(), pagination.size(), sort);
+        Pageable pageable = PageRequest.of(pagination.page(), pagination.size(), requireNonNull(sort));
 
         Query paginatedQuery = query.with(pageable);
         Query countQuery = Query.of(query).limit(-1).skip(-1);
@@ -124,12 +126,12 @@ public class ProductPersistenceAdapter implements ProductRepository {
 
     @Override
     public Mono<Void> deleteById(ProductId id) {
-        return mongoRepository.deleteById(id.value());
+        return mongoRepository.deleteById(requireNonNull(id.value()));
     }
 
     @Override
     public Mono<Boolean> existsById(ProductId id) {
-        return mongoRepository.existsById(id.value());
+        return mongoRepository.existsById(requireNonNull(id.value()));
     }
 
     private Query buildQuery(ProductFilter filter) {
@@ -163,11 +165,11 @@ public class ProductPersistenceAdapter implements ProductRepository {
 
         Criteria priceCriteria = Criteria.where("price.sale");
         if (minPrice != null && maxPrice != null) {
-            priceCriteria = priceCriteria.gte(toDecimal128(minPrice)).lte(toDecimal128(maxPrice));
+            priceCriteria = priceCriteria.gte(requireNonNull(toDecimal128(minPrice))).lte(requireNonNull(toDecimal128(maxPrice)));
         } else if (minPrice != null) {
-            priceCriteria = priceCriteria.gte(toDecimal128(minPrice));
+            priceCriteria = priceCriteria.gte(requireNonNull(toDecimal128(minPrice)));
         } else {
-            priceCriteria = priceCriteria.lte(toDecimal128(maxPrice));
+            priceCriteria = priceCriteria.lte(requireNonNull(toDecimal128(maxPrice)));
         }
         query.addCriteria(priceCriteria);
     }
@@ -202,10 +204,10 @@ public class ProductPersistenceAdapter implements ProductRepository {
                     Sort.Direction direction = option.order() == SortOrder.ASC
                             ? Sort.Direction.ASC
                             : Sort.Direction.DESC;
-                    return new Sort.Order(direction, field);
+                    return new Sort.Order(direction, requireNonNull(field));
                 }).toList();
 
-        return Sort.by(orders);
+        return Sort.by(requireNonNull(orders));
     }
 
     private String mapSortField(ProductSortField field) {

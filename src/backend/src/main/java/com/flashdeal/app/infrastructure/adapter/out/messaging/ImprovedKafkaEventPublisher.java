@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static java.util.Objects.requireNonNull;
+
 @Component
 public class ImprovedKafkaEventPublisher {
 
@@ -136,7 +138,7 @@ public class ImprovedKafkaEventPublisher {
     private CompletableFuture<SendResult<String, Object>> publishEvent(String topic, String key, Object event) {
         logger.info("Publishing event to topic: {}, key: {}, event: {}", topic, key, event);
         
-        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(topic, key, event);
+        CompletableFuture<SendResult<String, Object>> future = kafkaTemplate.send(requireNonNull(topic), requireNonNull(key), event);
         
         future.whenComplete((result, throwable) -> {
             if (throwable != null) {

@@ -11,6 +11,8 @@ import com.flashdeal.app.infrastructure.adapter.out.persistence.repository.Inven
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Inventory Persistence Adapter
  * 
@@ -30,13 +32,13 @@ public class InventoryPersistenceAdapter implements InventoryRepository {
     @Override
     public Mono<Inventory> save(Inventory inventory) {
         InventoryDocument document = mapper.toDocument(inventory);
-        return mongoRepository.save(document)
+        return mongoRepository.save(requireNonNull(document))
                 .map(mapper::toDomain);
     }
 
     @Override
     public Mono<Inventory> findById(InventoryId id) {
-        return mongoRepository.findById(id.value())
+        return mongoRepository.findById(requireNonNull(id.value()))
                 .map(mapper::toDomain);
     }
 
@@ -48,7 +50,7 @@ public class InventoryPersistenceAdapter implements InventoryRepository {
 
     @Override
     public Mono<Void> deleteById(InventoryId id) {
-        return mongoRepository.deleteById(id.value());
+        return mongoRepository.deleteById(requireNonNull(id.value()));
     }
 
     @Override

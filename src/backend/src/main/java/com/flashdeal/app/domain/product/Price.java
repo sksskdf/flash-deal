@@ -3,9 +3,6 @@ package com.flashdeal.app.domain.product;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-/**
- * 가격 Value Object
- */
 public record Price(
     BigDecimal original,
     BigDecimal sale,
@@ -39,9 +36,6 @@ public record Price(
         }
     }
 
-    /**
-     * 할인율 계산 (original - sale) / original × 100
-     */
     public int discountRate() {
         if (original.compareTo(BigDecimal.ZERO) == 0) {
             return 0;

@@ -10,11 +10,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/**
- * Order Persistence Adapter
- * 
- * OrderRepository Port의 MongoDB 구현체
- */
+import static java.util.Objects.requireNonNull;
+
 @Component
 public class OrderPersistenceAdapter implements OrderRepository {
 
@@ -29,13 +26,13 @@ public class OrderPersistenceAdapter implements OrderRepository {
     @Override
     public Mono<Order> save(Order order) {
         OrderDocument document = mapper.toDocument(order);
-        return mongoRepository.save(document)
+        return mongoRepository.save(requireNonNull(document))
                 .map(mapper::toDomain);
     }
 
     @Override
     public Mono<Order> findById(OrderId id) {
-        return mongoRepository.findById(id.value())
+        return mongoRepository.findById(requireNonNull(id.value()))
                 .map(mapper::toDomain);
     }
 
@@ -72,12 +69,12 @@ public class OrderPersistenceAdapter implements OrderRepository {
 
     @Override
     public Mono<Void> deleteById(OrderId id) {
-        return mongoRepository.deleteById(id.value());
+        return mongoRepository.deleteById(requireNonNull(id.value()));
     }
 
     @Override
     public Mono<Boolean> existsById(OrderId id) {
-        return mongoRepository.existsById(id.value());
+        return mongoRepository.existsById(requireNonNull(id.value()));
     }
 }
 

@@ -6,6 +6,10 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Redis Cache Adapter
@@ -68,9 +72,11 @@ public class RedisCacheAdapter {
      */
     public Mono<Boolean> setReservation(ProductId productId, String orderId, int quantity) {
         String key = RESERVATION_KEY_PREFIX + productId.value();
+        if (orderId == null)
+            throw new IllegalArgumentException("orderId is null");
         return redisTemplate.opsForZSet()
                 .add(key, orderId, System.currentTimeMillis())
-                .then(redisTemplate.expire(key, RESERVATION_TTL))
+                .then(redisTemplate.expire(key, requireNonNull(RESERVATION_TTL)))
                 .then(Mono.just(true));
     }
 
@@ -114,7 +120,7 @@ public class RedisCacheAdapter {
      */
     public Mono<Boolean> setInventoryTTL(ProductId productId, Duration ttl) {
         String key = INVENTORY_KEY_PREFIX + productId.value();
-        return redisTemplate.expire(key, ttl);
+        return redisTemplate.expire(key, requireNonNull(ttl));
     }
 
     /**
@@ -140,8 +146,10 @@ public class RedisCacheAdapter {
      */
     public Mono<Boolean> acquireLock(String resourceId, String lockId, Duration ttl) {
         String lockKey = LOCK_KEY_PREFIX + resourceId;
+        if (lockId == null)
+            throw new IllegalArgumentException("lockId is null");
         return redisTemplate.opsForValue()
-                .setIfAbsent(lockKey, lockId, ttl)
+                .setIfAbsent(lockKey, lockId, requireNonNull(ttl))
                 .map(result -> result != null && result);
     }
     
@@ -173,7 +181,9 @@ public class RedisCacheAdapter {
         org.springframework.data.redis.core.script.RedisScript<Long> script = 
             org.springframework.data.redis.core.script.RedisScript.of(luaScript, Long.class);
         
-               return redisTemplate.execute(script, java.util.Collections.singletonList(lockKey), java.util.Collections.singletonList(lockId))
+        return redisTemplate
+                .execute(script, requireNonNull(Collections.singletonList(lockKey)),
+                        requireNonNull(Collections.singletonList(lockId)))
                        .next()
                        .map(result -> result > 0);
     }
@@ -200,7 +210,9 @@ public class RedisCacheAdapter {
         org.springframework.data.redis.core.script.RedisScript<Long> script = 
             org.springframework.data.redis.core.script.RedisScript.of(luaScript, Long.class);
         
-               return redisTemplate.execute(script, java.util.Collections.singletonList(lockKey), java.util.Arrays.asList(lockId, String.valueOf(ttl.getSeconds())))
+        return redisTemplate
+                .execute(script, requireNonNull(Collections.singletonList(lockKey)),
+                        requireNonNull(Arrays.asList(lockId, String.valueOf(ttl.getSeconds()))))
                        .next()
                        .map(result -> result > 0);
     }
@@ -275,7 +287,10 @@ public class RedisCacheAdapter {
         org.springframework.data.redis.core.script.RedisScript<Long> script = 
             org.springframework.data.redis.core.script.RedisScript.of(luaScript, Long.class);
         
-        return redisTemplate.execute(script, java.util.Collections.emptyList(), java.util.Arrays.asList(lockId, String.valueOf(quantity), resourceId, inventoryKey))
+        return redisTemplate
+                .execute(script, requireNonNull(Collections.emptyList()),
+                        requireNonNull(
+                                Arrays.asList(lockId, String.valueOf(quantity), resourceId, inventoryKey)))
                 .next()
                 .map(result -> {
                     if (result == -1) {
@@ -308,7 +323,10 @@ public class RedisCacheAdapter {
         org.springframework.data.redis.core.script.RedisScript<Long> script = 
             org.springframework.data.redis.core.script.RedisScript.of(luaScript, Long.class);
         
-        return redisTemplate.execute(script, java.util.Collections.emptyList(), java.util.Arrays.asList(lockId, String.valueOf(quantity), resourceId, inventoryKey))
+        return redisTemplate
+                .execute(script, requireNonNull(Collections.emptyList()),
+                        requireNonNull(
+                                Arrays.asList(lockId, String.valueOf(quantity), resourceId, inventoryKey)))
                 .next()
                 .map(result -> {
                     if (result == -1) {

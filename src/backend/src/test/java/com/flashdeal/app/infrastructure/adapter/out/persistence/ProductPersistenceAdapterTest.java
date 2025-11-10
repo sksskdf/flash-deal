@@ -39,6 +39,7 @@ import reactor.test.StepVerifier;
 @DataMongoTest
 @Testcontainers
 @ActiveProfiles("test")
+@SuppressWarnings("resource")
 @DisplayName("Product Persistence Adapter 테스트")
 class ProductPersistenceAdapterTest {
 
@@ -80,15 +81,15 @@ class ProductPersistenceAdapterTest {
         // When
         Mono<Product> saveResult = adapter.save(product);
         Mono<Product> findResult = saveResult
-                .map(Product::getProductId)
+                .map(Product::productId)
                 .flatMap(adapter::findById);
 
         // Then
         StepVerifier.create(findResult)
                 .assertNext(foundProduct -> {
-                    assertThat(foundProduct.getProductId()).isEqualTo(product.getProductId());
-                    assertThat(foundProduct.getTitle()).isEqualTo(product.getTitle());
-                    assertThat(foundProduct.getStatus()).isEqualTo(product.getStatus());
+                    assertThat(foundProduct.productId()).isEqualTo(product.productId());
+                    assertThat(foundProduct.title()).isEqualTo(product.title());
+                    assertThat(foundProduct.status()).isEqualTo(product.status());
                 })
                 .verifyComplete();
     }
@@ -122,7 +123,7 @@ class ProductPersistenceAdapterTest {
         StepVerifier.create(findByFilter)
                 .assertNext(page -> {
                     assertThat(page.content()).hasSize(1);
-                    assertThat(page.content().get(0).getStatus()).isEqualTo(DealStatus.ACTIVE);
+                    assertThat(page.content().get(0).status()).isEqualTo(DealStatus.ACTIVE);
                     assertThat(page.pageInfo().total()).isEqualTo(1);
                 })
                 .verifyComplete();
@@ -394,9 +395,9 @@ class ProductPersistenceAdapterTest {
         StepVerifier.create(findByFilter)
                 .assertNext(page -> {
                     assertThat(page.content()).hasSize(3);
-                    assertThat(page.content().get(0).getTitle()).isEqualTo("Apple Product");
-                    assertThat(page.content().get(1).getTitle()).isEqualTo("Banana Product");
-                    assertThat(page.content().get(2).getTitle()).isEqualTo("Zebra Product");
+                    assertThat(page.content().get(0).title()).isEqualTo("Apple Product");
+                    assertThat(page.content().get(1).title()).isEqualTo("Banana Product");
+                    assertThat(page.content().get(2).title()).isEqualTo("Zebra Product");
                 })
                 .verifyComplete();
     }
@@ -426,11 +427,11 @@ class ProductPersistenceAdapterTest {
         StepVerifier.create(findByFilter)
                 .assertNext(page -> {
                     assertThat(page.content()).hasSize(3);
-                    assertThat(page.content().get(0).getPrice().sale())
+                    assertThat(page.content().get(0).price().sale())
                             .isEqualByComparingTo(new BigDecimal("120000"));
-                    assertThat(page.content().get(1).getPrice().sale())
+                    assertThat(page.content().get(1).price().sale())
                             .isEqualByComparingTo(new BigDecimal("80000"));
-                    assertThat(page.content().get(2).getPrice().sale())
+                    assertThat(page.content().get(2).price().sale())
                             .isEqualByComparingTo(new BigDecimal("40000"));
                 })
                 .verifyComplete();
@@ -557,8 +558,8 @@ class ProductPersistenceAdapterTest {
         StepVerifier.create(findByFilter)
                 .assertNext(page -> {
                     assertThat(page.content()).hasSize(1);
-                    assertThat(page.content().get(0).getProductId())
-                            .isEqualTo(product1.getProductId());
+                    assertThat(page.content().get(0).productId())
+                            .isEqualTo(product1.productId());
                 })
                 .verifyComplete();
     }
@@ -623,7 +624,7 @@ class ProductPersistenceAdapterTest {
         Price price = new Price(original, sale, "KRW");
         Schedule schedule = TestDataFactory.createSchedule();
         Specs specs = TestDataFactory.createSpecs();
-        return new Product(productId, "Test Product", "Test Description", price, schedule, specs);
+        return new Product(productId, "Test Product", "Test Description", "카테고리", price, schedule, specs, DealStatus.UPCOMING);
     }
 
     private ProductDocument createProductDocumentWithCategory(String category) {
@@ -638,7 +639,7 @@ class ProductPersistenceAdapterTest {
         Price price = TestDataFactory.createPrice();
         Schedule schedule = TestDataFactory.createSchedule();
         Specs specs = TestDataFactory.createSpecs();
-        return new Product(productId, title, "Test Description", price, schedule, specs);
+        return new Product(productId, title, "Test Description", "카테고리", price, schedule, specs, DealStatus.UPCOMING);
     }
 
     private Product createProductWithDescription(String description) {
@@ -646,13 +647,13 @@ class ProductPersistenceAdapterTest {
         Price price = TestDataFactory.createPrice();
         Schedule schedule = TestDataFactory.createSchedule();
         Specs specs = TestDataFactory.createSpecs();
-        return new Product(productId, "Test Product", description, price, schedule, specs);
+        return new Product(productId, "Test Product", description, "카테고리", price, schedule, specs, DealStatus.UPCOMING);
     }
 
     private Product createProductWithCategoryAndPrice(String category, BigDecimal original, BigDecimal sale) {
         Product product = createProductWithPrice(original, sale);
-        product.updateCategory(category);
-        product.transitionTo(DealStatus.ACTIVE);
-        return product;
+        Product updatedProduct = product.updateCategory(category);
+        Product updatedProduct2 = updatedProduct.transitionTo(DealStatus.ACTIVE);
+        return updatedProduct2;
     }
 }

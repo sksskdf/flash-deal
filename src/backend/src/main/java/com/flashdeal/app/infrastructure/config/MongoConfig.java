@@ -10,10 +10,8 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 import org.springframework.lang.NonNull;
 
-/**
- * MongoDB Reactive Configuration
- * 설정은 application.yml에서 관리됩니다.
- */
+import static java.util.Objects.requireNonNull;
+
 @Configuration
 @EnableReactiveMongoRepositories(basePackages = "com.flashdeal.app.infrastructure.adapter.out.persistence")
 public class MongoConfig extends AbstractReactiveMongoConfiguration {
@@ -27,13 +25,14 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
     @Override
     @NonNull
     protected String getDatabaseName() {
-        return databaseName;
+        return requireNonNull(databaseName);
     }
 
     @Override
     @NonNull
     public MongoClient reactiveMongoClient() {
-        return MongoClients.create(mongoUri);
+        MongoClient client = MongoClients.create(requireNonNull(mongoUri));
+        return requireNonNull(client);
     }
 
     @Bean

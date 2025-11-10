@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static java.util.Objects.requireNonNull;
+
 @Component
 public class KafkaEventPublisher {
 
@@ -39,7 +41,7 @@ public class KafkaEventPublisher {
         event.put("timestamp", ZonedDateTime.now());
         event.put("correlationId", UUID.randomUUID().toString());
 
-        kafkaTemplate.send(ORDER_CREATED_TOPIC, orderId.value(), event);
+        kafkaTemplate.send(ORDER_CREATED_TOPIC, requireNonNull(orderId.value()), event);
     }
 
     /**
@@ -56,7 +58,7 @@ public class KafkaEventPublisher {
         event.put("timestamp", ZonedDateTime.now());
         event.put("correlationId", UUID.randomUUID().toString());
 
-        kafkaTemplate.send(PAYMENT_COMPLETED_TOPIC, orderId.value(), event);
+        kafkaTemplate.send(PAYMENT_COMPLETED_TOPIC, requireNonNull(orderId.value()), event);
     }
 
     /**
@@ -73,7 +75,7 @@ public class KafkaEventPublisher {
         event.put("timestamp", ZonedDateTime.now());
         event.put("correlationId", UUID.randomUUID().toString());
 
-        kafkaTemplate.send(INVENTORY_RESERVED_TOPIC, productId.value(), event);
+        kafkaTemplate.send(INVENTORY_RESERVED_TOPIC, requireNonNull(productId.value()), event);
     }
 
     /**
@@ -89,7 +91,7 @@ public class KafkaEventPublisher {
         event.put("timestamp", ZonedDateTime.now());
         event.put("correlationId", UUID.randomUUID().toString());
 
-        kafkaTemplate.send(ORDER_CANCELLED_TOPIC, orderId.value(), event);
+        kafkaTemplate.send(ORDER_CANCELLED_TOPIC, requireNonNull(orderId.value()), event);
     }
 
     /**
@@ -100,7 +102,7 @@ public class KafkaEventPublisher {
         event.put("timestamp", ZonedDateTime.now());
         event.put("correlationId", UUID.randomUUID().toString());
 
-        kafkaTemplate.send(topic, key, event);
+        kafkaTemplate.send(requireNonNull(topic), requireNonNull(key), event);
     }
 }
 

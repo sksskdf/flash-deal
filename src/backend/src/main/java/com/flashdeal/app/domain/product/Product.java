@@ -1,56 +1,24 @@
 package com.flashdeal.app.domain.product;
 
 import java.time.ZonedDateTime;
-import java.util.Objects;
 
-public class Product {
-    
-    private final ProductId productId;
-    private String title;
-    private String description;
-    private String category;
-    private Price price;
-    private Schedule schedule;
-    private Specs specs;
-    private DealStatus status;
-
-    public Product(
-            ProductId productId,
-            String title,
-            String description,
-            Price price,
-            Schedule schedule,
-            Specs specs) {
-        this(productId, title, description, null, price, schedule, specs);
-    }
-
-    public Product(
-            ProductId productId,
-            String title,
-            String description,
-            String category,
-            Price price,
-            Schedule schedule,
-            Specs specs) {
-        
+public record Product (
+    ProductId productId,
+    String title,
+    String description,
+    String category,
+    Price price,
+    Schedule schedule,
+    Specs specs,
+    DealStatus status
+) {
+    public Product {
         validateNotNull(productId, "ProductId cannot be null");
         validateNotNull(title, "Title cannot be null");
         validateNotNull(price, "Price cannot be null");
         validateNotNull(schedule, "Schedule cannot be null");
         validateNotNull(specs, "Specs cannot be null");
-        
-        if (title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Title cannot be empty");
-        }
-        
-        this.productId = productId;
-        this.title = title;
-        this.description = description;
-        this.category = category;
-        this.price = price;
-        this.schedule = schedule;
-        this.specs = specs;
-        this.status = DealStatus.UPCOMING;
+        validateNotNull(status, "Status cannot be null");
     }
 
     private void validateNotNull(Object value, String message) {
@@ -73,106 +41,40 @@ public class Product {
         }
     }
 
-    public void transitionTo(DealStatus newStatus) {
+    public Product transitionTo(DealStatus newStatus) {
         if (!status.canTransitionTo(newStatus)) {
             throw new IllegalStateException(
                 String.format("Cannot transition from %s to %s", status, newStatus)
             );
         }
-        this.status = newStatus;
+        return new Product(productId, title, description, category, price, schedule, specs, newStatus);
     }
 
-    public void updatePrice(Price newPrice) {
-        validateNotNull(newPrice, "Price cannot be null");
-        this.price = newPrice;
+    public Product updatePrice(Price newPrice) {
+        return new Product(productId, title, description, category, newPrice, schedule, specs, status);
     }
 
-    public void updateSchedule(Schedule newSchedule) {
-        validateNotNull(newSchedule, "Schedule cannot be null");
-        this.schedule = newSchedule;
+    public Product updateSchedule(Schedule newSchedule) {
+        return new Product(productId, title, description, category, price, newSchedule, specs, status);
     }
 
-    public void updateSpecs(Specs newSpecs) {
-        validateNotNull(newSpecs, "Specs cannot be null");
-        this.specs = newSpecs;
+    public Product updateSpecs(Specs newSpecs) {
+        return new Product(productId, title, description, category, price, schedule, newSpecs, status);
     }
 
-    public void updateTitle(String newTitle) {
-        validateNotNull(newTitle, "Title cannot be null");
-        if (newTitle.trim().isEmpty()) {
-            throw new IllegalArgumentException("Title cannot be empty");
-        }
-        this.title = newTitle;
+    public Product updateTitle(String newTitle) {
+        return new Product(productId, newTitle, description, category, price, schedule, specs, status);
     }
 
-    public void updateDescription(String newDescription) {
-        this.description = newDescription;
+    public Product updateDescription(String newDescription) {
+        return new Product(productId, title, newDescription, category, price, schedule, specs, status);
     }
 
-    public void updateCategory(String newCategory) {
-        this.category = newCategory;
+    public Product updateCategory(String newCategory) {
+        return new Product(productId, title, description, newCategory, price, schedule, specs, status);
     }
 
-    public void updateStatus(DealStatus newStatus) {
-        this.status = newStatus;
-    }
-
-    public ProductId getProductId() {
-        return productId;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public Price getPrice() {
-        return price;
-    }
-
-    public Schedule getSchedule() {
-        return schedule;
-    }
-
-    public Specs getSpecs() {
-        return specs;
-    }
-
-    public DealStatus getStatus() {
-        return status;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Product product = (Product) o;
-        return Objects.equals(productId, product.productId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(productId);
-    }
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "productId=" + productId +
-                ", title='" + title + '\'' +
-                ", category='" + category + '\'' +
-                ", status=" + status +
-                ", price=" + price +
-                ", schedule=" + schedule +
-                ", specs=" + specs +
-                ", description=" + description +
-                '}';
+    public Product updateStatus(DealStatus newStatus) {
+        return new Product(productId, title, description, category, price, schedule, specs, newStatus);
     }
 }

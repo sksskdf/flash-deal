@@ -108,7 +108,7 @@ public class ProductResolver {
 
     @SchemaMapping(typeName = "Product", field = "productId")
     public String productId(Product product) {
-        return product.getProductId().value();
+        return product.productId().value();
     }
 
     @MutationMapping

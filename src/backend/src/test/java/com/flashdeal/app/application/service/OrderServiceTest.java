@@ -57,7 +57,7 @@ class OrderServiceTest {
         Price price = new Price(new BigDecimal("10000"), new BigDecimal("9000"), "KRW");
         Schedule schedule = new Schedule(ZonedDateTime.now().minusDays(1), ZonedDateTime.now().plusDays(1), "Asia/Seoul");
         Specs specs = new Specs(Map.of("imageUrl", "http://img"));
-        sampleProduct = new Product(productId, "상품", "설명", price, schedule, specs);
+        sampleProduct = new Product(productId, "상품", "설명", "카테고리", price, schedule, specs, DealStatus.UPCOMING);
 
         sampleInventory = new Inventory(
             new InventoryId("I-1"),
@@ -71,7 +71,7 @@ class OrderServiceTest {
     @DisplayName("주문을 생성하면 재고를 예약하고 주문을 저장한다")
     void createOrder_success_reservesInventory_andSavesOrder() {
         UserId userId = new UserId("U-1");
-        List<OrderItemDto> items = List.of(new OrderItemDto(sampleProduct.getProductId(), 2));
+        List<OrderItemDto> items = List.of(new OrderItemDto(sampleProduct.productId(), 2));
         ShippingDto shipping = new ShippingDto(
             "홍길동", // recipientName
             "010-0000-0000", // phoneNumber
@@ -85,8 +85,8 @@ class OrderServiceTest {
         CreateOrderCommand cmd = new CreateOrderCommand(userId, items, shipping, "idem-1", new BigDecimal("1000"));
 
         given(orderRepository.findByIdempotencyKey("idem-1")).willReturn(Mono.empty());
-        given(productRepository.findById(sampleProduct.getProductId())).willReturn(Mono.just(sampleProduct));
-        given(inventoryRepository.findByProductId(sampleProduct.getProductId())).willReturn(Mono.just(sampleInventory));
+        given(productRepository.findById(sampleProduct.productId())).willReturn(Mono.just(sampleProduct));
+        given(inventoryRepository.findByProductId(sampleProduct.productId())).willReturn(Mono.just(sampleInventory));
         given(inventoryRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
         given(orderRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
 
@@ -109,15 +109,15 @@ class OrderServiceTest {
     @DisplayName("멱등성 키가 있으면 기존 주문을 반환한다")
     void createOrder_idempotent_returnsExisting() {
         UserId userId = new UserId("U-1");
-        List<OrderItemDto> items = List.of(new OrderItemDto(sampleProduct.getProductId(), 1));
+        List<OrderItemDto> items = List.of(new OrderItemDto(sampleProduct.productId(), 1));
         ShippingDto shipping = new ShippingDto(
             "홍길동", "010", "12345", "서울 강남", "서울", "", "KR", null
         );
         CreateOrderCommand cmd = new CreateOrderCommand(userId, items, shipping, "idem-dup", BigDecimal.ZERO);
 
         Order existing = Order.create(new OrderId("O-1"), userId, List.of(
-            new OrderItem(sampleProduct.getProductId(),
-                new Snapshot(sampleProduct.getTitle(), "", sampleProduct.getPrice(), Map.of()), 1)
+            new OrderItem(sampleProduct.productId(),
+                new Snapshot(sampleProduct.title(), "", sampleProduct.price(), Map.of()), 1)
         ), new Shipping("Standard", new Recipient("홍길동", "010"), new Address("s", "c", "z", "KR"), null), "idem-dup");
 
         given(orderRepository.findByIdempotencyKey("idem-dup")).willReturn(Mono.just(existing));
@@ -135,11 +135,11 @@ class OrderServiceTest {
     void cancelOrder_whenPending_releasesInventory_andSaves() {
         OrderId orderId = new OrderId("O-2");
         Order pending = Order.create(orderId, new UserId("U-1"), List.of(
-            new OrderItem(sampleProduct.getProductId(), new Snapshot("t", "", sampleProduct.getPrice(), Map.of()), 3)
+            new OrderItem(sampleProduct.productId(), new Snapshot("t", "", sampleProduct.price(), Map.of()), 3)
         ), new Shipping("Standard", new Recipient("n", "p"), new Address("s","c","z","KR"), null), "idem");
 
         given(orderRepository.findById(orderId)).willReturn(Mono.just(pending));
-        given(inventoryRepository.findByProductId(sampleProduct.getProductId())).willReturn(Mono.just(sampleInventory));
+        given(inventoryRepository.findByProductId(sampleProduct.productId())).willReturn(Mono.just(sampleInventory));
         given(inventoryRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
         given(orderRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
 
@@ -156,11 +156,11 @@ class OrderServiceTest {
     void completePayment_whenPending_confirmsInventory_andSaves() {
         OrderId orderId = new OrderId("O-3");
         Order pending = Order.create(orderId, new UserId("U-1"), List.of(
-            new OrderItem(sampleProduct.getProductId(), new Snapshot("t", "", sampleProduct.getPrice(), Map.of()), 2)
+            new OrderItem(sampleProduct.productId(), new Snapshot("t", "", sampleProduct.price(), Map.of()), 2)
         ), new Shipping("Standard", new Recipient("n", "p"), new Address("s","c","z","KR"), null), "idem");
 
         given(orderRepository.findById(orderId)).willReturn(Mono.just(pending));
-        given(inventoryRepository.findByProductId(sampleProduct.getProductId())).willReturn(Mono.just(sampleInventory));
+        given(inventoryRepository.findByProductId(sampleProduct.productId())).willReturn(Mono.just(sampleInventory));
         given(inventoryRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
         given(orderRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
 
@@ -177,10 +177,10 @@ class OrderServiceTest {
     void createOrder_invalidQuantity_throws() {
         UserId userId = new UserId("U-1");
         org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {
-            new OrderItemDto(sampleProduct.getProductId(), 0);
+            new OrderItemDto(sampleProduct.productId(), 0);
         });
 
-        List<OrderItemDto> validItems = List.of(new OrderItemDto(sampleProduct.getProductId(), 1));
+        List<OrderItemDto> validItems = List.of(new OrderItemDto(sampleProduct.productId(), 1));
         org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {
             new CreateOrderCommand(userId, validItems, null, "idem", BigDecimal.ZERO);
         });

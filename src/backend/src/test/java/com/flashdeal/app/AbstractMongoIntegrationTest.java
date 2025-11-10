@@ -17,6 +17,7 @@ import java.time.Duration;
  */
 @Testcontainers
 @ActiveProfiles("test")
+@SuppressWarnings("resource")
 public abstract class AbstractMongoIntegrationTest {
 
     @Container

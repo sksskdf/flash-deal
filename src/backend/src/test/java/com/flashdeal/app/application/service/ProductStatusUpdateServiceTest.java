@@ -40,12 +40,8 @@ class ProductStatusUpdateServiceTest {
         Schedule schedule = new Schedule(ZonedDateTime.now().minusDays(1), ZonedDateTime.now().plusDays(1), "Asia/Seoul");
         Specs specs = new Specs(Map.of("imageUrl", "http://img", "category", "General"));
 
-        upcoming = new Product(new ProductId("P-1"), "상품1", "설명", price, schedule, specs);
-        active = new Product(new ProductId("P-2"), "상품2", "설명", price, schedule, specs);
-
-        // 강제로 상태를 원하는 값으로 세팅
-        upcoming.updateStatus(DealStatus.UPCOMING);
-        active.updateStatus(DealStatus.ACTIVE);
+        upcoming = new Product(new ProductId("P-1"), "상품1", "설명", "카테고리", price, schedule, specs, DealStatus.UPCOMING);
+        active = new Product(new ProductId("P-2"), "상품2", "설명", "카테고리", price, schedule, specs, DealStatus.ACTIVE);
     }
 
     @Test
