@@ -2,13 +2,6 @@ package com.flashdeal.app.domain.order;
 
 import java.math.BigDecimal;
 
-/**
- * 주문 금액 Value Object
- * 
- * 불변식:
- * - total = subtotal + shipping - discount
- * - subtotal, shipping, discount >= 0
- */
 public record Pricing(
         BigDecimal subtotal,
         BigDecimal shipping,

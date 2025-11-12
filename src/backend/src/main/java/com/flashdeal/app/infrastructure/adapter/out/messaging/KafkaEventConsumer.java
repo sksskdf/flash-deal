@@ -64,7 +64,7 @@ public class KafkaEventConsumer {
             OrderId orderId = new OrderId(orderIdStr);
 
             getOrderUseCase.getOrder(orderId)
-                    .flatMapMany(order -> Flux.fromIterable(order.getItems()))
+                    .flatMapMany(order -> Flux.fromIterable(order.items()))
                     .flatMap(orderItem -> {
                         ReserveInventoryUseCase.ReserveInventoryCommand command = new ReserveInventoryUseCase.ReserveInventoryCommand(orderItem.productId(), orderItem.quantity());
                         return reserveInventoryUseCase.reserve(command);
@@ -106,20 +106,19 @@ public class KafkaEventConsumer {
 
             CompletePaymentUseCase.CompletePaymentCommand command = new CompletePaymentUseCase.CompletePaymentCommand(orderId, transactionId);
             completePaymentUseCase.completePayment(command)
-                    .flatMap(order -> Flux.fromIterable(order.getItems())
+                    .flatMap(order -> Flux.fromIterable(order.items())
                             .flatMap(orderItem -> {
                                 ConfirmInventoryUseCase.ConfirmInventoryCommand confirmCommand = new ConfirmInventoryUseCase.ConfirmInventoryCommand(orderItem.productId(), orderItem.quantity());
                                 return confirmInventoryUseCase.confirm(confirmCommand);
                             })
-                            .then(Mono.just(order)) // Pass order to the next step
-                    )
+                            .then(Mono.just(order)))
                     .doOnSuccess(order -> {
                         acknowledgment.acknowledge();
-                        logger.info("Successfully processed PaymentCompleted event for orderId: {}", order.getOrderId().value());
+                        logger.info("Successfully processed PaymentCompleted event for orderId: {}",
+                                order.orderId().value());
                     })
                     .doOnError(error -> {
                         logger.error("Error processing PaymentCompleted event: {}", event, error);
-                        // 에러 처리 로직 (예: DLQ 전송)
                     })
                     .subscribe();
 
@@ -171,16 +170,16 @@ public class KafkaEventConsumer {
 
             CancelOrderUseCase.CancelOrderCommand command = new CancelOrderUseCase.CancelOrderCommand(orderId, reason);
             cancelOrderUseCase.cancelOrder(command)
-                    .flatMap(order -> Flux.fromIterable(order.getItems())
+                    .flatMap(order -> Flux.fromIterable(order.items())
                             .flatMap(orderItem -> {
                                 ReleaseInventoryUseCase.ReleaseInventoryCommand releaseCommand = new ReleaseInventoryUseCase.ReleaseInventoryCommand(orderItem.productId(), orderItem.quantity());
                                 return releaseInventoryUseCase.release(releaseCommand);
                             })
-                            .then(Mono.just(order)) // Pass order to the next step
-                    )
+                            .then(Mono.just(order)))
                     .doOnSuccess(order -> {
                         acknowledgment.acknowledge();
-                        logger.info("Successfully processed OrderCancelled event for orderId: {}", order.getOrderId().value());
+                        logger.info("Successfully processed OrderCancelled event for orderId: {}",
+                                order.orderId().value());
                     })
                     .doOnError(error -> {
                         logger.error("Error processing OrderCancelled event: {}", event, error);

@@ -74,15 +74,15 @@ class OrderPersistenceAdapterTest {
                 // When
                 Mono<Order> saveResult = adapter.save(order);
                 Mono<Order> findResult = saveResult
-                                .map(Order::getOrderId)
+                                .map(Order::orderId)
                                 .flatMap(adapter::findById);
 
                 // Then
                 StepVerifier.create(findResult)
                                 .assertNext(foundOrder -> {
-                                        assertThat(foundOrder.getOrderId()).isEqualTo(order.getOrderId());
+                                        assertThat(foundOrder.orderId()).isEqualTo(order.orderId());
                                         assertThat(foundOrder.getOrderNumber()).isEqualTo(order.getOrderNumber());
-                                        assertThat(foundOrder.getStatus()).isEqualTo(order.getStatus());
+                                        assertThat(foundOrder.status()).isEqualTo(order.status());
                                 })
                                 .verifyComplete();
         }
@@ -92,7 +92,7 @@ class OrderPersistenceAdapterTest {
         void shouldFindOrdersByUserId() {
                 // Given
                 Order order1 = TestDataFactory.createOrder();
-                UserId userId = order1.getUserId();
+                UserId userId = order1.userId();
                 Order order2 = TestDataFactory.createOrder(OrderId.generate(), userId);
 
                 // When
@@ -104,8 +104,8 @@ class OrderPersistenceAdapterTest {
 
                 // Then
                 StepVerifier.create(findByUserId)
-                                .assertNext(order -> assertThat(order.getUserId()).isEqualTo(userId))
-                                .assertNext(order -> assertThat(order.getUserId()).isEqualTo(userId))
+                                .assertNext(order -> assertThat(order.userId()).isEqualTo(userId))
+                                .assertNext(order -> assertThat(order.userId()).isEqualTo(userId))
                                 .verifyComplete();
         }
 
@@ -123,7 +123,7 @@ class OrderPersistenceAdapterTest {
 
                 // Then
                 StepVerifier.create(findByStatus)
-                                .assertNext(foundOrder -> assertThat(foundOrder.getStatus())
+                                .assertNext(foundOrder -> assertThat(foundOrder.status())
                                                 .isEqualTo(OrderStatus.PROCESSING))
                                 .verifyComplete();
         }
@@ -133,7 +133,7 @@ class OrderPersistenceAdapterTest {
         void shouldFindOrderByIdempotencyKey() {
                 // Given
                 Order order = TestDataFactory.createOrder();
-                String idempotencyKey = order.getIdempotencyKey();
+                String idempotencyKey = order.idempotencyKey();
 
                 // When
                 Mono<Order> saveResult = adapter.save(order);
@@ -142,7 +142,7 @@ class OrderPersistenceAdapterTest {
 
                 // Then
                 StepVerifier.create(findByIdempotencyKey)
-                                .assertNext(foundOrder -> assertThat(foundOrder.getIdempotencyKey())
+                                .assertNext(foundOrder -> assertThat(foundOrder.idempotencyKey())
                                                 .isEqualTo(idempotencyKey))
                                 .verifyComplete();
         }
@@ -152,7 +152,7 @@ class OrderPersistenceAdapterTest {
         void shouldDeleteOrder() {
                 // Given
                 Order order = TestDataFactory.createOrder();
-                OrderId orderId = order.getOrderId();
+                OrderId orderId = order.orderId();
 
                 // When
                 Mono<Order> saveResult = adapter.save(order);
@@ -173,7 +173,7 @@ class OrderPersistenceAdapterTest {
         void shouldCheckOrderExists() {
                 // Given
                 Order order = TestDataFactory.createOrder();
-                OrderId orderId = order.getOrderId();
+                OrderId orderId = order.orderId();
 
                 // When
                 Mono<Order> saveResult = adapter.save(order);

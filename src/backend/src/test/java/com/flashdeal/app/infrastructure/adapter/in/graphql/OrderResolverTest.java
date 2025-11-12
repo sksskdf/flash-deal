@@ -50,7 +50,7 @@ class OrderResolverTest {
     @DisplayName("order - 주문 조회 성공")
     void order_success() {
         // Given
-        String orderId = testOrder.getOrderId().value();
+        String orderId = testOrder.orderId().value();
         given(getOrderUseCase.getOrder(any(OrderId.class)))
             .willReturn(Mono.just(testOrder));
 
@@ -60,8 +60,8 @@ class OrderResolverTest {
         // Then
         StepVerifier.create(result)
             .assertNext(order -> {
-                assertThat(order.getOrderId()).isEqualTo(testOrder.getOrderId());
-                assertThat(order.getStatus()).isEqualTo(testOrder.getStatus());
+                    assertThat(order.orderId()).isEqualTo(testOrder.orderId());
+                    assertThat(order.status()).isEqualTo(testOrder.status());
             })
             .verifyComplete();
     }
@@ -70,7 +70,7 @@ class OrderResolverTest {
     @DisplayName("ordersByUser - 사용자별 주문 목록 조회")
     void ordersByUser_success() {
         // Given
-        String userId = testOrder.getUserId().value();
+        String userId = testOrder.userId().value();
         given(getOrderUseCase.getOrdersByUserId(any(UserId.class)))
             .willReturn(Flux.just(testOrder));
 
@@ -79,7 +79,7 @@ class OrderResolverTest {
 
         // Then
         StepVerifier.create(result)
-            .assertNext(order -> assertThat(order.getUserId()).isEqualTo(testOrder.getUserId()))
+                .assertNext(order -> assertThat(order.userId()).isEqualTo(testOrder.userId()))
             .verifyComplete();
     }
 
@@ -95,7 +95,7 @@ class OrderResolverTest {
 
         // Then
         StepVerifier.create(result)
-            .assertNext(order -> assertThat(order.getStatus()).isEqualTo(OrderStatus.PENDING))
+                .assertNext(order -> assertThat(order.status()).isEqualTo(OrderStatus.PENDING))
             .verifyComplete();
     }
 
@@ -190,7 +190,7 @@ class OrderResolverTest {
     @DisplayName("cancelOrder - 주문 취소 성공")
     void cancelOrder_success() {
         // Given
-        String orderId = testOrder.getOrderId().value();
+        String orderId = testOrder.orderId().value();
         Order cancelledOrder = TestDataFactory.createCancelledOrder();
 
         given(cancelOrderUseCase.cancelOrder(any(CancelOrderUseCase.CancelOrderCommand.class)))
@@ -201,7 +201,7 @@ class OrderResolverTest {
 
         // Then
         StepVerifier.create(result)
-            .assertNext(order -> assertThat(order.getStatus()).isEqualTo(OrderStatus.CANCELLED))
+                .assertNext(order -> assertThat(order.status()).isEqualTo(OrderStatus.CANCELLED))
             .verifyComplete();
     }
 
@@ -209,7 +209,7 @@ class OrderResolverTest {
     @DisplayName("completePayment - 결제 완료 성공")
     void completePayment_success() {
         // Given
-        String orderId = testOrder.getOrderId().value();
+        String orderId = testOrder.orderId().value();
         Order confirmedOrder = TestDataFactory.createConfirmedOrder();
 
         given(completePaymentUseCase.completePayment(any(CompletePaymentUseCase.CompletePaymentCommand.class)))
@@ -220,7 +220,7 @@ class OrderResolverTest {
 
         // Then
         StepVerifier.create(result)
-            .assertNext(order -> assertThat(order.getStatus()).isEqualTo(OrderStatus.CONFIRMED))
+                .assertNext(order -> assertThat(order.status()).isEqualTo(OrderStatus.CONFIRMED))
             .verifyComplete();
     }
 }

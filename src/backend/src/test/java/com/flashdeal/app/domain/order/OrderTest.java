@@ -31,11 +31,11 @@ class OrderTest {
         
         // then
         assertNotNull(order);
-        assertEquals(orderId, order.getOrderId());
-        assertEquals(userId, order.getUserId());
-        assertEquals(1, order.getItems().size());
-        assertEquals(shipping, order.getShipping());
-        assertEquals(OrderStatus.PENDING, order.getStatus());
+        assertEquals(orderId, order.orderId());
+        assertEquals(userId, order.userId());
+        assertEquals(1, order.items().size());
+        assertEquals(shipping, order.shipping());
+        assertEquals(OrderStatus.PENDING, order.status());
     }
 
     @Test
@@ -55,7 +55,7 @@ class OrderTest {
         );
         
         // then
-        Pricing pricing = order.getPricing();
+        Pricing pricing = order.pricing();
         assertEquals(new BigDecimal("160000"), pricing.subtotal());
         assertEquals(new BigDecimal("3000"), pricing.shipping());
         assertEquals(new BigDecimal("163000"), pricing.total());
@@ -100,7 +100,7 @@ class OrderTest {
         Order confirmed = order.confirm();
         
         // then
-        assertEquals(OrderStatus.CONFIRMED, confirmed.getStatus());
+        assertEquals(OrderStatus.CONFIRMED, confirmed.status());
     }
 
     @Test
@@ -114,7 +114,7 @@ class OrderTest {
         Order shipped = confirmed.ship();
         
         // then
-        assertEquals(OrderStatus.SHIPPED, shipped.getStatus());
+        assertEquals(OrderStatus.SHIPPED, shipped.status());
     }
 
     @Test
@@ -129,7 +129,7 @@ class OrderTest {
         Order delivered = shipped.deliver();
         
         // then
-        assertEquals(OrderStatus.DELIVERED, delivered.getStatus());
+        assertEquals(OrderStatus.DELIVERED, delivered.status());
     }
 
     @Test
@@ -142,7 +142,7 @@ class OrderTest {
         Order cancelled = order.cancel();
         
         // then
-        assertEquals(OrderStatus.CANCELLED, cancelled.getStatus());
+        assertEquals(OrderStatus.CANCELLED, cancelled.status());
     }
 
     @Test
@@ -155,8 +155,8 @@ class OrderTest {
         Order completed = order.completePayment("txn_12345");
         
         // then
-        assertEquals(PaymentStatus.COMPLETED, completed.getPayment().status());
-        assertEquals("txn_12345", completed.getPayment().transactionId());
+        assertEquals(PaymentStatus.COMPLETED, completed.payment().status());
+        assertEquals("txn_12345", completed.payment().transactionId());
     }
 
     @Test
@@ -169,7 +169,7 @@ class OrderTest {
         Order failed = order.failPayment();
         
         // then
-        assertEquals(PaymentStatus.FAILED, failed.getPayment().status());
+        assertEquals(PaymentStatus.FAILED, failed.payment().status());
     }
 
     @Test
@@ -182,8 +182,8 @@ class OrderTest {
         Order discounted = order.applyDiscount(new BigDecimal("10000"));
         
         // then
-        assertEquals(new BigDecimal("10000"), discounted.getPricing().discount());
-        assertEquals(new BigDecimal("153000"), discounted.getPricing().total());
+        assertEquals(new BigDecimal("10000"), discounted.pricing().discount());
+        assertEquals(new BigDecimal("153000"), discounted.pricing().total());
     }
 
     private Order createOrder() {

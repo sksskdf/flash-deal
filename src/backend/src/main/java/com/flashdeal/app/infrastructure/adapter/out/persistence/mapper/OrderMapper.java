@@ -33,26 +33,26 @@ public class OrderMapper {
      * Domain Order → Document 변환
      */
     public OrderDocument toDocument(Order order) {
-        List<OrderItemDocument> itemDocuments = order.getItems().stream()
+        List<OrderItemDocument> itemDocuments = order.items().stream()
                 .map(this::toOrderItemDocument)
                 .collect(Collectors.toList());
 
         return new OrderDocument(
-                order.getOrderId().value(),
-                order.getOrderNumber(),
-                toUserInfoDocument(order.getUserId()),
-                itemDocuments,
-                toPricingDocument(order.getPricing()),
-                toShippingDocument(order.getShipping()),
-                toPaymentDocument(order.getPayment()),
-                order.getStatus(),
+                order.orderId().value(),
+                        order.getOrderNumber(),
+                toUserInfoDocument(order.userId()),
+                        itemDocuments,
+                toPricingDocument(order.pricing()),
+                        toShippingDocument(order.shipping()),
+                toPaymentDocument(order.payment()),
+                order.status(),
                 new ArrayList<>(), // statusHistory는 별도 서비스에서 처리
                 new ArrayList<>(), // kafkaEvents는 별도 서비스에서 처리
-                order.getIdempotencyKey(),
-                toCancellationDocument(order.getCancellation()),
+                order.idempotencyKey(),
+                        toCancellationDocument(order.cancellation()),
                 null,
-                order.getCreatedAt(),
-                Instant.now()
+                order.createdAt(),
+                        Instant.now()
         );
     }
 

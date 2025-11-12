@@ -13,9 +13,6 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 import java.util.List;
 
-/**
- * Order GraphQL Resolver
- */
 @Controller
 public class OrderResolver {
 
@@ -110,12 +107,12 @@ public class OrderResolver {
 
     @SchemaMapping(typeName = "Order", field = "orderId")
     public String orderId(Order order) {
-        return order.getOrderId().value();
+        return order.orderId().value();
     }
 
     @SchemaMapping(typeName = "Order", field = "userId")
     public String userId(Order order) {
-        return order.getUserId().value();
+        return order.userId().value();
     }
 
     @SchemaMapping(typeName = "OrderItem", field = "productId")
@@ -123,7 +120,6 @@ public class OrderResolver {
         return orderItem.productId().value();
     }
 
-    // Input DTOs
     public record CreateOrderInput(
         String userId,
         List<OrderItemInput> items,

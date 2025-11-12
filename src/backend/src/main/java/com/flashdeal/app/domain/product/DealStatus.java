@@ -12,29 +12,11 @@ import java.util.Set;
  * - ACTIVE → ENDED (종료 시각 도달)
  */
 public enum DealStatus {
-    /**
-     * 시작 전
-     */
     UPCOMING,
-    
-    /**
-     * 진행 중
-     */
-    ACTIVE,
-    
-    /**
-     * 품절
-     */
-    SOLDOUT,
-    
-    /**
-     * 종료
-     */
-    ENDED;
+            ACTIVE,
+            SOLDOUT,
+            ENDED;
 
-    /**
-     * 주어진 상태로 전이 가능한지 확인
-     */
     public boolean canTransitionTo(DealStatus targetStatus) {
         if (this == targetStatus) {
             return false;
@@ -53,9 +35,6 @@ public enum DealStatus {
         }
     }
 
-    /**
-     * 허용된 전이 상태 목록 반환
-     */
     public Set<DealStatus> getAllowedTransitions() {
         switch (this) {
             case UPCOMING:

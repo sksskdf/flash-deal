@@ -2,9 +2,7 @@ package com.flashdeal.app.domain.order;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 public record Order(
         OrderId orderId,
@@ -28,7 +26,6 @@ public record Order(
         validateNotNull(createdAt, "CreatedAt cannot be null");
     }
 
-    // Static factory method for creating Order with minimal parameters
     public static Order create(OrderId orderId, UserId userId, List<OrderItem> items, Shipping shipping,
             String idempotencyKey) {
         if (items == null || items.isEmpty()) {
@@ -127,38 +124,6 @@ public record Order(
                 OrderStatus.CONFIRMED, cancellation, createdAt);
     }
 
-    public OrderId getOrderId() {
-        return orderId;
-    }
-
-    public UserId getUserId() {
-        return userId;
-    }
-
-    public List<OrderItem> getItems() {
-        return Collections.unmodifiableList(items);
-    }
-
-    public Shipping getShipping() {
-        return shipping;
-    }
-
-    public Pricing getPricing() {
-        return pricing;
-    }
-
-    public Payment getPayment() {
-        return payment;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
     public Order transitionTo(OrderStatus newStatus) {
         return new Order(orderId, userId, idempotencyKey, items, shipping, pricing, payment, newStatus, cancellation,
                 createdAt);
@@ -166,14 +131,6 @@ public record Order(
 
     public String getOrderNumber() {
         return "ORD-" + orderId.value().substring(0, 8);
-    }
-
-    public String getIdempotencyKey() {
-        return idempotencyKey;
-    }
-
-    public Cancellation getCancellation() {
-        return cancellation;
     }
 
     public Order setCancellation(Cancellation cancellation) {
@@ -189,29 +146,6 @@ public record Order(
     public Order setPayment(Payment payment) {
         return new Order(orderId, userId, idempotencyKey, items, shipping, pricing, payment, status, cancellation,
                 createdAt);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Order order = (Order) o;
-        return Objects.equals(orderId, order.orderId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(orderId);
-    }
-
-    @Override
-    public String toString() {
-        return "Order{" +
-                "orderId=" + orderId +
-                ", userId=" + userId +
-                ", status=" + status +
-                ", total=" + (pricing != null ? pricing.total() : BigDecimal.ZERO) +
-                '}';
     }
 }
 

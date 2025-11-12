@@ -17,9 +17,6 @@ import com.flashdeal.app.domain.product.ProductId;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-/**
- * Redis Cache Adapter 테스트
- */
 @SpringBootTest
 @DisplayName("RedisCacheAdapter 테스트")
 class RedisCacheAdapterTest extends AbstractRedisIntegrationTest {

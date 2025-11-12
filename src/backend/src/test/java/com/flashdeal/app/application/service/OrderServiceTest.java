@@ -94,10 +94,10 @@ class OrderServiceTest {
 
         StepVerifier.create(result)
             .assertNext(order -> {
-                assertThat(order.getUserId()).isEqualTo(userId);
-                assertThat(order.getItems()).hasSize(1);
-                    assertThat(order.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
-                    assertThat(order.getPricing().discount()).isEqualTo(new BigDecimal("1000"));
+                    assertThat(order.userId()).isEqualTo(userId);
+                    assertThat(order.items()).hasSize(1);
+                    assertThat(order.status()).isEqualTo(OrderStatus.CONFIRMED);
+                    assertThat(order.pricing().discount()).isEqualTo(new BigDecimal("1000"));
             })
             .verifyComplete();
 
@@ -144,7 +144,7 @@ class OrderServiceTest {
         given(orderRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         StepVerifier.create(orderService.cancelOrder(new CancelOrderCommand(orderId, "change of mind")))
-            .assertNext(order -> assertThat(order.getStatus()).isEqualTo(OrderStatus.CANCELLED))
+                .assertNext(order -> assertThat(order.status()).isEqualTo(OrderStatus.CANCELLED))
             .verifyComplete();
 
         verify(inventoryRepository, atLeastOnce()).save(any());
@@ -165,7 +165,7 @@ class OrderServiceTest {
         given(orderRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         StepVerifier.create(orderService.completePayment(new CompletePaymentCommand(orderId, "tx-1")))
-            .assertNext(order -> assertThat(order.getStatus()).isEqualTo(OrderStatus.CONFIRMED))
+                .assertNext(order -> assertThat(order.status()).isEqualTo(OrderStatus.CONFIRMED))
             .verifyComplete();
 
         verify(inventoryRepository, atLeastOnce()).save(any());

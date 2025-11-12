@@ -158,18 +158,17 @@ public class OrderService implements
         return orderRepository.findById(command.orderId())
             .switchIfEmpty(Mono.error(new IllegalArgumentException("Order not found: " + command.orderId())))
             .flatMap(order -> {
-                if (order.getStatus() != OrderStatus.PENDING) {
+                    if (order.status() != OrderStatus.PENDING) {
                     return Mono.error(new IllegalStateException(
-                        "Cannot cancel order with status: " + order.getStatus()
+                                "Cannot cancel order with status: " + order.status()
                     ));
                 }
                 
                 String reason = command.reason() != null ? command.reason() : "User requested";
-                    String cancelledBy = order.getUserId().value(); // 사용자 ID 사용
+                    String cancelledBy = order.userId().value();
                 Order cancelledOrder = order.cancel(reason, cancelledBy);
                 
-                // 재고 복구
-                return releaseInventory(cancelledOrder.getItems())
+                    return releaseInventory(cancelledOrder.items())
                     .then(orderRepository.save(cancelledOrder));
             });
     }
@@ -192,17 +191,16 @@ public class OrderService implements
         return orderRepository.findById(command.orderId())
             .switchIfEmpty(Mono.error(new IllegalArgumentException("Order not found: " + command.orderId())))
             .flatMap(order -> {
-                if (order.getStatus() != OrderStatus.PENDING) {
+                    if (order.status() != OrderStatus.PENDING) {
                     return Mono.error(new IllegalStateException(
-                        "Cannot complete payment for order with status: " + order.getStatus()
+                                "Cannot complete payment for order with status: " + order.status()
                     ));
                 }
                 
                 Order completedOrder = order.completePayment(command.transactionId());
                 Order confirmedOrder = completedOrder.confirm();
                 
-                // 재고 확정
-                return confirmInventory(confirmedOrder.getItems())
+                    return confirmInventory(confirmedOrder.items())
                     .then(orderRepository.save(confirmedOrder));
             });
     }

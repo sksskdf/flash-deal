@@ -34,6 +34,6 @@ public class OrderTimeoutService {
     }
 
     private Mono<Order> cancelOrder(Order order) {
-        return cancelOrderUseCase.cancelOrder(new CancelOrderUseCase.CancelOrderCommand(order.getOrderId(), "Order timed out"));
+        return cancelOrderUseCase.cancelOrder(new CancelOrderUseCase.CancelOrderCommand(order.orderId(), "Order timed out"));
     }
 }
