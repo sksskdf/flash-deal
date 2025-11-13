@@ -58,22 +58,22 @@ public class ProductResolver {
     }
 
     @QueryMapping
-    public Mono<ProductPage> productFiltered(
+    public Mono<ProductPage> productsFiltered(
             @Argument ProductFilterInput filter,
             @Argument PaginationInput pagination,
             @Argument List<SortOptionInput> sort) {
-        ProductFilter domainFilter = mapToProductFilter(filter);
+        com.flashdeal.app.domain.product.ProductFilter domainFilter = mapToProductFilter(filter);
         Pagination domainPagination = mapToPagination(pagination);
         List<ProductSortOption> domainSortOptions = mapToSortOptions(sort);
 
         return getProductUseCase.getProductsByFilter(domainFilter, domainPagination, domainSortOptions);
     }
 
-    private ProductFilter mapToProductFilter(ProductFilterInput filter) {
+    private com.flashdeal.app.domain.product.ProductFilter mapToProductFilter(ProductFilterInput filter) {
         if (filter == null) {
-            return new ProductFilter(null, null, null, null, null, null);
+            return new com.flashdeal.app.domain.product.ProductFilter(null, null, null, null, null, null);
         }
-        return new ProductFilter(
+        return new com.flashdeal.app.domain.product.ProductFilter(
                 filter.status(),
                 filter.category(),
                 filter.minPrice(),
@@ -109,6 +109,73 @@ public class ProductResolver {
     @SchemaMapping(typeName = "Product", field = "productId")
     public String productId(Product product) {
         return product.productId().value();
+    }
+
+    @SchemaMapping(typeName = "Product", field = "price")
+    public Price price(Product product) {
+        return product.price();
+    }
+
+    @SchemaMapping(typeName = "Product", field = "schedule")
+    public Schedule schedule(Product product) {
+        return product.schedule();
+    }
+
+    @SchemaMapping(typeName = "Product", field = "specs")
+    public List<SpecField> specs(Product product) {
+        return product.specs().getFields().entrySet().stream()
+                .map(entry -> new SpecField(entry.getKey(), entry.getValue().toString()))
+                .toList();
+    }
+
+    @SchemaMapping(typeName = "Price", field = "original")
+    public BigDecimal original(Price price) {
+        return price.original();
+    }
+
+    @SchemaMapping(typeName = "Price", field = "sale")
+    public BigDecimal sale(Price price) {
+        return price.sale();
+    }
+
+    @SchemaMapping(typeName = "Price", field = "currency")
+    public String currency(Price price) {
+        return price.currency();
+    }
+
+    @SchemaMapping(typeName = "Price", field = "discountRate")
+    public int discountRate(Price price) {
+        return price.discountRate();
+    }
+
+    @SchemaMapping(typeName = "Schedule", field = "startsAt")
+    public ZonedDateTime startsAt(Schedule schedule) {
+        return schedule.startsAt();
+    }
+
+    @SchemaMapping(typeName = "Schedule", field = "endsAt")
+    public ZonedDateTime endsAt(Schedule schedule) {
+        return schedule.endsAt();
+    }
+
+    @SchemaMapping(typeName = "Schedule", field = "timezone")
+    public String timezone(Schedule schedule) {
+        return schedule.timezone();
+    }
+
+    @SchemaMapping(typeName = "ProductPage", field = "content")
+    public List<Product> content(ProductPage productPage) {
+        return productPage.content();
+    }
+
+    @SchemaMapping(typeName = "ProductPage", field = "pageInfo")
+    public com.flashdeal.app.domain.common.PageInfo pageInfo(ProductPage productPage) {
+        return productPage.pageInfo();
+    }
+
+    @SchemaMapping(typeName = "PageInfo", field = "totalElements")
+    public long totalElements(com.flashdeal.app.domain.common.PageInfo pageInfo) {
+        return pageInfo.total();
     }
 
     @MutationMapping
@@ -168,6 +235,11 @@ public class ProductResolver {
     ) {}
 
     public record SpecFieldInput(
+        String key,
+        String value
+    ) {}
+
+    public record SpecField(
         String key,
         String value
     ) {}

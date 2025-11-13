@@ -17,9 +17,6 @@ import com.flashdeal.app.AbstractKafkaIntegrationTest;
 import com.flashdeal.app.domain.order.OrderId;
 import com.flashdeal.app.domain.product.ProductId;
 
-/**
- * Kafka Event Publisher 테스트
- */
 @SpringBootTest
 @ActiveProfiles("test")
 @DisplayName("KafkaEventPublisher 테스트")

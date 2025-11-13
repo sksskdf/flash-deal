@@ -3,9 +3,9 @@ type Query {
     product(id: ID!): Product
     products(status: DealStatus, category: String): [Product!]!
     productsFiltered(
-        filter: ProductFilter!, 
+        filter: ProductFilterInput!, 
         pagination: PaginationInput!, 
-        sort: [SortOption!]
+        sort: [SortOptionInput!]
     ): ProductPage!
     activeProducts: [Product!]!
     
@@ -275,7 +275,7 @@ enum ProductSortField {
     ENDS_AT
 }
 
-input SortOption {
+input SortOptionInput {
     field: ProductSortField!
     order: SortOrder!
 }
@@ -285,7 +285,7 @@ input PaginationInput {
     size: Int! = 20
 }
 
-input ProductFilter {
+input ProductFilterInput {
     status: DealStatus
     category: String
     minPrice: Decimal

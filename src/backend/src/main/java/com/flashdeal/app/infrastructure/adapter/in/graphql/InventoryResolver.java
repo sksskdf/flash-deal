@@ -102,6 +102,61 @@ public class InventoryResolver {
         return inventory.productId().value();
     }
 
+    @SchemaMapping(typeName = "Inventory", field = "stock")
+    public Stock stock(Inventory inventory) {
+        return inventory.stock();
+    }
+
+    @SchemaMapping(typeName = "Inventory", field = "policy")
+    public Policy policy(Inventory inventory) {
+        return inventory.policy();
+    }
+
+    @SchemaMapping(typeName = "Inventory", field = "isOutOfStock")
+    public boolean isOutOfStock(Inventory inventory) {
+        return inventory.stock().available() == 0;
+    }
+
+    @SchemaMapping(typeName = "Inventory", field = "isLowStock")
+    public boolean isLowStock(Inventory inventory) {
+        return inventory.lowStock();
+    }
+
+    @SchemaMapping(typeName = "Stock", field = "total")
+    public int total(Stock stock) {
+        return stock.total();
+    }
+
+    @SchemaMapping(typeName = "Stock", field = "reserved")
+    public int reserved(Stock stock) {
+        return stock.reserved();
+    }
+
+    @SchemaMapping(typeName = "Stock", field = "available")
+    public int available(Stock stock) {
+        return stock.available();
+    }
+
+    @SchemaMapping(typeName = "Stock", field = "sold")
+    public int sold(Stock stock) {
+        return stock.sold();
+    }
+
+    @SchemaMapping(typeName = "Policy", field = "lowStockThreshold")
+    public int lowStockThreshold(Policy policy) {
+        return policy.safetyStock();
+    }
+
+    @SchemaMapping(typeName = "Policy", field = "reservationTimeout")
+    public int reservationTimeout(Policy policy) {
+        return policy.reservationTimeout();
+    }
+
+    @SchemaMapping(typeName = "Policy", field = "maxPurchasePerUser")
+    public int maxPurchasePerUser(Policy policy) {
+        return policy.maxPurchasePerUser();
+    }
+
     // Input DTOs
     public record CreateInventoryInput(
         String productId,
