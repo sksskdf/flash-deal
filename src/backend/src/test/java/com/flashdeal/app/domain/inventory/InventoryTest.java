@@ -63,8 +63,8 @@ class InventoryTest {
         Inventory reservedInventory = inventory.reserve(new Quantity(30));
 
         // then
-        assertEquals(30, reservedInventory.stock().reserved());
-        assertEquals(70, reservedInventory.stock().available());
+        assertEquals(30, reservedInventory.stock().reserved().value());
+        assertEquals(70, reservedInventory.stock().available().value());
     }
 
     @Test
@@ -89,9 +89,9 @@ class InventoryTest {
         Inventory confirmedInventory = reservedInventory.confirm(new Quantity(20));
 
         // then
-        assertEquals(10, confirmedInventory.stock().reserved());
-        assertEquals(70, confirmedInventory.stock().available());
-        assertEquals(20, confirmedInventory.stock().sold());
+        assertEquals(10, confirmedInventory.stock().reserved().value());
+        assertEquals(70, confirmedInventory.stock().available().value());
+        assertEquals(20, confirmedInventory.stock().sold().value());
     }
 
     @Test
@@ -117,8 +117,8 @@ class InventoryTest {
         Inventory releasedInventory = reservedInventory.release(new Quantity(10));
 
         // then
-        assertEquals(20, releasedInventory.stock().reserved());
-        assertEquals(80, releasedInventory.stock().available());
+        assertEquals(20, releasedInventory.stock().reserved().value());
+        assertEquals(80, releasedInventory.stock().available().value());
     }
 
     @Test
@@ -217,8 +217,8 @@ class InventoryTest {
         Inventory increasedInventory = inventory.increaseStock(new Quantity(50));
 
         // then
-        assertEquals(150, increasedInventory.stock().total());
-        assertEquals(150, increasedInventory.stock().available());
+        assertEquals(150, increasedInventory.stock().total().value());
+        assertEquals(150, increasedInventory.stock().available().value());
     }
 
     @Test

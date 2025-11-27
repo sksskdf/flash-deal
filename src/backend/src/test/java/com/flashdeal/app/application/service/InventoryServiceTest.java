@@ -59,7 +59,7 @@ class InventoryServiceTest {
         StepVerifier.create(inventoryService.createInventory(cmd))
                 .assertNext(inv -> {
                     org.assertj.core.api.Assertions.assertThat(inv.productId()).isEqualTo(productId);
-                    org.assertj.core.api.Assertions.assertThat(inv.stock().total()).isEqualTo(100);
+                    org.assertj.core.api.Assertions.assertThat(inv.stock().total().value()).isEqualTo(100);
                 })
                 .verifyComplete();
     }
