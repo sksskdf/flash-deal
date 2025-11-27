@@ -1,12 +1,15 @@
 package com.flashdeal.app.domain.inventory;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.flashdeal.app.domain.product.ProductId;
-
-import org.junit.jupiter.api.DisplayName;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Inventory Entity 테스트")
 class InventoryTest {
@@ -17,12 +20,12 @@ class InventoryTest {
         // given
         InventoryId inventoryId = InventoryId.generate();
         ProductId productId = ProductId.generate();
-        Stock stock = Stock.initial(100);
+        Stock stock = Stock.initial(new Quantity(100));
         Policy policy = Policy.defaultPolicy();
-        
+
         // when
         Inventory inventory = new Inventory(inventoryId, productId, stock, policy);
-        
+
         // then
         assertNotNull(inventory);
         assertEquals(inventoryId, inventory.inventoryId());
@@ -36,18 +39,18 @@ class InventoryTest {
     void throwsExceptionWhenRequiredFieldsAreNull() {
         // given
         ProductId productId = ProductId.generate();
-        Stock stock = Stock.initial(100);
+        Stock stock = Stock.initial(new Quantity(100));
         Policy policy = Policy.defaultPolicy();
-        
+
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> new Inventory(null, productId, stock, policy));
+                () -> new Inventory(null, productId, stock, policy));
         assertThrows(IllegalArgumentException.class,
-            () -> new Inventory(InventoryId.generate(), null, stock, policy));
+                () -> new Inventory(InventoryId.generate(), null, stock, policy));
         assertThrows(IllegalArgumentException.class,
-            () -> new Inventory(InventoryId.generate(), productId, null, policy));
+                () -> new Inventory(InventoryId.generate(), productId, null, policy));
         assertThrows(IllegalArgumentException.class,
-            () -> new Inventory(InventoryId.generate(), productId, stock, null));
+                () -> new Inventory(InventoryId.generate(), productId, stock, null));
     }
 
     @Test
@@ -55,10 +58,10 @@ class InventoryTest {
     void canReserveStock() {
         // given
         Inventory inventory = createInventory(100);
-        
+
         // when
-        Inventory reservedInventory = inventory.reserve(30);
-        
+        Inventory reservedInventory = inventory.reserve(new Quantity(30));
+
         // then
         assertEquals(30, reservedInventory.stock().reserved());
         assertEquals(70, reservedInventory.stock().available());
@@ -69,10 +72,10 @@ class InventoryTest {
     void throwsExceptionWhenReserveMoreThanAvailable() {
         // given
         Inventory inventory = createInventory(100);
-        
+
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> inventory.reserve(101));
+                () -> inventory.reserve(new Quantity(101)));
     }
 
     @Test
@@ -80,11 +83,11 @@ class InventoryTest {
     void canConfirmReservation() {
         // given
         Inventory inventory = createInventory(100);
-        Inventory reservedInventory = inventory.reserve(30);
-        
+        Inventory reservedInventory = inventory.reserve(new Quantity(30));
+
         // when
-        Inventory confirmedInventory = reservedInventory.confirm(20);
-        
+        Inventory confirmedInventory = reservedInventory.confirm(new Quantity(20));
+
         // then
         assertEquals(10, confirmedInventory.stock().reserved());
         assertEquals(70, confirmedInventory.stock().available());
@@ -96,11 +99,11 @@ class InventoryTest {
     void throwsExceptionWhenConfirmMoreThanReserved() {
         // given
         Inventory inventory = createInventory(100);
-        inventory.reserve(30);
-        
+        inventory.reserve(new Quantity(30));
+
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> inventory.confirm(31));
+                () -> inventory.confirm(new Quantity(31)));
     }
 
     @Test
@@ -108,11 +111,11 @@ class InventoryTest {
     void canReleaseReservation() {
         // given
         Inventory inventory = createInventory(100);
-        Inventory reservedInventory = inventory.reserve(30);
-        
+        Inventory reservedInventory = inventory.reserve(new Quantity(30));
+
         // when
-        Inventory releasedInventory = reservedInventory.release(10);
-        
+        Inventory releasedInventory = reservedInventory.release(new Quantity(10));
+
         // then
         assertEquals(20, releasedInventory.stock().reserved());
         assertEquals(80, releasedInventory.stock().available());
@@ -123,11 +126,11 @@ class InventoryTest {
     void throwsExceptionWhenReleaseMoreThanReserved() {
         // given
         Inventory inventory = createInventory(100);
-        inventory.reserve(30);
-        
+        inventory.reserve(new Quantity(30));
+
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> inventory.release(31));
+                () -> inventory.release(new Quantity(31)));
     }
 
     @Test
@@ -135,8 +138,8 @@ class InventoryTest {
     void isOutOfStockWhenAvailableIsZero() {
         // given
         Inventory inventory = createInventory(100);
-        Inventory reservedInventory = inventory.reserve(100);
-        
+        Inventory reservedInventory = inventory.reserve(new Quantity(100));
+
         // when & then
         assertTrue(reservedInventory.stock().outOfStock());
     }
@@ -147,13 +150,12 @@ class InventoryTest {
         // given
         Policy policy = new Policy(50, 600, 5);
         Inventory inventory = new Inventory(
-            InventoryId.generate(),
-            ProductId.generate(),
-            Stock.initial(100),
-            policy
-        );
-        Inventory reservedInventory = inventory.reserve(51); // available: 49
-        
+                InventoryId.generate(),
+                ProductId.generate(),
+                Stock.initial(new Quantity(100)),
+                policy);
+        Inventory reservedInventory = inventory.reserve(new Quantity(51)); // available: 49
+
         // when & then
         assertTrue(reservedInventory.lowStock());
     }
@@ -164,13 +166,12 @@ class InventoryTest {
         // given
         Policy policy = new Policy(50, 600, 5);
         Inventory inventory = new Inventory(
-            InventoryId.generate(),
-            ProductId.generate(),
-            Stock.initial(100),
-            policy
-        );
-        Inventory reservedInventory = inventory.reserve(50); // available: 50
-        
+                InventoryId.generate(),
+                ProductId.generate(),
+                Stock.initial(new Quantity(100)),
+                policy);
+        Inventory reservedInventory = inventory.reserve(new Quantity(50)); // available: 50
+
         // when & then
         assertFalse(reservedInventory.lowStock());
     }
@@ -181,16 +182,15 @@ class InventoryTest {
         // given
         Policy policy = new Policy(50, 600, 5);
         Inventory inventory = new Inventory(
-            InventoryId.generate(),
-            ProductId.generate(),
-            Stock.initial(100),
-            policy
-        );
-        
+                InventoryId.generate(),
+                ProductId.generate(),
+                Stock.initial(new Quantity(100)),
+                policy);
+
         // when & then
-        assertTrue(inventory.policy().isValidPurchaseQuantity(5));
-        assertFalse(inventory.policy().isValidPurchaseQuantity(6));
-        assertFalse(inventory.policy().isValidPurchaseQuantity(0));
+        assertTrue(inventory.policy().isValidPurchaseQuantity(new Quantity(5)));
+        assertFalse(inventory.policy().isValidPurchaseQuantity(new Quantity(6)));
+        assertFalse(inventory.policy().isValidPurchaseQuantity(new Quantity(0)));
     }
 
     @Test
@@ -199,10 +199,10 @@ class InventoryTest {
         // given
         Inventory inventory = createInventory(100);
         Policy newPolicy = new Policy(30, 900, 10);
-        
+
         // when
         Inventory updatedInventory = inventory.updatePolicy(newPolicy);
-        
+
         // then
         assertEquals(newPolicy, updatedInventory.policy());
     }
@@ -212,10 +212,10 @@ class InventoryTest {
     void canIncreaseStock() {
         // given
         Inventory inventory = createInventory(100);
-        
+
         // when
-        Inventory increasedInventory = inventory.increaseStock(50);
-        
+        Inventory increasedInventory = inventory.increaseStock(new Quantity(50));
+
         // then
         assertEquals(150, increasedInventory.stock().total());
         assertEquals(150, increasedInventory.stock().available());
@@ -226,19 +226,17 @@ class InventoryTest {
     void throwsExceptionWhenIncreaseNegative() {
         // given
         Inventory inventory = createInventory(100);
-        
+
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> inventory.increaseStock(-10));
+                () -> inventory.increaseStock(new Quantity(-10)));
     }
 
     private Inventory createInventory(int totalStock) {
         return new Inventory(
-            InventoryId.generate(),
-            ProductId.generate(),
-            Stock.initial(totalStock),
-            Policy.defaultPolicy()
-        );
+                InventoryId.generate(),
+                ProductId.generate(),
+                Stock.initial(new Quantity(totalStock)),
+                Policy.defaultPolicy());
     }
 }
-

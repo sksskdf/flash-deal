@@ -1,96 +1,65 @@
 package com.flashdeal.app.domain.inventory;
 
 public record Stock(
-        int total,
-        int reserved,
-        int available,
-        int sold) {
+        Quantity total,
+        Quantity reserved,
+        Quantity available,
+        Quantity sold) {
 
     public Stock {
-        validateNonNegative(total, "Total");
-        validateNonNegative(reserved, "Reserved");
-        validateNonNegative(available, "Available");
-        validateNonNegative(sold, "Sold");
-        
-        if (total != reserved + available + sold) {
+        if (total.value() != reserved.value() + available.value() + sold.value()) {
             throw new IllegalArgumentException(
-                String.format(
-                    "Invariant violated: total(%d) must equal reserved(%d) + available(%d) + sold(%d) = %d",
-                    total, reserved, available, sold, reserved + available + sold
-                )
-            );
+                    String.format(
+                            "Invariant violated: total(%d) must equal reserved(%d) + available(%d) + sold(%d) = %d",
+                            total.value(), reserved.value(), available.value(), sold.value(),
+                            reserved.value() + available.value() + sold.value()));
         }
     }
 
-    private void validateNonNegative(int value, String fieldName) {
-        if (value < 0) {
-            throw new IllegalArgumentException(fieldName + " cannot be negative");
-        }
+    public static Stock initial(Quantity total) {
+        return new Stock(total, new Quantity(0), total, new Quantity(0));
     }
 
-    public static Stock initial(int total) {
-        return new Stock(total, 0, total, 0);
-    }
-
-    public Stock reserve(int quantity) {
-        quantityMustOverZero(quantity);
-        
-        if (quantity > available) {
+    public Stock reserve(Quantity quantity) {
+        if (quantity.value() > available.value()) {
             throw new IllegalArgumentException(
-                String.format("Cannot decrease by %d: only %d available", quantity, available)
-            );
+                    String.format("Cannot decrease by %d: only %d available", quantity.value(), available.value()));
         }
-        
+
         return new Stock(
-            total,
-            reserved + quantity,
-            available - quantity,
-            sold
-        );
+                total,
+                new Quantity(reserved.value() + quantity.value()),
+                new Quantity(available.value() - quantity.value()),
+                sold);
     }
 
-    public Stock confirm(int quantity) {
-        quantityMustOverZero(quantity);
-        
-        if (quantity > reserved) {
+    public Stock confirm(Quantity quantity) {
+        if (quantity.value() > reserved.value()) {
             throw new IllegalArgumentException(
-                String.format("Cannot confirm %d: only %d reserved", quantity, reserved)
-            );
+                    String.format("Cannot confirm %d: only %d reserved", quantity.value(), reserved.value()));
         }
-        
+
         return new Stock(
-            total,
-            reserved - quantity,
-            available,
-            sold + quantity
-        );
+                total,
+                new Quantity(reserved.value() - quantity.value()),
+                available,
+                new Quantity(sold.value() + quantity.value()));
     }
 
-    public Stock release(int quantity) {
-        quantityMustOverZero(quantity);
-        
-        if (quantity > reserved) {
+    public Stock release(Quantity quantity) {
+        if (quantity.value() > reserved.value()) {
             throw new IllegalArgumentException(
-                String.format("Cannot release %d: only %d reserved", quantity, reserved)
-            );
+                    String.format("Cannot release %d: only %d reserved", quantity.value(), reserved.value()));
         }
-        
+
         return new Stock(
-            total,
-            reserved - quantity,
-            available + quantity,
-            sold
-        );
+                total,
+                new Quantity(reserved.value() - quantity.value()),
+                new Quantity(available.value() + quantity.value()),
+                sold);
     }
 
     public boolean outOfStock() {
-        return available == 0;
-    }
-
-    private void quantityMustOverZero(int quantity) {
-        if (quantity < 0) {
-            throw new IllegalArgumentException("Quantity cannot be negative");
-        }
+        return available.value() == 0;
     }
 }
-

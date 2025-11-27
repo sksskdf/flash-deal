@@ -1,9 +1,14 @@
 package com.flashdeal.app.domain.inventory;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.DisplayName;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Policy Value Object 테스트")
 class PolicyTest {
@@ -13,7 +18,7 @@ class PolicyTest {
     void createPolicyWithValidValues() {
         // when
         Policy policy = new Policy(50, 600, 5);
-        
+
         // then
         assertNotNull(policy);
         assertEquals(50, policy.safetyStock());
@@ -25,28 +30,28 @@ class PolicyTest {
     @DisplayName("안전 재고가 음수이면 예외가 발생한다")
     void throwsExceptionWhenSafetyStockIsNegative() {
         // when & then
-        assertThrows(IllegalArgumentException.class, 
-            () -> new Policy(-1, 600, 5));
+        assertThrows(IllegalArgumentException.class,
+                () -> new Policy(-1, 600, 5));
     }
 
     @Test
     @DisplayName("예약 제한 시간이 0 이하이면 예외가 발생한다")
     void throwsExceptionWhenReservationTimeoutIsZeroOrNegative() {
         // when & then
-        assertThrows(IllegalArgumentException.class, 
-            () -> new Policy(50, 0, 5));
-        assertThrows(IllegalArgumentException.class, 
-            () -> new Policy(50, -1, 5));
+        assertThrows(IllegalArgumentException.class,
+                () -> new Policy(50, 0, 5));
+        assertThrows(IllegalArgumentException.class,
+                () -> new Policy(50, -1, 5));
     }
 
     @Test
     @DisplayName("1인 최대 구매량이 0 이하이면 예외가 발생한다")
     void throwsExceptionWhenMaxPurchasePerUserIsZeroOrNegative() {
         // when & then
-        assertThrows(IllegalArgumentException.class, 
-            () -> new Policy(50, 600, 0));
-        assertThrows(IllegalArgumentException.class, 
-            () -> new Policy(50, 600, -1));
+        assertThrows(IllegalArgumentException.class,
+                () -> new Policy(50, 600, 0));
+        assertThrows(IllegalArgumentException.class,
+                () -> new Policy(50, 600, -1));
     }
 
     @Test
@@ -54,10 +59,10 @@ class PolicyTest {
     void isLowStockWhenAvailableIsBelowSafetyStock() {
         // given
         Policy policy = new Policy(50, 600, 5);
-        
+
         // when & then
-        assertTrue(policy.isLowStock(49));
-        assertTrue(policy.isLowStock(0));
+        assertTrue(policy.isLowStock(new Quantity(49)));
+        assertTrue(policy.isLowStock(new Quantity(0)));
     }
 
     @Test
@@ -65,10 +70,10 @@ class PolicyTest {
     void isNotLowStockWhenAvailableIsAboveSafetyStock() {
         // given
         Policy policy = new Policy(50, 600, 5);
-        
+
         // when & then
-        assertFalse(policy.isLowStock(50));
-        assertFalse(policy.isLowStock(100));
+        assertFalse(policy.isLowStock(new Quantity(50)));
+        assertFalse(policy.isLowStock(new Quantity(100)));
     }
 
     @Test
@@ -76,13 +81,12 @@ class PolicyTest {
     void canValidatePurchaseQuantity() {
         // given
         Policy policy = new Policy(50, 600, 5);
-        
+
         // when & then
-        assertTrue(policy.isValidPurchaseQuantity(1));
-        assertTrue(policy.isValidPurchaseQuantity(5));
-        assertFalse(policy.isValidPurchaseQuantity(6));
-        assertFalse(policy.isValidPurchaseQuantity(0));
-        assertFalse(policy.isValidPurchaseQuantity(-1));
+        assertTrue(policy.isValidPurchaseQuantity(new Quantity(1)));
+        assertTrue(policy.isValidPurchaseQuantity(new Quantity(5)));
+        assertFalse(policy.isValidPurchaseQuantity(new Quantity(6)));
+        assertFalse(policy.isValidPurchaseQuantity(new Quantity(0)));
     }
 
     @Test
@@ -90,7 +94,7 @@ class PolicyTest {
     void createDefaultPolicy() {
         // when
         Policy policy = Policy.defaultPolicy();
-        
+
         // then
         assertNotNull(policy);
         assertEquals(10, policy.safetyStock());
@@ -104,7 +108,7 @@ class PolicyTest {
         // given
         Policy policy1 = new Policy(50, 600, 5);
         Policy policy2 = new Policy(50, 600, 5);
-        
+
         // then
         assertEquals(policy1, policy2);
         assertEquals(policy1.hashCode(), policy2.hashCode());
@@ -116,9 +120,8 @@ class PolicyTest {
         // given
         Policy policy1 = new Policy(50, 600, 5);
         Policy policy2 = new Policy(40, 600, 5);
-        
+
         // then
         assertNotEquals(policy1, policy2);
     }
 }
-

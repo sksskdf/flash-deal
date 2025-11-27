@@ -1,12 +1,9 @@
 package com.flashdeal.app.application.service;
 
-import com.flashdeal.app.application.port.in.ConfirmInventoryUseCase.ConfirmInventoryCommand;
-import com.flashdeal.app.application.port.in.CreateInventoryUseCase.CreateInventoryCommand;
-import com.flashdeal.app.application.port.in.ReleaseInventoryUseCase.ReleaseInventoryCommand;
-import com.flashdeal.app.application.port.in.ReserveInventoryUseCase.ReserveInventoryCommand;
-import com.flashdeal.app.application.port.out.InventoryRepository;
-import com.flashdeal.app.domain.inventory.*;
-import com.flashdeal.app.domain.product.ProductId;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,11 +11,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.flashdeal.app.application.port.in.ConfirmInventoryUseCase.ConfirmInventoryCommand;
+import com.flashdeal.app.application.port.in.CreateInventoryUseCase.CreateInventoryCommand;
+import com.flashdeal.app.application.port.in.ReleaseInventoryUseCase.ReleaseInventoryCommand;
+import com.flashdeal.app.application.port.in.ReserveInventoryUseCase.ReserveInventoryCommand;
+import com.flashdeal.app.application.port.out.InventoryRepository;
+import com.flashdeal.app.domain.inventory.Inventory;
+import com.flashdeal.app.domain.inventory.InventoryId;
+import com.flashdeal.app.domain.inventory.Policy;
+import com.flashdeal.app.domain.inventory.Quantity;
+import com.flashdeal.app.domain.inventory.Stock;
+import com.flashdeal.app.domain.product.ProductId;
+
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("InventoryService 테스트")
@@ -37,11 +44,10 @@ class InventoryServiceTest {
     void setUp() {
         productId = new ProductId("P-1");
         baseInventory = new Inventory(
-            new InventoryId("I-1"),
-            productId,
-            Stock.initial(100),
-            new Policy(5, 600, 10)
-        );
+                new InventoryId("I-1"),
+                productId,
+                Stock.initial(new Quantity(100)),
+                new Policy(5, 600, 10));
     }
 
     @Test
@@ -51,11 +57,11 @@ class InventoryServiceTest {
         given(inventoryRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         StepVerifier.create(inventoryService.createInventory(cmd))
-            .assertNext(inv -> {
-                org.assertj.core.api.Assertions.assertThat(inv.productId()).isEqualTo(productId);
-                org.assertj.core.api.Assertions.assertThat(inv.stock().total()).isEqualTo(100);
-            })
-            .verifyComplete();
+                .assertNext(inv -> {
+                    org.assertj.core.api.Assertions.assertThat(inv.productId()).isEqualTo(productId);
+                    org.assertj.core.api.Assertions.assertThat(inv.stock().total()).isEqualTo(100);
+                })
+                .verifyComplete();
     }
 
     @Test
@@ -64,8 +70,8 @@ class InventoryServiceTest {
         given(inventoryRepository.findById(baseInventory.inventoryId())).willReturn(Mono.just(baseInventory));
 
         StepVerifier.create(inventoryService.getInventory(baseInventory.inventoryId()))
-            .expectNext(baseInventory)
-            .verifyComplete();
+                .expectNext(baseInventory)
+                .verifyComplete();
     }
 
     @Test
@@ -74,8 +80,8 @@ class InventoryServiceTest {
         given(inventoryRepository.findByProductId(productId)).willReturn(Mono.just(baseInventory));
 
         StepVerifier.create(inventoryService.getInventoryByProductId(productId))
-            .expectNext(baseInventory)
-            .verifyComplete();
+                .expectNext(baseInventory)
+                .verifyComplete();
     }
 
     @Test
@@ -85,7 +91,7 @@ class InventoryServiceTest {
         given(inventoryRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         StepVerifier.create(inventoryService.reserve(new ReserveInventoryCommand(productId, 3)))
-            .verifyComplete();
+                .verifyComplete();
 
         verify(inventoryRepository).save(any());
     }
@@ -94,14 +100,14 @@ class InventoryServiceTest {
     @DisplayName("예약된 재고를 판매로 확정할 수 있다")
     void confirm_movesFromReservedToSold() {
         Inventory withReserved = new Inventory(
-            baseInventory.inventoryId(), productId,
-            new Stock(100, 5, 95, 0), baseInventory.policy()
-        );
+                baseInventory.inventoryId(), productId,
+                new Stock(new Quantity(100), new Quantity(5), new Quantity(95), new Quantity(0)),
+                baseInventory.policy());
         given(inventoryRepository.findByProductId(productId)).willReturn(Mono.just(withReserved));
         given(inventoryRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         StepVerifier.create(inventoryService.confirm(new ConfirmInventoryCommand(productId, 3)))
-            .verifyComplete();
+                .verifyComplete();
         verify(inventoryRepository).save(any());
     }
 
@@ -109,16 +115,14 @@ class InventoryServiceTest {
     @DisplayName("예약된 재고를 사용 가능 상태로 해제할 수 있다")
     void release_returnsToAvailable() {
         Inventory withReserved = new Inventory(
-            baseInventory.inventoryId(), productId,
-            new Stock(100, 5, 95, 0), baseInventory.policy()
-        );
+                baseInventory.inventoryId(), productId,
+                new Stock(new Quantity(100), new Quantity(5), new Quantity(95), new Quantity(0)),
+                baseInventory.policy());
         given(inventoryRepository.findByProductId(productId)).willReturn(Mono.just(withReserved));
         given(inventoryRepository.save(any())).willAnswer(inv -> Mono.just(inv.getArgument(0)));
 
         StepVerifier.create(inventoryService.release(new ReleaseInventoryCommand(productId, 2)))
-            .verifyComplete();
+                .verifyComplete();
         verify(inventoryRepository).save(any());
     }
 }
-
-

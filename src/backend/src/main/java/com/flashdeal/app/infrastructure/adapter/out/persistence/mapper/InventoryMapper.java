@@ -1,6 +1,15 @@
 package com.flashdeal.app.infrastructure.adapter.out.persistence.mapper;
 
-import com.flashdeal.app.domain.inventory.*;
+import java.time.Instant;
+import java.util.ArrayList;
+
+import org.springframework.stereotype.Component;
+
+import com.flashdeal.app.domain.inventory.Inventory;
+import com.flashdeal.app.domain.inventory.InventoryId;
+import com.flashdeal.app.domain.inventory.Policy;
+import com.flashdeal.app.domain.inventory.Quantity;
+import com.flashdeal.app.domain.inventory.Stock;
 import com.flashdeal.app.domain.product.ProductId;
 import com.flashdeal.app.infrastructure.adapter.out.persistence.documents.InventoryDocument;
 import com.flashdeal.app.infrastructure.adapter.out.persistence.documents.PolicyDocument;
@@ -8,11 +17,6 @@ import com.flashdeal.app.infrastructure.adapter.out.persistence.documents.RedisI
 import com.flashdeal.app.infrastructure.adapter.out.persistence.documents.RestockPolicyDocument;
 import com.flashdeal.app.infrastructure.adapter.out.persistence.documents.StockDocument;
 import com.flashdeal.app.infrastructure.adapter.out.persistence.documents.ThresholdsDocument;
-
-import org.springframework.stereotype.Component;
-
-import java.time.Instant;
-import java.util.ArrayList;
 
 /**
  * Inventory Domain ↔ Document Mapper
@@ -26,7 +30,7 @@ public class InventoryMapper {
     public InventoryDocument toDocument(Inventory inventory) {
         return new InventoryDocument(
                 inventory.inventoryId().value(),
-                        inventory.productId().value(),
+                inventory.productId().value(),
                 toStockDocument(inventory.stock()),
                 calculateLevel(inventory.stock()),
                 toRedisInfoDocument(inventory),
@@ -35,8 +39,7 @@ public class InventoryMapper {
                 new ArrayList<>(),
                 new ArrayList<>(),
                 Instant.now(),
-                Instant.now()
-        );
+                Instant.now());
     }
 
     /**
@@ -53,30 +56,28 @@ public class InventoryMapper {
 
     private StockDocument toStockDocument(Stock stock) {
         return new StockDocument(
-                stock.total(),
-                stock.reserved(),
-                stock.available(),
-                stock.sold()
-        );
+                stock.total().value(),
+                stock.reserved().value(),
+                stock.available().value(),
+                stock.sold().value());
     }
 
     private Stock toStock(StockDocument document) {
         if (document == null) {
-            return new Stock(0, 0, 0, 0);
+            return new Stock(new Quantity(0), new Quantity(0), new Quantity(0), new Quantity(0));
         }
         return new Stock(
-            document.getTotal(),
-            document.getReserved(),
-            document.getAvailable(),
-            document.getSold()
-        );
+                new Quantity(document.getTotal()),
+                new Quantity(document.getReserved()),
+                new Quantity(document.getAvailable()),
+                new Quantity(document.getSold()));
     }
 
     private String calculateLevel(Stock stock) {
-        if (stock.total() == 0) {
+        if (stock.total().value() == 0) {
             return "LOW";
         }
-        double ratio = (double) stock.available() / stock.total();
+        double ratio = (double) stock.available().value() / stock.total().value();
         if (ratio >= 0.5) {
             return "HIGH";
         }
@@ -89,10 +90,9 @@ public class InventoryMapper {
     private RedisInfoDocument toRedisInfoDocument(Inventory inventory) {
         return new RedisInfoDocument(
                 "inventory:" + inventory.productId().value(),
-                inventory.stock().available(),
-                        Instant.now(),
-                1L
-        );
+                inventory.stock().available().value(),
+                Instant.now(),
+                1L);
     }
 
     private PolicyDocument toPolicyDocument(Policy policy) {
@@ -101,10 +101,9 @@ public class InventoryMapper {
         }
         return new PolicyDocument(
                 policy.safetyStock(),
-                    new RestockPolicyDocument(false, 0, 0, null),
+                new RestockPolicyDocument(false, 0, 0, null),
                 policy.reservationTimeout(),
-                policy.maxPurchasePerUser()
-        );
+                policy.maxPurchasePerUser());
     }
 
     private Policy toPolicy(PolicyDocument document) {
@@ -112,10 +111,9 @@ public class InventoryMapper {
             return new Policy(0, 0, 0);
         }
         return new Policy(
-            document.getSafetyStock(),
-            document.getReservationTimeout(),
-            document.getMaxPurchasePerUser()
-        );
+                document.getSafetyStock(),
+                document.getReservationTimeout(),
+                document.getMaxPurchasePerUser());
     }
 
     private ThresholdsDocument toThresholdsDocument() {
