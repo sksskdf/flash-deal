@@ -1,5 +1,6 @@
 package com.flashdeal.app.domain.order;
 
+import com.flashdeal.app.domain.inventory.Quantity;
 import com.flashdeal.app.domain.product.ProductId;
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -7,7 +8,7 @@ import java.util.Objects;
 public record OrderItem(
     ProductId productId,
     Snapshot snapshot,
-    int quantity,
+    Quantity quantity,
     OrderItemStatus status
 ) {
     public OrderItem {
@@ -18,31 +19,22 @@ public record OrderItem(
         if (snapshot == null) {
             throw new IllegalArgumentException("Snapshot cannot be null");
         }
-        
-        validateQuantity(quantity);
     }
 
-    public OrderItem(ProductId productId, Snapshot snapshot, int quantity) {
+    public OrderItem(ProductId productId, Snapshot snapshot, Quantity quantity) {
         this(productId, snapshot, quantity, OrderItemStatus.CONFIRMED);
-    }
-
-    private static void validateQuantity(int quantity) {
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be positive");
-        }
     }
 
     public OrderItem cancel() {
         return new OrderItem(productId, snapshot, quantity, OrderItemStatus.CANCELLED);
     }
 
-    public OrderItem updateQuantity(int newQuantity) {
-        validateQuantity(newQuantity);
+    public OrderItem updateQuantity(Quantity newQuantity) {
         return new OrderItem(productId, snapshot, newQuantity, status);
     }
 
     public BigDecimal getSubtotal() {
-        return snapshot.price().sale().multiply(BigDecimal.valueOf(quantity));
+        return snapshot.price().sale().multiply(BigDecimal.valueOf(quantity.value()));
     }
 
     @Override

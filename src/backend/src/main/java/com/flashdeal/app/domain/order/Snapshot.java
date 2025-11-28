@@ -1,6 +1,10 @@
 package com.flashdeal.app.domain.order;
 
 import com.flashdeal.app.domain.product.Price;
+
+import static com.flashdeal.app.domain.validator.Validator.validateNotEmpty;
+import static com.flashdeal.app.domain.validator.Validator.validateNotNull;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,23 +21,11 @@ public record Snapshot(
     Map<String, Object> selectedOptions
 ) {
     public Snapshot {
-        if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Title cannot be null or empty");
-        }
-        
-        if (image == null) {
-            throw new IllegalArgumentException("Image cannot be null");
-        }
-        
-        if (price == null) {
-            throw new IllegalArgumentException("Price cannot be null");
-        }
-        
-        if (selectedOptions == null) {
-            throw new IllegalArgumentException("Selected options cannot be null");
-        }
-        
-        // Make a defensive copy
+        validateNotEmpty(title, "Title cannot be null or empty");
+        validateNotNull(image, "Image cannot be null");
+        validateNotNull(price, "Price cannot be null");
+        validateNotNull(selectedOptions, "Selected options cannot be null");
+
         selectedOptions = new HashMap<>(selectedOptions);
     }
 

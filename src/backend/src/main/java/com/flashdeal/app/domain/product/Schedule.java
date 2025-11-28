@@ -1,23 +1,18 @@
 package com.flashdeal.app.domain.product;
 
+import static com.flashdeal.app.domain.validator.Validator.validateNotNull;
+
 import java.time.ZonedDateTime;
 
 public record Schedule(
-    ZonedDateTime startsAt,
-    ZonedDateTime endsAt,
-    String timezone
-) {
+        ZonedDateTime startsAt,
+        ZonedDateTime endsAt,
+        String timezone) {
     public Schedule {
-        if (startsAt == null) {
-            throw new IllegalArgumentException("Start time cannot be null");
-        }
-        if (endsAt == null) {
-            throw new IllegalArgumentException("End time cannot be null");
-        }
-        if (timezone == null) {
-            throw new IllegalArgumentException("Timezone cannot be null");
-        }
-        
+        validateNotNull(startsAt, "Start time cannot be null");
+        validateNotNull(endsAt, "End time cannot be null");
+        validateNotNull(timezone, "Timezone cannot be null");
+
         if (startsAt.isAfter(endsAt) || startsAt.isEqual(endsAt)) {
             throw new IllegalArgumentException("Start time must be before end time");
         }

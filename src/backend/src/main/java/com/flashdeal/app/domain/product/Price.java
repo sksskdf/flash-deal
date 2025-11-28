@@ -1,5 +1,9 @@
 package com.flashdeal.app.domain.product;
 
+import static com.flashdeal.app.domain.validator.Validator.validateNonNegative;
+import static com.flashdeal.app.domain.validator.Validator.validateNotEmpty;
+import static com.flashdeal.app.domain.validator.Validator.validateNotNull;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -9,27 +13,11 @@ public record Price(
     String currency
 ) {
     public Price {
-        if (original == null) {
-            throw new IllegalArgumentException("Original price cannot be null");
-        }
-        if (sale == null) {
-            throw new IllegalArgumentException("Sale price cannot be null");
-        }
-        if (currency == null) {
-            throw new IllegalArgumentException("Currency cannot be null");
-        }
-        
-        if (currency.trim().isEmpty()) {
-            throw new IllegalArgumentException("Currency cannot be empty");
-        }
-        
-        if (original.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Original price cannot be negative");
-        }
-        
-        if (sale.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Sale price cannot be negative");
-        }
+        validateNotNull(original, "Original price cannot be null");
+        validateNotNull(sale, "Sale price cannot be null");
+        validateNotEmpty(currency, "Currency cannot be null or empty");
+        validateNonNegative(original, "Original price cannot be negative");
+        validateNonNegative(sale, "Sale price cannot be negative");
         
         if (sale.compareTo(original) > 0) {
             throw new IllegalArgumentException("Sale price cannot be greater than original price");
@@ -44,7 +32,7 @@ public record Price(
         BigDecimal discount = original.subtract(sale);
         BigDecimal rate = discount.divide(original, 4, RoundingMode.HALF_UP)
                                   .multiply(new BigDecimal("100"));
-        
+
         return rate.setScale(0, RoundingMode.HALF_UP).intValue();
     }
 }

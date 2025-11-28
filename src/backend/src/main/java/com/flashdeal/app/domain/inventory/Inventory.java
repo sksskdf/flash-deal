@@ -1,5 +1,7 @@
 package com.flashdeal.app.domain.inventory;
 
+import static com.flashdeal.app.domain.validator.Validator.validateNotNull;
+
 import com.flashdeal.app.domain.product.ProductId;
 
 /**
@@ -18,15 +20,6 @@ public record Inventory(
         validateNotNull(productId, "ProductId cannot be null");
         validateNotNull(stock, "Stock cannot be null");
         validateNotNull(policy, "Policy cannot be null");
-    }
-
-    /**
-     * null 검사
-     */
-    private void validateNotNull(Object value, String message) {
-        if (value == null) {
-            throw new IllegalArgumentException(message);
-        }
     }
 
     public Inventory reserve(Quantity quantity) {

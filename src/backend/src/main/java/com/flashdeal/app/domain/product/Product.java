@@ -1,5 +1,7 @@
 package com.flashdeal.app.domain.product;
 
+import static com.flashdeal.app.domain.validator.Validator.validateNotNull;
+
 import java.time.ZonedDateTime;
 
 public record Product (
@@ -19,12 +21,6 @@ public record Product (
         validateNotNull(schedule, "Schedule cannot be null");
         validateNotNull(specs, "Specs cannot be null");
         validateNotNull(status, "Status cannot be null");
-    }
-
-    private void validateNotNull(Object value, String message) {
-        if (value == null) {
-            throw new IllegalArgumentException(message);
-        }
     }
 
     public DealStatus calculateStatus(ZonedDateTime now) {

@@ -1,7 +1,10 @@
 package com.flashdeal.app.infrastructure.adapter.in.graphql;
 
 import com.flashdeal.app.application.port.in.*;
+import com.flashdeal.app.domain.inventory.Quantity;
 import com.flashdeal.app.domain.order.*;
+import com.flashdeal.app.domain.product.ProductId;
+
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -63,7 +66,7 @@ public class OrderResolver {
             new UserId(input.userId()),
             input.items().stream()
                 .map(item -> new CreateOrderUseCase.OrderItemDto(
-                    new com.flashdeal.app.domain.product.ProductId(item.productId()),
+                    new ProductId(item.productId()),
                     item.quantity()
                 ))
                 .toList(),
@@ -157,7 +160,7 @@ public class OrderResolver {
 
     @SchemaMapping(typeName = "OrderItem", field = "quantity")
     public int quantity(OrderItem orderItem) {
-        return orderItem.quantity();
+        return orderItem.quantity().value();
     }
 
     @SchemaMapping(typeName = "OrderItem", field = "snapshot")
@@ -313,7 +316,7 @@ public class OrderResolver {
 
     public record OrderItemInput(
         String productId,
-        int quantity
+        Quantity quantity
     ) {}
 
     public record ShippingInput(

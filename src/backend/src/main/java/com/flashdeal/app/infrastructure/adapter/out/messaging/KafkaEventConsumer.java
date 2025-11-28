@@ -66,7 +66,7 @@ public class KafkaEventConsumer {
             getOrderUseCase.getOrder(orderId)
                     .flatMapMany(order -> Flux.fromIterable(order.items()))
                     .flatMap(orderItem -> {
-                        ReserveInventoryUseCase.ReserveInventoryCommand command = new ReserveInventoryUseCase.ReserveInventoryCommand(orderItem.productId(), orderItem.quantity());
+                        ReserveInventoryUseCase.ReserveInventoryCommand command = new ReserveInventoryUseCase.ReserveInventoryCommand(orderItem.productId(), orderItem.quantity().value());
                         return reserveInventoryUseCase.reserve(command);
                     })
                     .doOnComplete(() -> {
@@ -108,7 +108,7 @@ public class KafkaEventConsumer {
             completePaymentUseCase.completePayment(command)
                     .flatMap(order -> Flux.fromIterable(order.items())
                             .flatMap(orderItem -> {
-                                ConfirmInventoryUseCase.ConfirmInventoryCommand confirmCommand = new ConfirmInventoryUseCase.ConfirmInventoryCommand(orderItem.productId(), orderItem.quantity());
+                                ConfirmInventoryUseCase.ConfirmInventoryCommand confirmCommand = new ConfirmInventoryUseCase.ConfirmInventoryCommand(orderItem.productId(), orderItem.quantity().value());
                                 return confirmInventoryUseCase.confirm(confirmCommand);
                             })
                             .then(Mono.just(order)))
@@ -172,7 +172,7 @@ public class KafkaEventConsumer {
             cancelOrderUseCase.cancelOrder(command)
                     .flatMap(order -> Flux.fromIterable(order.items())
                             .flatMap(orderItem -> {
-                                ReleaseInventoryUseCase.ReleaseInventoryCommand releaseCommand = new ReleaseInventoryUseCase.ReleaseInventoryCommand(orderItem.productId(), orderItem.quantity());
+                                ReleaseInventoryUseCase.ReleaseInventoryCommand releaseCommand = new ReleaseInventoryUseCase.ReleaseInventoryCommand(orderItem.productId(), orderItem.quantity().value());
                                 return releaseInventoryUseCase.release(releaseCommand);
                             })
                             .then(Mono.just(order)))

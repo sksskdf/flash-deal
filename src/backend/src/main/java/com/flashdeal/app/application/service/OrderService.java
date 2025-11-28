@@ -14,6 +14,7 @@ import com.flashdeal.app.application.port.in.GetOrderUseCase;
 import com.flashdeal.app.application.port.out.InventoryRepository;
 import com.flashdeal.app.application.port.out.OrderRepository;
 import com.flashdeal.app.application.port.out.ProductRepository;
+import com.flashdeal.app.domain.inventory.Inventory;
 import com.flashdeal.app.domain.inventory.Quantity;
 import com.flashdeal.app.domain.order.Address;
 import com.flashdeal.app.domain.order.Order;
@@ -123,14 +124,14 @@ public class OrderService implements
                                 new IllegalArgumentException("Inventory not found for product: " + item.productId())))
                         .flatMap(inventory -> {
                             validateInventoryForPurchase(inventory, item.quantity());
-                            inventory.reserve(new Quantity(item.quantity()));
+                                                inventory.reserve(item.quantity());
                             return inventoryRepository.save(inventory);
                         }))
                 .then();
     }
 
-    private void validateInventoryForPurchase(com.flashdeal.app.domain.inventory.Inventory inventory, int quantity) {
-        if (!inventory.policy().isValidPurchaseQuantity(new Quantity(quantity))) {
+    private void validateInventoryForPurchase(Inventory inventory, Quantity quantity) {
+            if (!inventory.policy().isValidPurchaseQuantity(quantity)) {
             throw new IllegalArgumentException("Invalid purchase quantity: " + quantity);
         }
         if (inventory.stock().outOfStock()) {
@@ -183,7 +184,7 @@ public class OrderService implements
         return Flux.fromIterable(items)
                 .flatMap(item -> inventoryRepository.findByProductId(item.productId())
                         .flatMap(inventory -> {
-                            inventory.release(new Quantity(item.quantity()));
+                                                inventory.release(item.quantity());
                             return inventoryRepository.save(inventory);
                         }))
                 .then();
@@ -212,7 +213,7 @@ public class OrderService implements
         return Flux.fromIterable(items)
                 .flatMap(item -> inventoryRepository.findByProductId(item.productId())
                         .flatMap(inventory -> {
-                            inventory.confirm(new Quantity(item.quantity()));
+                                                inventory.confirm(item.quantity());
                             return inventoryRepository.save(inventory);
                         }))
                 .then();

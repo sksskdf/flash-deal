@@ -162,12 +162,12 @@ public class TestDataFactory {
                 "https://example.com/image1.jpg",
                 price1,
                 Map.of("color", "black"));
-        items.add(new OrderItem(ProductId.generate(), snapshot1, 2));
+        items.add(new OrderItem(ProductId.generate(), snapshot1, new Quantity(2)));
 
         return items;
     }
 
-    public static OrderItem createOrderItem(ProductId productId, int quantity) {
+    public static OrderItem createOrderItem(ProductId productId, Quantity quantity) {
         Price price = new Price(new BigDecimal("50000"), new BigDecimal("40000"), "KRW");
         Snapshot snapshot = new Snapshot(
                 "Test Item",

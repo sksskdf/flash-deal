@@ -1,18 +1,20 @@
 package com.flashdeal.app.domain.order;
 
-import org.junit.jupiter.api.Test;
-
-import com.flashdeal.app.domain.product.Price;
-import com.flashdeal.app.domain.product.ProductId;
-
-import org.junit.jupiter.api.DisplayName;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import com.flashdeal.app.domain.inventory.Quantity;
+import com.flashdeal.app.domain.product.Price;
+import com.flashdeal.app.domain.product.ProductId;
 
 @DisplayName("Order Entity 테스트")
 class OrderTest {
@@ -25,10 +27,10 @@ class OrderTest {
         UserId userId = new UserId("user123");
         List<OrderItem> items = createOrderItems();
         Shipping shipping = createShipping();
-        
+
         // when
         Order order = Order.create(orderId, userId, items, shipping, "test-key");
-        
+
         // then
         assertNotNull(order);
         assertEquals(orderId, order.orderId());
@@ -44,16 +46,15 @@ class OrderTest {
         // given
         List<OrderItem> items = createOrderItems();
         Shipping shipping = createShipping();
-        
+
         // when
         Order order = Order.create(
-            OrderId.generate(),
-            new UserId("user123"),
-            items,
-            shipping,
-            "test-key"
-        );
-        
+                OrderId.generate(),
+                new UserId("user123"),
+                items,
+                shipping,
+                "test-key");
+
         // then
         Pricing pricing = order.pricing();
         assertEquals(new BigDecimal("160000"), pricing.subtotal());
@@ -67,16 +68,16 @@ class OrderTest {
         // given
         List<OrderItem> items = createOrderItems();
         Shipping shipping = createShipping();
-        
+
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> Order.create(null, new UserId("user123"), items, shipping, "test-key"));
+                () -> Order.create(null, new UserId("user123"), items, shipping, "test-key"));
         assertThrows(IllegalArgumentException.class,
-            () -> Order.create(OrderId.generate(), null, items, shipping, "test-key"));
+                () -> Order.create(OrderId.generate(), null, items, shipping, "test-key"));
         assertThrows(IllegalArgumentException.class,
-            () -> Order.create(OrderId.generate(), new UserId("user123"), null, shipping, "test-key"));
+                () -> Order.create(OrderId.generate(), new UserId("user123"), null, shipping, "test-key"));
         assertThrows(IllegalArgumentException.class,
-            () -> Order.create(OrderId.generate(), new UserId("user123"), items, null, "test-key"));
+                () -> Order.create(OrderId.generate(), new UserId("user123"), items, null, "test-key"));
     }
 
     @Test
@@ -84,10 +85,10 @@ class OrderTest {
     void throwsExceptionWhenItemsAreEmpty() {
         // given
         Shipping shipping = createShipping();
-        
+
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> Order.create(OrderId.generate(), new UserId("user123"), new ArrayList<>(), shipping, "test-key"));
+                () -> Order.create(OrderId.generate(), new UserId("user123"), new ArrayList<>(), shipping, "test-key"));
     }
 
     @Test
@@ -95,10 +96,10 @@ class OrderTest {
     void canConfirmOrder() {
         // given
         Order order = createOrder();
-        
+
         // when
         Order confirmed = order.confirm();
-        
+
         // then
         assertEquals(OrderStatus.CONFIRMED, confirmed.status());
     }
@@ -109,10 +110,10 @@ class OrderTest {
         // given
         Order order = createOrder();
         Order confirmed = order.confirm();
-        
+
         // when
         Order shipped = confirmed.ship();
-        
+
         // then
         assertEquals(OrderStatus.SHIPPED, shipped.status());
     }
@@ -124,10 +125,10 @@ class OrderTest {
         Order order = createOrder();
         Order confirmed = order.confirm();
         Order shipped = confirmed.ship();
-        
+
         // when
         Order delivered = shipped.deliver();
-        
+
         // then
         assertEquals(OrderStatus.DELIVERED, delivered.status());
     }
@@ -137,10 +138,10 @@ class OrderTest {
     void canCancelOrder() {
         // given
         Order order = createOrder();
-        
+
         // when
         Order cancelled = order.cancel();
-        
+
         // then
         assertEquals(OrderStatus.CANCELLED, cancelled.status());
     }
@@ -150,10 +151,10 @@ class OrderTest {
     void canCompletePayment() {
         // given
         Order order = createOrder();
-        
+
         // when
         Order completed = order.completePayment("txn_12345");
-        
+
         // then
         assertEquals(PaymentStatus.COMPLETED, completed.payment().status());
         assertEquals("txn_12345", completed.payment().transactionId());
@@ -164,10 +165,10 @@ class OrderTest {
     void canFailPayment() {
         // given
         Order order = createOrder();
-        
+
         // when
         Order failed = order.failPayment();
-        
+
         // then
         assertEquals(PaymentStatus.FAILED, failed.payment().status());
     }
@@ -177,10 +178,10 @@ class OrderTest {
     void canApplyDiscount() {
         // given
         Order order = createOrder();
-        
+
         // when
         Order discounted = order.applyDiscount(new BigDecimal("10000"));
-        
+
         // then
         assertEquals(new BigDecimal("10000"), discounted.pricing().discount());
         assertEquals(new BigDecimal("153000"), discounted.pricing().total());
@@ -188,26 +189,24 @@ class OrderTest {
 
     private Order createOrder() {
         return Order.create(
-            OrderId.generate(),
-            new UserId("user123"),
-            createOrderItems(),
-            createShipping(),
-            "test-key"
-        );
+                OrderId.generate(),
+                new UserId("user123"),
+                createOrderItems(),
+                createShipping(),
+                "test-key");
     }
 
     private List<OrderItem> createOrderItems() {
         List<OrderItem> items = new ArrayList<>();
-        
+
         Price price1 = new Price(new BigDecimal("100000"), new BigDecimal("80000"), "KRW");
         Snapshot snapshot1 = new Snapshot(
-            "AirPods Pro",
-            "https://example.com/image1.jpg",
-            price1,
-            new HashMap<>()
-        );
-        items.add(new OrderItem(ProductId.generate(), snapshot1, 2));
-        
+                "AirPods Pro",
+                "https://example.com/image1.jpg",
+                price1,
+                new HashMap<>());
+        items.add(new OrderItem(ProductId.generate(), snapshot1, new Quantity(2)));
+
         return items;
     }
 
@@ -217,4 +216,3 @@ class OrderTest {
         return new Shipping("Standard", recipient, address, null);
     }
 }
-

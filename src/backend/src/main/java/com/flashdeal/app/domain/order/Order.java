@@ -1,5 +1,7 @@
 package com.flashdeal.app.domain.order;
 
+import static com.flashdeal.app.domain.validator.Validator.validateNotNull;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -16,7 +18,7 @@ public record Order(
         Cancellation cancellation,
         Instant createdAt) {
     private static final BigDecimal DEFAULT_SHIPPING_FEE = new BigDecimal("3000");
-    
+
     public Order {
         validateNotNull(orderId, "OrderId cannot be null");
         validateNotNull(userId, "UserId cannot be null");
@@ -58,19 +60,13 @@ public record Order(
         return new Pricing(subtotal, DEFAULT_SHIPPING_FEE, BigDecimal.ZERO, currency);
     }
 
-    private void validateNotNull(Object value, String message) {
-        if (value == null) {
-            throw new IllegalArgumentException(message);
-        }
-    }
-
     private Pricing calculatePricing(BigDecimal discount) {
         BigDecimal subtotal = items.stream()
-            .map(OrderItem::getSubtotal)
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-        
+                .map(OrderItem::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         String currency = items.get(0).snapshot().price().currency();
-        
+
         return new Pricing(subtotal, pricing != null ? pricing.shipping() : DEFAULT_SHIPPING_FEE, discount,
                 currency);
     }
@@ -148,4 +144,3 @@ public record Order(
                 createdAt);
     }
 }
-

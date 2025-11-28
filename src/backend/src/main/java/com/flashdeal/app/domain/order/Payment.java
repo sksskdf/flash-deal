@@ -1,23 +1,20 @@
 package com.flashdeal.app.domain.order;
 
+import static com.flashdeal.app.domain.validator.Validator.validateNotEmpty;
+import static com.flashdeal.app.domain.validator.Validator.validateNotNull;
+
 /**
  * 결제 정보 Value Object
  */
 public record Payment(
-    String method,
-    PaymentStatus status,
-    String transactionId,
-    String gateway
-) {
+        String method,
+        PaymentStatus status,
+        String transactionId,
+        String gateway) {
     public Payment {
-        if (method == null || method.trim().isEmpty()) {
-            throw new IllegalArgumentException("Method cannot be null or empty");
-        }
-        
-        if (status == null) {
-            throw new IllegalArgumentException("Status cannot be null");
-        }
-        
+        validateNotEmpty(method, "Method cannot be null or empty");
+        validateNotNull(status, "Status cannot be null");
+
         if (status == PaymentStatus.COMPLETED && (transactionId == null || transactionId.trim().isEmpty())) {
             throw new IllegalArgumentException("TransactionId is required when status is COMPLETED");
         }
@@ -44,4 +41,3 @@ public record Payment(
         return new Payment(method, PaymentStatus.REFUNDED, transactionId, gateway);
     }
 }
-

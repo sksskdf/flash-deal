@@ -1,17 +1,19 @@
 package com.flashdeal.app.domain.order;
 
-import org.junit.jupiter.api.Test;
-
-import com.flashdeal.app.domain.product.Price;
-import com.flashdeal.app.domain.product.ProductId;
-
-import org.junit.jupiter.api.DisplayName;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import com.flashdeal.app.domain.inventory.Quantity;
+import com.flashdeal.app.domain.product.Price;
+import com.flashdeal.app.domain.product.ProductId;
 
 @DisplayName("OrderItem Entity 테스트")
 class OrderItemTest {
@@ -23,16 +25,17 @@ class OrderItemTest {
         ProductId productId = ProductId.generate();
         Price price = new Price(new BigDecimal("100000"), new BigDecimal("80000"), "KRW");
         Snapshot snapshot = createSnapshot(price);
-        
+
         // when
-        OrderItem orderItem = new OrderItem(productId, snapshot, 2);
-        
+        OrderItem orderItem = new OrderItem(productId, snapshot, new Quantity(2));
+
         // then
         assertNotNull(orderItem);
         assertEquals(productId, orderItem.productId());
         assertEquals(snapshot, orderItem.snapshot());
-        assertEquals(2, orderItem.quantity());
-        assertEquals(new BigDecimal("160000"), orderItem.snapshot().price().sale().multiply(BigDecimal.valueOf(orderItem.quantity())));
+        assertEquals(new Quantity(2), orderItem.quantity());
+        assertEquals(new BigDecimal("160000"),
+                orderItem.snapshot().price().sale().multiply(BigDecimal.valueOf(orderItem.quantity().value())));
     }
 
     @Test
@@ -41,12 +44,12 @@ class OrderItemTest {
         // given
         Price price = new Price(new BigDecimal("100000"), new BigDecimal("80000"), "KRW");
         Snapshot snapshot = createSnapshot(price);
-        
+
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> new OrderItem(null, snapshot, 1));
+                () -> new OrderItem(null, snapshot, new Quantity(1)));
         assertThrows(IllegalArgumentException.class,
-            () -> new OrderItem(ProductId.generate(), null, 1));
+                () -> new OrderItem(ProductId.generate(), null, new Quantity(1)));
     }
 
     @Test
@@ -55,12 +58,10 @@ class OrderItemTest {
         // given
         Price price = new Price(new BigDecimal("100000"), new BigDecimal("80000"), "KRW");
         Snapshot snapshot = createSnapshot(price);
-        
+
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> new OrderItem(ProductId.generate(), snapshot, 0));
-        assertThrows(IllegalArgumentException.class,
-            () -> new OrderItem(ProductId.generate(), snapshot, -1));
+                () -> new OrderItem(ProductId.generate(), snapshot, new Quantity(-1)));
     }
 
     @Test
@@ -69,12 +70,13 @@ class OrderItemTest {
         // given
         Price price = new Price(new BigDecimal("100000"), new BigDecimal("80000"), "KRW");
         Snapshot snapshot = createSnapshot(price);
-        
+
         // when
-        OrderItem orderItem = new OrderItem(ProductId.generate(), snapshot, 3);
-        
+        OrderItem orderItem = new OrderItem(ProductId.generate(), snapshot, new Quantity(3));
+
         // then
-        assertEquals(new BigDecimal("240000"), orderItem.snapshot().price().sale().multiply(BigDecimal.valueOf(orderItem.quantity())));
+        assertEquals(new BigDecimal("240000"),
+                orderItem.snapshot().price().sale().multiply(BigDecimal.valueOf(orderItem.quantity().value())));
     }
 
     @Test
@@ -83,16 +85,17 @@ class OrderItemTest {
         // given
         Price price = new Price(new BigDecimal("100000"), new BigDecimal("80000"), "KRW");
         Snapshot snapshot = createSnapshot(price);
-        OrderItem orderItem = new OrderItem(ProductId.generate(), snapshot, 2);
-        
+        OrderItem orderItem = new OrderItem(ProductId.generate(), snapshot, new Quantity(2));
+
         // when
-        OrderItem updated = orderItem.updateQuantity(5);
-        
+        OrderItem updated = orderItem.updateQuantity(new Quantity(5));
+
         // then
-        assertEquals(5, updated.quantity());
-        assertEquals(new BigDecimal("400000"), updated.snapshot().price().sale().multiply(BigDecimal.valueOf(updated.quantity())));
+        assertEquals(5, updated.quantity().value());
+        assertEquals(new BigDecimal("400000"),
+                updated.snapshot().price().sale().multiply(BigDecimal.valueOf(updated.quantity().value())));
         // 원본은 변경되지 않음
-        assertEquals(2, orderItem.quantity());
+        assertEquals(2, orderItem.quantity().value());
     }
 
     @Test
@@ -101,24 +104,20 @@ class OrderItemTest {
         // given
         Price price = new Price(new BigDecimal("100000"), new BigDecimal("80000"), "KRW");
         Snapshot snapshot = createSnapshot(price);
-        OrderItem orderItem = new OrderItem(ProductId.generate(), snapshot, 2);
-        
+        OrderItem orderItem = new OrderItem(ProductId.generate(), snapshot, new Quantity(2));
+
         // when & then
         assertThrows(IllegalArgumentException.class,
-            () -> orderItem.updateQuantity(0));
-        assertThrows(IllegalArgumentException.class,
-            () -> orderItem.updateQuantity(-1));
+                () -> orderItem.updateQuantity(new Quantity(-1)));
     }
 
     private Snapshot createSnapshot(Price price) {
         Map<String, Object> options = new HashMap<>();
         options.put("color", "black");
         return new Snapshot(
-            "AirPods Pro",
-            "https://example.com/image.jpg",
-            price,
-            options
-        );
+                "AirPods Pro",
+                "https://example.com/image.jpg",
+                price,
+                options);
     }
 }
-

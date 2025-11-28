@@ -1,5 +1,8 @@
 package com.flashdeal.app.domain.order;
 
+import static com.flashdeal.app.domain.validator.Validator.validateNotEmpty;
+import static com.flashdeal.app.domain.validator.Validator.validateNotNull;
+
 /**
  * 배송 정보 Value Object
  */
@@ -9,17 +12,8 @@ public record Shipping(
         Address address,
         String instructions) {
     public Shipping {
-        if (method == null || method.trim().isEmpty()) {
-            throw new IllegalArgumentException("Method cannot be null or empty");
-        }
-        
-        if (recipient == null) {
-            throw new IllegalArgumentException("Recipient cannot be null");
-        }
-        
-        if (address == null) {
-            throw new IllegalArgumentException("Address cannot be null");
-        }
+        validateNotEmpty(method, "Method cannot be null or empty");
+        validateNotNull(recipient, "Recipient cannot be null");
+        validateNotNull(address, "Address cannot be null");
     }
 }
-

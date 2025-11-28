@@ -97,7 +97,7 @@ public class OrderMapper {
                 toOrderItemSnapshotDocument(item.snapshot()),
                 item.quantity(),
                 item.snapshot().price().sale(),
-                item.snapshot().price().sale().multiply(BigDecimal.valueOf(item.quantity())),
+                item.snapshot().price().sale().multiply(BigDecimal.valueOf(item.quantity().value())),
                 item.status(),
                 null
         );

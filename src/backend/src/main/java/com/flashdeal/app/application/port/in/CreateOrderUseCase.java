@@ -1,5 +1,6 @@
 package com.flashdeal.app.application.port.in;
 
+import com.flashdeal.app.domain.inventory.Quantity;
 import com.flashdeal.app.domain.order.Order;
 import com.flashdeal.app.domain.order.UserId;
 import com.flashdeal.app.domain.product.ProductId;
@@ -39,13 +40,13 @@ public interface CreateOrderUseCase {
     
     record OrderItemDto(
         ProductId productId,
-        int quantity
+        Quantity quantity
     ) {
         public OrderItemDto {
             if (productId == null) {
                 throw new IllegalArgumentException("Product ID is required");
             }
-            if (quantity <= 0) {
+            if (quantity.value() <= 0) {
                 throw new IllegalArgumentException("Quantity must be positive");
             }
         }

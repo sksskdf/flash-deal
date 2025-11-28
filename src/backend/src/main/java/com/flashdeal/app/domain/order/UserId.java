@@ -1,5 +1,7 @@
 package com.flashdeal.app.domain.order;
 
+import static com.flashdeal.app.domain.validator.Validator.validateNotEmpty;
+
 import java.util.UUID;
 
 /**
@@ -7,13 +9,10 @@ import java.util.UUID;
  */
 public record UserId(String value) {
     public UserId {
-        if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException("UserId value cannot be null or empty");
-        }
+        validateNotEmpty(value, "UserId value cannot be null or empty");
     }
 
     public static UserId generate() {
         return new UserId(UUID.randomUUID().toString());
     }
 }
-

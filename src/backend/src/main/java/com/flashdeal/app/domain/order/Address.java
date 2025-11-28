@@ -1,5 +1,7 @@
 package com.flashdeal.app.domain.order;
 
+import static com.flashdeal.app.domain.validator.Validator.*;
+
 public record Address(
         String street,
         String city,
@@ -16,10 +18,5 @@ public record Address(
         }
     }
 
-    private static void validateNotEmpty(String value, String fieldName) {
-        if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException(fieldName + " cannot be null or empty");
-        }
-    }
 }
 
